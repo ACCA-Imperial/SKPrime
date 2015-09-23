@@ -11,6 +11,7 @@ This software is still experimental, and as such should only be relied on for co
 * Run the `install.m` function from MATLAB in the directory you've just unzipped.
     * This will put the SKPrime directory on your MATLAB search path.
 * See the `example.m` file for usage examples.
+* See the `example_accuracy.m` file for an accuracy test example.
 
 ### Contribution guidelines ###
 
