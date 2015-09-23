@@ -1,0 +1,63 @@
+classdef bvpFun < skpObject
+%bvpFun is the base class for the BVP functions.
+
+% Everett Kropf, 2015
+% 
+% This file is part of SKPrime.
+% 
+% SKPrime is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% SKPrime is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
+
+properties(SetAccess=protected)
+    phiFun
+    truncation = 64
+end
+
+methods
+    function bvp = bvpFun(D, N, phi)
+        if ~nargin
+            sarg = {};
+        elseif isa(D, 'bvpFun')
+            phi = D.phiFun;
+            N = D.truncation;
+            sarg = {D.domain};
+        else
+            sarg = {D};
+        end
+        bvp = bvp@skpObject(sarg{:});
+        if ~nargin
+            return
+        end
+        
+        if nargin > 1 && ~isempty(N)
+            if ~isnumeric(N) || N <= 0 || N ~= floor(N)
+                error('SKPrime:invalidArgument', ...
+                    'N must be a non-zero, positive integer.')
+            end
+            bvp.truncation = N;
+        end
+        if nargin > 2 && ~isempty(phi)
+            if ~isa(phi, 'schwarz')
+                error('SKPrime:invalidArgument', ...
+                    '"phi" must be a "schwarz" object.')
+            end
+            bvp.phiFun = phi;
+        end
+        
+        if isempty(bvp.phiFun)
+            bvp.phiFun = schwarz(bvp.domain, bvp.truncation);
+        end
+    end
+end
+
+end
