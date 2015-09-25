@@ -33,29 +33,34 @@ methods
             sarg = {D.domain};
         else
             sarg = {D};
+            if nargin < 2
+                N = [];
+            end
+            if nargin < 3
+                phi = [];
+            end
         end
         bvp = bvp@skpObject(sarg{:});
         if ~nargin
             return
         end
         
-        if nargin > 1 && ~isempty(N)
+        if ~isempty(N)
             if ~isnumeric(N) || N <= 0 || N ~= floor(N)
                 error('SKPrime:invalidArgument', ...
                     'N must be a non-zero, positive integer.')
             end
             bvp.truncation = N;
         end
-        if nargin > 2 && ~isempty(phi)
+        
+        if isempty(phi)
+            bvp.phiFun = schwarz(bvp.domain, bvp.truncation);
+        else
             if ~isa(phi, 'schwarz')
                 error('SKPrime:invalidArgument', ...
                     '"phi" must be a "schwarz" object.')
             end
             bvp.phiFun = phi;
-        end
-        
-        if isempty(bvp.phiFun)
-            bvp.phiFun = schwarz(bvp.domain, bvp.truncation);
         end
     end
 end
