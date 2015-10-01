@@ -23,6 +23,7 @@ properties(SetAccess=protected)
     
     vjFuns
     g0fun
+    gjfuns
 end
 
 properties(SetAccess=private)
@@ -51,6 +52,15 @@ methods
             rhs.bvfun = @rhs.onBdryFun;
             return
         end
+
+        % Is parameter near outer boundary?
+        [dv, qv, m] = domainData(rhs.domain);
+        an = abs(dv - 1/conj(param));
+        an = find(eps(2) < an & an < qv + 0.1);
+        rhs.gjfuns = cell(m, 1);
+        for j = an'
+            rhs.gjfuns{j} = GjCauchy(param, j, rhs.domain);
+        end
         
         rhs.g0fun = G0Cauchy(param, vjfuns{1});
         rhs.bvfun = @rhs.inDomainFun;
@@ -76,6 +86,16 @@ end
 
 methods(Access=protected)
     function val = inDomainFun(rhs, j, zj)
+        if j > 0 && ~isempty(rhs.gjfuns{j})
+            dj = rhs.domain.centers(j);
+            qj = rhs.domain.radii(j);
+            alpha = rhs.parameter;
+            thja = dj + qj^2/conj(alpha - dj);
+            val = 2*pi*real(rhs.gjfuns{j}.hat(zj)) + unwrap(angle( ...
+                (zj - dj).*(alpha - dj)./(zj - alpha)./(zj - thja) ));
+            return
+        end
+        
         val = 2*pi*real(rhs.g0fun.hat(zj));
         if j > 0
             vj = rhs.vjFuns{j};
