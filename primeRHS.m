@@ -87,12 +87,7 @@ end
 methods(Access=protected)
     function val = inDomainFun(rhs, j, zj)
         if j > 0 && ~isempty(rhs.gjfuns{j})
-            dj = rhs.domain.centers(j);
-            qj = rhs.domain.radii(j);
-            alpha = rhs.parameter;
-            thja = dj + qj^2/conj(alpha - dj);
-            val = 2*pi*real(rhs.gjfuns{j}.hat(zj)) + unwrap(angle( ...
-                (zj - dj).*(alpha - dj)./(zj - alpha)./(zj - thja) ));
+            val = 2*pi*real(rhs.gjfuns{j}.hat(zj));
             return
         end
         
