@@ -25,12 +25,17 @@ end
 
 properties(Access=protected)
     primeCorrect
-    normFactor
-    
+   
     logXhatBdry
     logXhatCont
     logXhatOutBdry
     logXhatOutCont
+    
+    refdata
+end
+
+properties(Dependent, Access=protected)
+    normFactor
 end
 
 methods
@@ -58,6 +63,9 @@ methods
         if ~nargin
             return
         end
+        
+        % Initialize handle data.
+        skp.refdata = SKP.skprefdata;
                 
         param = skpParameter(alpha, skp.domain);
         skp.parameter = param;
@@ -179,6 +187,16 @@ methods
             return
         end
         X = exp(evalLogX(skp, z));
+    end
+end
+
+methods % Setting and getting
+    function nf = get.normFactor(skp)
+        nf = skp.refdata.normFactor;
+    end
+    
+    function skp = set.normFactor(skp, nf)
+        skp.refdata.normFactor = nf;
     end
 end
 
