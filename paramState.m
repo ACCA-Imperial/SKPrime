@@ -29,7 +29,7 @@ enumeration
 end
 
 methods
-    function state = unitConj(state)
+    function state = inv(state)
         m = enumeration(state);
         state = m(-state + (numel(m) + 1)/2);
     end

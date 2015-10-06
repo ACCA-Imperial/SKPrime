@@ -65,7 +65,7 @@ methods
     end
     
     function alphac = parameter(skpc)
-        alphac = unitConj(skpc.parameter);
+        alphac = inv(skpc.parameter);
     end
 end
 

@@ -196,7 +196,7 @@ methods(Access=protected)
             skp.normFactor = skp.logXhatCont(alpha);
         end
         
-        imLogXhatConj = primeRHS(unitConj(alpha), skp.vjFuns);
+        imLogXhatConj = primeRHS(inv(alpha), skp.vjFuns);
         phiConj = solve(skp.phiFun, imLogXhatConj);
         skp.logXhatConjBdry = @(z) phiConj(z) + 1i*imLogXhatConj(z);
         skp.logXhatConjCont = bmcCauchy(skp.logXhatConjBdry, D, N);
@@ -242,7 +242,7 @@ methods(Access=protected)
             skp.logXhatConjBdry = @(z) logConjPart(z) + skp.logXhatBdry(z);
             skp.logXhatConjCont = @(z) logConjPart(z) + skp.logXhatCont(z);
         else
-            imLogXhatConj = primeRHS(unitConj(alpha), skp.vjFuns);
+            imLogXhatConj = primeRHS(inv(alpha), skp.vjFuns);
             phiConj = solve(skp.phiFun, imLogXhatConj);
             skp.logXhatConjBdry = @(z) phiConj(z) + 1i*imLogXhatConj(z);
             skp.logXhatConjCont = bmcCauchy(skp.logXhatConjBdry, D, N);
@@ -255,7 +255,7 @@ methods(Access=protected)
         N = skp.truncation;
         [d, q] = domainDataB(D);
         
-        imLogXhatConj = primeRHS(unitConj(alpha), skp.vjFuns);
+        imLogXhatConj = primeRHS(inv(alpha), skp.vjFuns);
         j = alpha.ison;
         vj = skp.vjFuns{j};
         
