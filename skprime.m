@@ -29,8 +29,8 @@ properties(Access=protected)
     
     logXhatBdry
     logXhatCont
-    logXhatConjBdry
-    logXhatConjCont
+    logXhatOutBdry
+    logXhatOutCont
 end
 
 methods
@@ -100,7 +100,7 @@ methods
             testpt = (1 - 1e-6)*exp(2i*pi*rand(1));
         end
         skp.primeCorrect = abs(imag(skp.logXhatCont(testpt) ...
-            - conj(skp.logXhatConjCont(1/conj(testpt))))) > pi/4;
+            - conj(skp.logXhatOutCont(1/conj(testpt))))) > pi/4;
     end % ctor
     
     function skp = invParam(skp)
@@ -198,10 +198,10 @@ methods(Access=protected)
         
         imLogXhatConj = primeRHS(inv(alpha), skp.vjFuns);
         phiConj = solve(skp.phiFun, imLogXhatConj);
-        skp.logXhatConjBdry = @(z) phiConj(z) + 1i*imLogXhatConj(z);
-        skp.logXhatConjCont = bmcCauchy(skp.logXhatConjBdry, D, N);
+        skp.logXhatOutBdry = @(z) phiConj(z) + 1i*imLogXhatConj(z);
+        skp.logXhatOutCont = bmcCauchy(skp.logXhatOutBdry, D, N);
         if abs(alpha) >= 1 + eps(2)
-            skp.normFactor = conj(skp.logXhatConjCont(1/conj(alpha)));
+            skp.normFactor = conj(skp.logXhatOutCont(1/conj(alpha)));
         end
     end
     
@@ -216,8 +216,8 @@ methods(Access=protected)
         skp.logXhatBdry = @(z) phi(z) + 1i*imLogXhat(z) - skp.normFactor;
         skp.logXhatCont = bmcCauchy(skp.logXhatBdry, D, N);
         
-        skp.logXhatConjBdry = skp.logXhatBdry;
-        skp.logXhatConjCont = bmcCauchy(skp.logXhatConjBdry, D, N);
+        skp.logXhatOutBdry = skp.logXhatBdry;
+        skp.logXhatOutCont = bmcCauchy(skp.logXhatOutBdry, D, N);
     end
     
     function skp = bvpOnInner(skp)
@@ -239,13 +239,13 @@ methods(Access=protected)
             logConjPart = @(z) 2*log((z - alpha)./(z - 1/conj(alpha))) ...
                 + 4i*pi*(real(vj(alpha)) - vj(z)) ...
                 - 2*log(q(j+1)/(1 - conj(d(j+1)/alpha)));
-            skp.logXhatConjBdry = @(z) logConjPart(z) + skp.logXhatBdry(z);
-            skp.logXhatConjCont = @(z) logConjPart(z) + skp.logXhatCont(z);
+            skp.logXhatOutBdry = @(z) logConjPart(z) + skp.logXhatBdry(z);
+            skp.logXhatOutCont = @(z) logConjPart(z) + skp.logXhatCont(z);
         else
             imLogXhatConj = primeRHS(inv(alpha), skp.vjFuns);
             phiConj = solve(skp.phiFun, imLogXhatConj);
-            skp.logXhatConjBdry = @(z) phiConj(z) + 1i*imLogXhatConj(z);
-            skp.logXhatConjCont = bmcCauchy(skp.logXhatConjBdry, D, N);
+            skp.logXhatOutBdry = @(z) phiConj(z) + 1i*imLogXhatConj(z);
+            skp.logXhatOutCont = bmcCauchy(skp.logXhatOutBdry, D, N);
         end
     end
     
@@ -261,15 +261,15 @@ methods(Access=protected)
         
         phi = solve(skp.phiFun, imLogXhatConj);
         skp.normFactor = phi(1/conj(alpha)) + 1i*imLogXhatConj(1/conj(alpha));
-        skp.logXhatConjBdry = @(z) phi(z) + 1i*imLogXhatConj(z) ...
+        skp.logXhatOutBdry = @(z) phi(z) + 1i*imLogXhatConj(z) ...
             - skp.normFactor;
-        skp.logXhatConjCont = bmcCauchy(skp.logXhatConjBdry, D, N);
+        skp.logXhatOutCont = bmcCauchy(skp.logXhatOutBdry, D, N);
         
         logConjPart = @(z) 2*log((z - 1/conj(alpha))./(z - alpha)) ...
             + 4i*pi*(real(vj(alpha)) - vj(z)) ...
             - 2*log(q(j+1)/(1 - conj(d(j+1))*alpha));
-        skp.logXhatBdry = @(z) logConjPart(z) + skp.logXhatConjBdry(z);
-        skp.logXhatCont = @(z) logConjPart(z) + skp.logXhatConjCont(z);
+        skp.logXhatBdry = @(z) logConjPart(z) + skp.logXhatOutBdry(z);
+        skp.logXhatCont = @(z) logConjPart(z) + skp.logXhatOutCont(z);
     end
     
     function skps = copyProperties(skp)
@@ -299,11 +299,11 @@ methods(Access=protected)
             onB = onBoundary(skp, 1./conj(z));
             L = ~inUnit & onB;
             if any(L(:))
-                logXhat(L) = conj(skp.logXhatConjBdry(1./conj(z(L))));
+                logXhat(L) = conj(skp.logXhatOutBdry(1./conj(z(L))));
             end
             L = ~inUnit & ~onB;
             if any(L(:))
-                logXhat(L) = conj(skp.logXhatConjCont(1./conj(z(L))));
+                logXhat(L) = conj(skp.logXhatOutCont(1./conj(z(L))));
             end
         end
         
