@@ -103,8 +103,8 @@ methods
             - conj(skp.logXhatConjCont(1/conj(testpt))))) > pi/4;
     end % ctor
     
-    function skp = conjParam(skp)
-        skp = skprimeconj(skp);
+    function skp = invParam(skp)
+        skp = skpinvparam(skp);
     end
     
     function dw = diff(skp)
