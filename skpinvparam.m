@@ -48,7 +48,7 @@ methods
     
     function Xc = Xeval(skpc, z)
         Xc = conj(Xeval@skprime(skpc, 1./conj(z)));
-        alpha = skpc.alphaValue;
+        alpha = skpc.parameter;
         if 0 ~= alpha && ~isinf(alpha)
             Xc = (z/conj(alpha)).^2.*Xc;
         else
