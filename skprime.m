@@ -65,7 +65,7 @@ methods
         end
         
         % Initialize handle data.
-        skp.refdata = SKP.skprefdata;
+        skp.refdata = SKP.primedata;
                 
         param = skpParameter(alpha, skp.domain);
         skp.parameter = param;

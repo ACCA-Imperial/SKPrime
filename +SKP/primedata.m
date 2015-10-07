@@ -1,5 +1,5 @@
-classdef skprefdata < handle
-%SKPREFDATA container class.
+classdef primedata < handle
+%PRIMEDATA container class.
 %
 % Handle container class for SKPRIME properties that could possibly change
 % after construction. Allows SKPRIME to have some handle class-like
