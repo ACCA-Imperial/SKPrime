@@ -51,6 +51,8 @@ methods
         alpha = skpc.alphaValue;
         if 0 ~= alpha && ~isinf(alpha)
             Xc = (z/conj(alpha)).^2.*Xc;
+        else
+            Xc = z.^2*Xc;
         end
     end
     
