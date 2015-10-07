@@ -3,7 +3,7 @@ classdef primedata < handle
 %
 % Handle container class for SKPRIME properties that could possibly change
 % after construction. Allows SKPRIME to have some handle class-like
-% behaviour.
+% behaviour. (State change without copy.)
 
 % E. Kropf, 2015
 % 
@@ -25,7 +25,6 @@ classdef primedata < handle
 properties
     primeCorrect
     normFactor
-    
     logXhatOutBdry
     logXhatOutCont
 end
