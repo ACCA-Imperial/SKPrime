@@ -24,18 +24,16 @@ properties(SetAccess=protected)
 end
 
 properties(Access=protected)
-    primeCorrect
-   
+    refdata
     logXhatBdry
     logXhatCont
-    logXhatOutBdry
-    logXhatOutCont
-    
-    refdata
 end
 
 properties(Dependent, Access=protected)
+    primeCorrect
     normFactor
+    logXhatOutBdry
+    logXhatOutCont
 end
 
 methods
@@ -190,16 +188,6 @@ methods
     end
 end
 
-methods % Setting and getting
-    function nf = get.normFactor(skp)
-        nf = skp.refdata.normFactor;
-    end
-    
-    function skp = set.normFactor(skp, nf)
-        skp.refdata.normFactor = nf;
-    end
-end
-
 methods(Access=protected)
     function skp = bvpInDomain(skp)
         alpha = skp.parameter;
@@ -349,6 +337,40 @@ methods(Access=protected)
             case paramState.onOuterBdry
                 skp = bvpOnOuter(skp);
         end
+    end
+end
+
+methods % Setting and getting
+    function nf = get.normFactor(skp)
+        nf = skp.refdata.normFactor;
+    end
+    
+    function skp = set.normFactor(skp, nf)
+        skp.refdata.normFactor = nf;
+    end
+    
+    function pc = get.primeCorrect(skp)
+        pc = skp.refdata.primeCorrect;
+    end
+    
+    function skp = set.primeCorrect(skp, pc)
+        skp.refdata.primeCorrect = pc;
+    end
+    
+    function lxh = get.logXhatOutBdry(skp)
+        lxh = skp.refdata.logXhatOutBdry;
+    end
+    
+    function skp = set.logXhatOutBdry(skp, lxh)
+        skp.refdata.logXhatOutBdry = lxh;
+    end
+    
+    function lxh = get.logXhatOutCont(skp)
+        lxh = skp.refdata.logXhatOutCont;
+    end
+    
+    function skp = set.logXhatOutCont(skp, lxh)
+        skp.refdata.logXhatOutCont = lxh;
     end
 end
 
