@@ -1,5 +1,9 @@
-classdef paramState < int8
-%paramState describes the state of the alpha parameter.
+classdef primedata < handle
+%PRIMEDATA container class.
+%
+% Handle container class for SKPRIME properties that could possibly change
+% after construction. Allows SKPRIME to have some handle class-like
+% behaviour. (State change without copy.)
 
 % E. Kropf, 2015
 % 
@@ -18,21 +22,11 @@ classdef paramState < int8
 % You should have received a copy of the GNU General Public License
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
-enumeration
-    isZero(-3)
-    innerFD(-2)
-    onInnerBdry(-1)
-    isUnit(0)
-    onOuterBdry(1)
-    outerFD(2)
-    atInf(3)
-end
-
-methods
-    function state = inv(state)
-        m = enumeration(state);
-        state = m(-state + (numel(m) + 1)/2);
-    end
+properties
+    primeCorrect
+    normFactor
+    logXhatOutBdry
+    logXhatOutCont
 end
 
 end

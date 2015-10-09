@@ -24,13 +24,16 @@ properties(SetAccess=protected)
 end
 
 properties(Access=protected)
-    primeCorrect
-    normFactor
-    
+    refdata
     logXhatBdry
     logXhatCont
-    logXhatConjBdry
-    logXhatConjCont
+end
+
+properties(Dependent, Access=protected)
+    primeCorrect
+    normFactor
+    logXhatOutBdry
+    logXhatOutCont
 end
 
 methods
@@ -58,6 +61,9 @@ methods
         if ~nargin
             return
         end
+        
+        % Initialize handle data.
+        skp.refdata = SKP.primedata;
                 
         param = skpParameter(alpha, skp.domain);
         skp.parameter = param;
@@ -91,20 +97,10 @@ methods
         end
         
         skp = solveBVPs(skp);
-        
-        % Does the prime function need a correction to stay on the proper branch?
-        % FIXME: This should check the test point is not in a circle! This should
-        % have a maximum retry count on test point selection!
-        testpt = 1 - 1e-6;
-        while abs(testpt - param) < 1e-2
-            testpt = (1 - 1e-6)*exp(2i*pi*rand(1));
-        end
-        skp.primeCorrect = abs(imag(skp.logXhatCont(testpt) ...
-            - conj(skp.logXhatConjCont(1/conj(testpt))))) > pi/4;
     end % ctor
     
-    function skp = conjParam(skp)
-        skp = skprimeconj(skp);
+    function skp = invParam(skp)
+        skp = skpinvparam(skp);
     end
     
     function dw = diff(skp)
@@ -165,7 +161,7 @@ methods
         [w, L] = evalLogX(skp, z);
         w = exp(w/2);
         
-        if skp.primeCorrect
+        if ~isempty(skp.primeCorrect) && skp.primeCorrect
             if abs(skp.parameter) < 1 + eps(2)
                 L = ~L;
             end
@@ -183,95 +179,6 @@ methods
 end
 
 methods(Access=protected)
-    function skp = bvpInDomain(skp)
-        alpha = skp.parameter;
-        D = skp.domain;
-        N = skp.truncation;
-
-        imLogXhat = primeRHS(alpha, skp.vjFuns);
-        phi = solve(skp.phiFun, imLogXhat);
-        skp.logXhatBdry = @(z) phi(z) + 1i*imLogXhat(z);
-        skp.logXhatCont = bmcCauchy(skp.logXhatBdry, D, N);
-        if abs(alpha) < 1 + eps(2)
-            skp.normFactor = skp.logXhatCont(alpha);
-        end
-        
-        imLogXhatConj = primeRHS(unitConj(alpha), skp.vjFuns);
-        phiConj = solve(skp.phiFun, imLogXhatConj);
-        skp.logXhatConjBdry = @(z) phiConj(z) + 1i*imLogXhatConj(z);
-        skp.logXhatConjCont = bmcCauchy(skp.logXhatConjBdry, D, N);
-        if abs(alpha) >= 1 + eps(2)
-            skp.normFactor = conj(skp.logXhatConjCont(1/conj(alpha)));
-        end
-    end
-    
-    function skp = bvpIsUnit(skp)
-        alpha = skp.parameter;
-        D = skp.domain;
-        N = skp.truncation;
-
-        imLogXhat = primeRHS(alpha, skp.vjFuns);
-        phi = solve(skp.phiFun, imLogXhat);
-        skp.normFactor = phi(alpha) + 1i*imLogXhat(alpha);
-        skp.logXhatBdry = @(z) phi(z) + 1i*imLogXhat(z) - skp.normFactor;
-        skp.logXhatCont = bmcCauchy(skp.logXhatBdry, D, N);
-        
-        skp.logXhatConjBdry = skp.logXhatBdry;
-        skp.logXhatConjCont = bmcCauchy(skp.logXhatConjBdry, D, N);
-    end
-    
-    function skp = bvpOnInner(skp)
-        alpha = skp.parameter;
-        D = skp.domain;
-        N = skp.truncation;
-        [d, q] = domainDataB(D);
-        
-        imLogXhat = primeRHS(alpha, skp.vjFuns);
-        j = alpha.ison;
-        vj = skp.vjFuns{j};
-        
-        phi = solve(skp.phiFun, imLogXhat);
-        skp.normFactor = phi(alpha) + 1i*imLogXhat(alpha);
-        skp.logXhatBdry = @(z) phi(z) + 1i*imLogXhat(z) - skp.normFactor;
-        skp.logXhatCont = bmcCauchy(skp.logXhatBdry, D, N);
-        
-        if alpha ~= 0
-            logConjPart = @(z) 2*log((z - alpha)./(z - 1/conj(alpha))) ...
-                + 4i*pi*(real(vj(alpha)) - vj(z)) ...
-                - 2*log(q(j+1)/(1 - conj(d(j+1)/alpha)));
-            skp.logXhatConjBdry = @(z) logConjPart(z) + skp.logXhatBdry(z);
-            skp.logXhatConjCont = @(z) logConjPart(z) + skp.logXhatCont(z);
-        else
-            imLogXhatConj = primeRHS(unitConj(alpha), skp.vjFuns);
-            phiConj = solve(skp.phiFun, imLogXhatConj);
-            skp.logXhatConjBdry = @(z) phiConj(z) + 1i*imLogXhatConj(z);
-            skp.logXhatConjCont = bmcCauchy(skp.logXhatConjBdry, D, N);
-        end
-    end
-    
-    function skp = bvpOnOuter(skp)
-        alpha = skp.parameter;
-        D = skp.domain;
-        N = skp.truncation;
-        [d, q] = domainDataB(D);
-        
-        imLogXhatConj = primeRHS(unitConj(alpha), skp.vjFuns);
-        j = alpha.ison;
-        vj = skp.vjFuns{j};
-        
-        phi = solve(skp.phiFun, imLogXhatConj);
-        skp.normFactor = phi(1/conj(alpha)) + 1i*imLogXhatConj(1/conj(alpha));
-        skp.logXhatConjBdry = @(z) phi(z) + 1i*imLogXhatConj(z) ...
-            - skp.normFactor;
-        skp.logXhatConjCont = bmcCauchy(skp.logXhatConjBdry, D, N);
-        
-        logConjPart = @(z) 2*log((z - 1/conj(alpha))./(z - alpha)) ...
-            + 4i*pi*(real(vj(alpha)) - vj(z)) ...
-            - 2*log(q(j+1)/(1 - conj(d(j+1))*alpha));
-        skp.logXhatBdry = @(z) logConjPart(z) + skp.logXhatConjBdry(z);
-        skp.logXhatCont = @(z) logConjPart(z) + skp.logXhatConjCont(z);
-    end
-    
     function skps = copyProperties(skp)
         mco = ?skprime;
         for k = 1:numel(mco.PropertyList)
@@ -280,7 +187,7 @@ methods(Access=protected)
         end
     end
     
-    function [logX, inUnit] = evalLogX(skp, z)
+    function [logX, inUnit] = evalLogX(skp, z)        
         logXhat = complex(nan(size(z)));
         
         inUnit = abs(z) < 1 + eps(2);
@@ -296,14 +203,21 @@ methods(Access=protected)
             end
         end
         if any(~inUnit(:))
+            if isempty(skp.logXhatOutCont)
+                solveBVPouter(skp);
+            end
+            if isempty(skp.primeCorrect)
+                setCorrection(skp);
+            end
+            
             onB = onBoundary(skp, 1./conj(z));
             L = ~inUnit & onB;
             if any(L(:))
-                logXhat(L) = conj(skp.logXhatConjBdry(1./conj(z(L))));
+                logXhat(L) = conj(skp.logXhatOutBdry(1./conj(z(L))));
             end
             L = ~inUnit & ~onB;
             if any(L(:))
-                logXhat(L) = conj(skp.logXhatConjCont(1./conj(z(L))));
+                logXhat(L) = conj(skp.logXhatOutCont(1./conj(z(L))));
             end
         end
         
@@ -314,6 +228,116 @@ methods(Access=protected)
         if isempty(skp.parameter.ison)
             logX = logX - skp.normFactor;
         end
+    end
+    
+    function skp = setCorrection(skp)
+        % Does the prime function need a correction to stay on the proper branch?
+        % FIXME: This should check the test point is not in a circle! This should
+        % have a maximum retry count on test point selection!
+        testpt = 1 - 1e-6;
+        while abs(testpt - skp.parameter) < 1e-2
+            testpt = (1 - 1e-6)*exp(2i*pi*rand(1));
+        end
+        skp.primeCorrect = abs(imag(skp.logXhatCont(testpt) ...
+            - conj(skp.logXhatOutCont(1/conj(testpt))))) > pi/4;
+    end
+end
+
+methods(Access=protected) % BVP stuff
+    function skp = bvpInDomain(skp)
+        alpha = skp.parameter;
+
+        imLogXhat = primeRHS(alpha, skp.vjFuns);
+        phi = solve(skp.phiFun, imLogXhat);
+        skp.logXhatBdry = @(z) phi(z) + 1i*imLogXhat(z);
+        skp.logXhatCont = ...
+            bmcCauchy(skp.logXhatBdry, skp.domain, skp.truncation);
+        if abs(alpha) < 1 + eps(2)
+            skp.normFactor = skp.logXhatCont(alpha);
+        else
+            skp = bvpInDomainOuter(skp);
+        end
+    end
+    
+    function skp = bvpInDomainOuter(skp)
+        alpha = skp.parameter;
+
+        imLogXhatInvp = primeRHS(inv(alpha), skp.vjFuns);
+        phiInvp = solve(skp.phiFun, imLogXhatInvp);
+        skp.logXhatOutBdry = @(z) phiInvp(z) + 1i*imLogXhatInvp(z);
+        skp.logXhatOutCont = ...
+            bmcCauchy(skp.logXhatOutBdry, skp.domain, skp.truncation);
+        if abs(alpha) >= 1 + eps(2)
+            skp.normFactor = conj(skp.logXhatOutCont(1/conj(alpha)));
+        end
+    end
+    
+    function skp = bvpIsUnit(skp)
+        alpha = skp.parameter;
+
+        imLogXhat = primeRHS(alpha, skp.vjFuns);
+        phi = solve(skp.phiFun, imLogXhat);
+        skp.normFactor = phi(alpha) + 1i*imLogXhat(alpha);
+        skp.logXhatBdry = @(z) phi(z) + 1i*imLogXhat(z) - skp.normFactor;
+        skp.logXhatCont = ...
+            bmcCauchy(skp.logXhatBdry, skp.domain, skp.truncation);
+    end
+    
+    function skp = bvpIsUnitOuter(skp)
+        skp.logXhatOutBdry = skp.logXhatBdry;
+        skp.logXhatOutCont = bmcCauchy(skp.logXhatOutBdry, ...
+            skp.domain, skp.truncation);
+    end
+    
+    function skp = bvpOnInner(skp)
+        alpha = skp.parameter;
+        D = skp.domain;
+        N = skp.truncation;
+        [d, q] = domainDataB(D);
+        j = alpha.ison;
+        vj = skp.vjFuns{j};
+        
+        imLogXhat = primeRHS(alpha, skp.vjFuns);        
+        phi = solve(skp.phiFun, imLogXhat);
+        skp.normFactor = phi(alpha) + 1i*imLogXhat(alpha);
+        skp.logXhatBdry = @(z) phi(z) + 1i*imLogXhat(z) - skp.normFactor;
+        skp.logXhatCont = bmcCauchy(skp.logXhatBdry, D, N);
+                
+        if alpha ~= 0
+            logInvpPart = @(z) 2*log((z - alpha)./(z - 1/conj(alpha))) ...
+                + 4i*pi*(real(vj(alpha)) - vj(z)) ...
+                - 2*log(q(j+1)/(1 - conj(d(j+1)/alpha)));
+            skp.logXhatOutBdry = @(z) logInvpPart(z) + skp.logXhatBdry(z);
+            skp.logXhatOutCont = @(z) logInvpPart(z) + skp.logXhatCont(z);
+        else
+            imLogXhatInvp = primeRHS(inv(alpha), skp.vjFuns);
+            phiInvp = solve(skp.phiFun, imLogXhatInvp);
+            skp.logXhatOutBdry = @(z) phiInvp(z) + 1i*imLogXhatInvp(z);
+            skp.logXhatOutCont = bmcCauchy(skp.logXhatOutBdry, D, N);
+        end        
+    end
+    
+    function skp = bvpOnOuter(skp)
+        alpha = skp.parameter;
+        [d, q] = domainDataB(skp.domain);
+        j = alpha.ison;
+        vj = skp.vjFuns{j};
+        
+        imLogXhatInvp = primeRHS(inv(alpha), skp.vjFuns);        
+        phi = solve(skp.phiFun, imLogXhatInvp);
+        skp.normFactor = phi(1/conj(alpha)) + 1i*imLogXhatInvp(1/conj(alpha));
+        skp.logXhatOutBdry = @(z) phi(z) + 1i*imLogXhatInvp(z) ...
+            - skp.normFactor;
+        skp.logXhatOutCont = ...
+            bmcCauchy(skp.logXhatOutBdry, skp.domain, skp.truncation);
+        
+        logInvpPart = @(z) 2*log((z - 1/conj(alpha))./(z - alpha)) ...
+            + 4i*pi*(real(vj(alpha)) - vj(z)) ...
+            - 2*log(q(j+1)/(1 - conj(d(j+1))*alpha));
+        skp.logXhatBdry = @(z) logInvpPart(z) + skp.logXhatOutBdry(z);
+        skp.logXhatCont = @(z) logInvpPart(z) + skp.logXhatOutCont(z);
+        
+        skp = setCorrection(skp);
     end
     
     function skp = solveBVPs(skp)
@@ -331,6 +355,51 @@ methods(Access=protected)
             case paramState.onOuterBdry
                 skp = bvpOnOuter(skp);
         end
+    end
+    
+    function skp = solveBVPouter(skp)
+        switch skp.parameter.state
+            case {paramState.isZero, paramState.atInf, ...
+                    paramState.innerFD, paramState.outerFD}
+                bvpInDomainOuter(skp);
+                
+            case paramState.isUnit
+                skp = bvpIsUnitOuter(skp);
+        end
+    end
+end
+
+methods % Setting and getting
+    function nf = get.normFactor(skp)
+        nf = skp.refdata.normFactor;
+    end
+    
+    function skp = set.normFactor(skp, nf)
+        skp.refdata.normFactor = nf;
+    end
+    
+    function pc = get.primeCorrect(skp)
+        pc = skp.refdata.primeCorrect;
+    end
+    
+    function skp = set.primeCorrect(skp, pc)
+        skp.refdata.primeCorrect = pc;
+    end
+    
+    function lxh = get.logXhatOutBdry(skp)
+        lxh = skp.refdata.logXhatOutBdry;
+    end
+    
+    function skp = set.logXhatOutBdry(skp, lxh)
+        skp.refdata.logXhatOutBdry = lxh;
+    end
+    
+    function lxh = get.logXhatOutCont(skp)
+        lxh = skp.refdata.logXhatOutCont;
+    end
+    
+    function skp = set.logXhatOutCont(skp, lxh)
+        skp.refdata.logXhatOutCont = lxh;
     end
 end
 

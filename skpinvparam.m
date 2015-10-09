@@ -1,8 +1,8 @@
-classdef skprimeconj < skprime
-%SKPRIMECONJ is the "conjugate" prime function.
+classdef skpinvparam < skprime
+%SKPINVPARAM is the inverted parameter prime functino.
 %
 % Given the S-K prime function w(zeta, alpha), this class represents the
-% "conjugate" prime function
+% inverted (w.r.t. the unit circle) parameter prime function
 %
 %   w(zeta, 1/conj(alpha)) = -zeta/conj(alpha)*conj(w(1/conj(zeta), alpha))
 %
@@ -30,7 +30,7 @@ classdef skprimeconj < skprime
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 methods
-    function skpc = skprimeconj(skp)
+    function skpc = skpinvparam(skp)
         if ~nargin
             return
         end
@@ -48,9 +48,11 @@ methods
     
     function Xc = Xeval(skpc, z)
         Xc = conj(Xeval@skprime(skpc, 1./conj(z)));
-        alpha = skpc.alphaValue;
+        alpha = skpc.parameter;
         if 0 ~= alpha && ~isinf(alpha)
             Xc = (z/conj(alpha)).^2.*Xc;
+        else
+            Xc = z.^2*Xc;
         end
     end
     
@@ -65,7 +67,7 @@ methods
     end
     
     function alphac = parameter(skpc)
-        alphac = unitConj(skpc.parameter);
+        alphac = inv(skpc.parameter);
     end
 end
 

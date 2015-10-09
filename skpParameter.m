@@ -125,8 +125,8 @@ methods
             'Not a supported subscripted reference.')
     end
     
-    function aobj = unitConj(aobj)
-        aobj.state = unitConj(aobj.state);
+    function aobj = inv(aobj)
+        aobj.state = inv(aobj.state);
         aobj = skpParameter(1/conj(aobj), aobj);
     end
 end
