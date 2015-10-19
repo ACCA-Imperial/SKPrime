@@ -23,7 +23,7 @@ properties(SetAccess=protected)
     
     vjFuns
     g0fun
-    gjfuns
+    gjhats
 end
 
 properties(Access=private)
@@ -55,9 +55,17 @@ methods
         [dv, qv, m] = domainData(rhs.domain);
         an = abs(dv - 1/conj(param));
         an = find(eps(2) < an & an < qv + 0.1);
-        rhs.gjfuns = cell(m, 1);
+        rhs.gjhats = cell(m, 1);
         for j = an'
-            rhs.gjfuns{j} = GjCauchy(param, j, rhs.domain);
+            gj = GjCauchy(param, j, rhs.domain);
+            zj = dv(j) + qv(j);
+            thja = dv(j) + qv(j)^2/conj(param - dv(j));
+            g0norm = real(rhs.g0fun.hat(zj) - rhs.vjfuns{j}(zj) + ...
+                rhs.vjfuns{j}(alpha)) + unwrap(angle( ...
+                param/(param - dv(j))*(zj - thja)/(zj - 1/conj(param)) ...
+                *(zj - di(j))/(zj - dv(j)) ))/(2*pi) ...
+                - real(gj.hat(zj));
+            rhs.gjhats{j} = @(z) gj.hat(zj) + g0norm;
         end
         
         rhs.bvfun = @rhs.inDomainFun;
@@ -83,8 +91,14 @@ end
 
 methods(Access=protected)
     function val = inDomainFun(rhs, j, zj)
-        if j > 0 && ~isempty(rhs.gjfuns{j})
-            val = 2*pi*real(rhs.gjfuns{j}.hat(zj));
+        if j > 0 && ~isempty(rhs.gjhats{j})
+            [d, q] = domainData(rhs.domain);
+            alpha = rhs.parameter;
+            
+            thja = d(j) + q(j)^2/conj(alpha - d(j));
+            val = 2*pi*real(rhs.gjhats{j}(zj)) ...
+                + unwrap(angle( (zj - d(j)).*(alpha - d(j)) ...
+                ./(zj - alpha)./(zj - thja) ));
             return
         end
         
