@@ -26,10 +26,6 @@ properties(SetAccess=protected)
     gjfuns
 end
 
-properties(SetAccess=private)
-    minusConstant = false
-end
-
 properties(Access=private)
     bvfun
 end
@@ -53,6 +49,8 @@ methods
             return
         end
 
+        rhs.g0fun = G0Cauchy(param, vjfuns{1});
+
         % Is parameter near outer boundary?
         [dv, qv, m] = domainData(rhs.domain);
         an = abs(dv - 1/conj(param));
@@ -62,7 +60,6 @@ methods
             rhs.gjfuns{j} = GjCauchy(param, j, rhs.domain);
         end
         
-        rhs.g0fun = G0Cauchy(param, vjfuns{1});
         rhs.bvfun = @rhs.inDomainFun;
     end
     
@@ -142,35 +139,18 @@ methods(Access=protected)
         [d, q, ~, di] = domainDataB(rhs.domain);
         sf = rhs.g0fun.singCorrFact;
         
-        if ~rhs.minusConstant
-            if abs(d(j+1)) > q(j+1)
-                if 0 < abs(alpha) && ~isinf(alpha)
-                    val = unwrap(angle(...
-                        alpha.*(zj - di(j)) ...
-                        ./(zj - alpha)./(zj - 1/conj(alpha)).*sf(zj) ));
-                else
-                    val = unwrap(angle((zj - di(j))./zj.*sf(zj)));
-                end
-            else
+        if abs(d(j+1)) > q(j+1)
+            if 0 < abs(alpha) && ~isinf(alpha)
                 val = unwrap(angle(...
-                    alpha./(zj - alpha)./(zj - 1/conj(alpha)) ...
-                    .*sf(zj) ));
+                    alpha.*(zj - di(j)) ...
+                    ./(zj - alpha)./(zj - 1/conj(alpha)).*sf(zj) ));
+            else
+                val = unwrap(angle((zj - di(j))./zj.*sf(zj)));
             end
         else
-            thja = d(j+1) + q(j+1)^2/conj(alpha - d(j+1));
-            if abs(d(j+1)) > q(j+1)
-                if 0 < abs(alpha) && ~isinf(alpha)
-                    val = unwrap(angle(...
-                        alpha*(zj - thja).*(zj - di(j)) ...
-                        ./(zj - 1/conj(alpha))./(zj - d(j+1)).*sf(zj) ));
-                else
-                    val = unwrap(angle((zj - di(j))./zj.*sf(zj)));
-                end
-            else
-                val = unwrap(angle(...
-                    alpha*(zj - thja) ...
-                    ./(zj - 1/conj(alpha))./(zj - d(j+1)).*sf(zj) ));
-            end
+            val = unwrap(angle(...
+                alpha./(zj - alpha)./(zj - 1/conj(alpha)) ...
+                .*sf(zj) ));
         end
     end
     
