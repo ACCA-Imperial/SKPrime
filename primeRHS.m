@@ -52,20 +52,21 @@ methods
         rhs.g0fun = G0Cauchy(param, vjfuns{1});
 
         % Is parameter near outer boundary?
-        [dv, qv, m] = domainData(rhs.domain);
+        [dv, qv, m, di] = domainData(rhs.domain);
         an = abs(dv - 1/conj(param));
         an = find(eps(2) < an & an < qv + 0.1);
+        sf = rhs.g0fun.singCorrFact;
         rhs.gjhats = cell(m, 1);
         for j = an'
             gj = GjCauchy(param, j, rhs.domain);
             zj = dv(j) + qv(j);
             thja = dv(j) + qv(j)^2/conj(param - dv(j));
-            g0norm = real(rhs.g0fun.hat(zj) - rhs.vjfuns{j}(zj) + ...
-                rhs.vjfuns{j}(alpha)) + unwrap(angle( ...
+            g0norm = real(rhs.g0fun.hat(zj) - vjfuns{j}(zj) + ...
+                vjfuns{j}(param)) + unwrap(angle( ...
                 param/(param - dv(j))*(zj - thja)/(zj - 1/conj(param)) ...
-                *(zj - di(j))/(zj - dv(j)) ))/(2*pi) ...
+                *(zj - di(j))/(zj - dv(j))*sf(zj) ))/(2*pi) ...
                 - real(gj.hat(zj));
-            rhs.gjhats{j} = @(z) gj.hat(zj) + g0norm;
+            rhs.gjhats{j} = @(z) gj.hat(z) + g0norm;
         end
         
         rhs.bvfun = @rhs.inDomainFun;
