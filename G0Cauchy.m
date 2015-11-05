@@ -76,23 +76,13 @@ methods
         elseif isinf(alpha)
             loga = @(z) -log(z)/(2i*pi);
         else
-            if abs(alpha) <= 1
-                aj = abs(alpha - d);
-                aj = find(eps(2) < aj & aj < q + 0.1);
-                for j = aj'
-                    acj = d(j) + q(j)^2/conj(alpha - d(j));
-                    sf = @(z) sf(z).*(z - d(j))./(z - acj);
-                end
-            else            
-                aj = find(abs(1/conj(alpha) - d) < q + 0.1);
-                for j = aj'
-                    acj = d(j) + q(j)^2*alpha/(1 - conj(d(j))*alpha);
-                    sf = @(z) sf(z).*(z - acj)./(z - d(j));
-                end
+            for j = isclose(g0.domain, alpha)
+                thj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
+                sf = @(z) sf(z).*(z - thj(alpha))./(z - thj(inv(alpha)));
             end
             
             loga = @(z) ...
-                log((z - alpha)./(z - 1/conj(alpha)).*sf(z))/(2i*pi);
+                log((z - alpha)./(z - inv(alpha)).*sf(z))/(2i*pi);
         end
         g0.logaFun = loga;
         g0.singCorrFact = sf;

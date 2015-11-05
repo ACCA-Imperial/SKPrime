@@ -23,7 +23,7 @@ properties(SetAccess=protected)
     
     vjFuns
     g0fun
-    gjhats
+    prfact
 end
 
 properties(Access=private)
@@ -52,23 +52,15 @@ methods
         rhs.g0fun = G0Cauchy(param, vjfuns{1});
 
         % Is parameter near outer boundary?
-        [dv, qv, m, di] = domainData(rhs.domain);
-        an = abs(dv - 1/conj(param));
-        an = find(eps(2) < an & an < qv + 0.1);
-        sf = rhs.g0fun.singCorrFact;
-        rhs.gjhats = cell(m, 1);
-        for j = an'
-            gj = GjCauchy(param, j, rhs.domain);
-            zj = dv(j) + qv(j);
-            thja = dv(j) + qv(j)^2/conj(param - dv(j));
-            g0norm = real(rhs.g0fun.hat(zj) - vjfuns{j}(zj) + ...
-                vjfuns{j}(param)) + unwrap(angle( ...
-                param/(param - dv(j))*(zj - thja)/(zj - 1/conj(param)) ...
-                *(zj - di(j))/(zj - dv(j))*sf(zj) ))/(2*pi) ...
-                - real(gj.hat(zj));
-            rhs.gjhats{j} = @(z) gj.hat(z) + g0norm;
+        [d, q] = domainData(rhs.domain);
+        thf = @(z) 1;
+        for j = isclose(rhs.domain, param)'
+            thj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
+            thf = @(z) thf(z).*(z - thj(z)).^2 ...
+                ./(z - thj(param))./(z - thj(inv(param)));
         end
-        
+        rhs.prfact = thf;
+
         rhs.bvfun = @rhs.inDomainFun;
     end
     
@@ -92,17 +84,6 @@ end
 
 methods(Access=protected)
     function val = inDomainFun(rhs, j, zj)
-        if j > 0 && ~isempty(rhs.gjhats{j})
-            [d, q] = domainData(rhs.domain);
-            alpha = rhs.parameter;
-            
-            thja = d(j) + q(j)^2/conj(alpha - d(j));
-            val = 2*pi*real(rhs.gjhats{j}(zj)) ...
-                + unwrap(angle( (zj - d(j)).*(alpha - d(j)) ...
-                ./(zj - alpha)./(zj - thja) ));
-            return
-        end
-        
         val = 2*pi*real(rhs.g0fun.hat(zj));
         if j > 0
             vj = rhs.vjFuns{j};
@@ -144,28 +125,27 @@ methods(Access=protected)
             return
         end
         
-        % FIXME: Should just ignore this if it's the identity.
-        sf = rhs.g0fun.singCorrFact;        
-        val = unwrap(angle(sf(zj)));
+        thf = rhs.prfact;
+        val = unwrap(angle( alpha*zj.*thf(zj) ...
+            ./(zj - alpha)./(zj - inv(alpha)) ));
     end
     
     function val = Aj(rhs, j, zj)
         alpha = rhs.parameter;
-        [d, q, ~, di] = domainDataB(rhs.domain);
-        sf = rhs.g0fun.singCorrFact;
+        [d, q, ~, di] = domainData(rhs.domain);
+        thf = rhs.prfact;
         
-        if abs(d(j+1)) > q(j+1)
+        if abs(d(j)) > q(j)
             if 0 < abs(alpha) && ~isinf(alpha)
                 val = unwrap(angle(...
-                    alpha.*(zj - di(j)) ...
-                    ./(zj - alpha)./(zj - 1/conj(alpha)).*sf(zj) ));
+                    alpha.*(zj - di(j)).*thf(zj) ...
+                    ./(zj - alpha)./(zj - 1/conj(alpha)) ));
             else
-                val = unwrap(angle((zj - di(j))./zj.*sf(zj)));
+                val = unwrap(angle( (zj - di(j))./zj) );
             end
         else
             val = unwrap(angle(...
-                alpha./(zj - alpha)./(zj - 1/conj(alpha)) ...
-                .*sf(zj) ));
+                alpha./(zj - alpha)./(zj - 1/conj(alpha)) ));
         end
     end
     
