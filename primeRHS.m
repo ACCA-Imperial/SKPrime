@@ -120,14 +120,14 @@ methods(Access=protected)
     
     function val = A0(rhs, zj)
         alpha = rhs.parameter;
-        if abs(alpha) == 0 || isinf(alpha)
-            val = complex(zeros(size(zj)));
-            return
-        end
-        
         thf = rhs.prfact;
-        val = unwrap(angle( alpha*zj.*thf(zj) ...
-            ./(zj - alpha)./(zj - inv(alpha)) ));
+
+        if abs(alpha) == 0 || isinf(alpha)
+            val = thf(zj);
+        else
+            val = unwrap(angle( alpha*zj.*thf(zj) ...
+                ./(zj - alpha)./(zj - inv(alpha)) ));
+        end
     end
     
     function val = Aj(rhs, j, zj)
@@ -141,11 +141,11 @@ methods(Access=protected)
                     alpha.*(zj - di(j)).*thf(zj) ...
                     ./(zj - alpha)./(zj - 1/conj(alpha)) ));
             else
-                val = unwrap(angle( (zj - di(j))./zj) );
+                val = unwrap(angle( (zj - di(j))./zj).*thf(zj) );
             end
         else
             val = unwrap(angle(...
-                alpha./(zj - alpha)./(zj - 1/conj(alpha)) ));
+                alpha.*thf(zj)./(zj - alpha)./(zj - 1/conj(alpha)) ));
         end
     end
     
