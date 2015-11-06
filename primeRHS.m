@@ -141,7 +141,7 @@ methods(Access=protected)
                     alpha.*(zj - di(j)).*thf(zj) ...
                     ./(zj - alpha)./(zj - 1/conj(alpha)) ));
             else
-                val = unwrap(angle( (zj - di(j))./zj).*thf(zj) );
+                val = unwrap(angle( (zj - di(j)).*thf(zj)./zj ));
             end
         else
             val = unwrap(angle(...
