@@ -125,8 +125,12 @@ methods(Access=protected)
         if abs(alpha) == 0 || isinf(alpha)
             val = thf(zj);
         else
-            val = unwrap(angle( alpha*zj.*thf(zj) ...
-                ./(zj - alpha)./(zj - inv(alpha)) ));
+            if all(thf(complex(rand(1,2), rand(1,2))) == 1)
+                val = complex(zeros(size(zj)));
+            else
+                val = unwrap(angle( alpha*zj.*thf(zj) ...
+                    ./(zj - alpha)./(zj - inv(alpha)) ));
+            end
         end
     end
     
