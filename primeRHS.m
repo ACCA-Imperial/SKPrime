@@ -202,10 +202,4 @@ methods(Access=protected)
     end    
 end
 
-methods(Hidden)
-    function rhs = flipConstState(rhs)
-        rhs.minusConstant = ~rhs.minusConstant;
-    end
-end
-
 end % primeRHS
