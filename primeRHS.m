@@ -54,7 +54,7 @@ methods
         % Is parameter near outer boundary?
         [d, q] = domainData(rhs.domain);
         thf = @(z) 1;
-        for j = isclose(rhs.domain, param)'
+        for j = isclose(rhs.domain, param)
             thj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
             thf = @(z) thf(z).*(z - thj(z)).^2 ...
                 ./(z - thj(param))./(z - thj(inv(param)));
