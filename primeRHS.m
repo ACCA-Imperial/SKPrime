@@ -23,6 +23,7 @@ properties(SetAccess=protected)
     
     vjFuns
     g0fun
+    prfact
 end
 
 properties(Access=private)
@@ -47,8 +48,26 @@ methods
             rhs.bvfun = @rhs.onBdryFun;
             return
         end
-        
+
         rhs.g0fun = G0Cauchy(param, vjfuns{1});
+
+        % Is parameter near outer boundary?
+        [d, q] = domainData(rhs.domain);
+        thf = @(z) 1;
+        for j = isclose(rhs.domain, param)
+            thj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
+            if abs(param) == 0 || isinf(param)
+                thja = d(j);
+                thjia = d(j) - q(j)^2/conj(d(j));
+            else
+                thja = thj(param);
+                thjia = thj(inv(param));
+            end
+            thf = @(z) thf(z).*(z - thj(z)).^2 ...
+                ./(z - thja)./(z - thjia);
+        end
+        rhs.prfact = thf;
+
         rhs.bvfun = @rhs.inDomainFun;
     end
     
@@ -108,33 +127,36 @@ methods(Access=protected)
     
     function val = A0(rhs, zj)
         alpha = rhs.parameter;
-        if abs(alpha) == 0 || isinf(alpha)
+        thf = rhs.prfact;
+
+        if all(thf(complex(rand(1,2), rand(1,2))) == 1)
             val = complex(zeros(size(zj)));
-            return
+        else
+            if abs(alpha) == 0 || isinf(alpha)
+                val = unwrap(angle( thf(zj) ));
+            else
+                val = unwrap(angle( alpha*zj.*thf(zj) ...
+                    ./(zj - alpha)./(zj - inv(alpha)) ));
+            end
         end
-        
-        % FIXME: Should just ignore this if it's the identity.
-        sf = rhs.g0fun.singCorrFact;        
-        val = unwrap(angle(sf(zj)));
     end
     
     function val = Aj(rhs, j, zj)
         alpha = rhs.parameter;
-        [d, q, ~, di] = domainDataB(rhs.domain);
-        sf = rhs.g0fun.singCorrFact;
+        [d, q, ~, di] = domainData(rhs.domain);
+        thf = rhs.prfact;
         
-        if abs(d(j+1)) > q(j+1)
+        if abs(d(j)) > q(j)
             if 0 < abs(alpha) && ~isinf(alpha)
                 val = unwrap(angle(...
-                    alpha.*(zj - di(j)) ...
-                    ./(zj - alpha)./(zj - 1/conj(alpha)).*sf(zj) ));
+                    alpha.*(zj - di(j)).*thf(zj) ...
+                    ./(zj - alpha)./(zj - 1/conj(alpha)) ));
             else
-                val = unwrap(angle((zj - di(j))./zj.*sf(zj)));
+                val = unwrap(angle( (zj - di(j)).*thf(zj)./zj ));
             end
         else
             val = unwrap(angle(...
-                alpha./(zj - alpha)./(zj - 1/conj(alpha)) ...
-                .*sf(zj) ));
+                alpha.*thf(zj)./(zj - alpha)./(zj - 1/conj(alpha)) ));
         end
     end
     

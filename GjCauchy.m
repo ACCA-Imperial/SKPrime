@@ -94,7 +94,7 @@ methods
         % Solve for unknown part on the boundary.
         gj.phiFun = solve(gj.phiFun, ha);
         
-        % Normalisation from Schwarz problem.
+        % Normalisation from Schwarz problem -- G_j is zero on C_j.
         normval = gj.phiFun.phiCoef(1,j+1);
         
         % Boundary function and Cauchy interpolant.

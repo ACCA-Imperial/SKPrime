@@ -143,6 +143,19 @@ methods
         [dv, qv, m, di, qi] = deal(D.datCellB{:});
     end
     
+    function je = isclose(D, alpha)
+        %isclose gives inner boundary indices for a close parameter.
+        
+        [d, q] = domainData(D);
+        if abs(alpha) < 1
+            je = abs(alpha - d);
+        elseif abs(alpha) > 1
+            je = abs(1/conj(alpha) - d);
+        end
+        je = find(q + eps(2) < je & je < q + 0.1);
+        je = je(:)';
+    end
+    
     function tf = isin(D, z)
         tf = true(size(z));
         tf(abs(z) >= 1) = false;

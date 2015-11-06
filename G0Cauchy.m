@@ -58,6 +58,8 @@ methods
         
         % Singularity correction factor.
         sf = @(z) 1;
+        aj = isclose(g0.domain, alpha);
+        
         if ~isempty(alpha.ison) && alpha.ison == 0
             % Alpha on the unit circle is const zero.
             g0.logaFun = @(z) zeros(size(z));
@@ -66,33 +68,27 @@ methods
             g0.contFun = @(z) zeros(size(z));
             return
         elseif alpha == 0
-            aj = find(abs(d) < q + 0.1);
-            for j = aj'
-                acj = d(j) + q(j)^2/conj(-d(j));
-                sf = @(z) sf(z).*(z - d(j))./(z - acj);
-            end
-            
+            for j = aj
+                thj0 = d(j);
+                thjinf = d(j) - q(j)^2/conj(d(j));
+                sf = @(z) sf(z).*(z - thj0)./(z - thjinf);
+            end            
             loga = @(z) log(z.*sf(z))/(2i*pi);
         elseif isinf(alpha)
-            loga = @(z) -log(z)/(2i*pi);
+            for j = aj
+                thj0 = d(j);
+                thjinf = d(j) - q(j)^2/conj(d(j));
+                sf = @(z) sf(z).*(z - thjinf)./(z - thj0);
+            end
+            loga = @(z) log(sf(z)./z)/(2i*pi);
         else
-            if abs(alpha) <= 1
-                aj = abs(alpha - d);
-                aj = find(eps(2) < aj & aj < q + 0.1);
-                for j = aj'
-                    acj = d(j) + q(j)^2/conj(alpha - d(j));
-                    sf = @(z) sf(z).*(z - d(j))./(z - acj);
-                end
-            else            
-                aj = find(abs(1/conj(alpha) - d) < q + 0.1);
-                for j = aj'
-                    acj = d(j) + q(j)^2*alpha/(1 - conj(d(j))*alpha);
-                    sf = @(z) sf(z).*(z - acj)./(z - d(j));
-                end
+            for j = isclose(g0.domain, alpha)
+                thj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
+                sf = @(z) sf(z).*(z - thj(alpha))./(z - thj(inv(alpha)));
             end
             
             loga = @(z) ...
-                log((z - alpha)./(z - 1/conj(alpha)).*sf(z))/(2i*pi);
+                log((z - alpha)./(z - inv(alpha)).*sf(z))/(2i*pi);
         end
         g0.logaFun = loga;
         g0.singCorrFact = sf;
