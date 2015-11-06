@@ -246,13 +246,7 @@ end
 methods(Access=protected) % BVP stuff
     function skp = bvpInDomain(skp)
         alpha = skp.parameter;
-        [d, q] = domainData(skp.domain);
-        
-        psi = @(z) 1;
-        for j = isclose(skp.domain, alpha);
-            thj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
-            psi = @(z) psi(z).*(z - thj(alpha))./(z - thj(z));
-        end
+        psi = calcPsi(skp, alpha);
 
         imLogXhat = primeRHS(alpha, skp.vjFuns);
         phi = solve(skp.phiFun, imLogXhat);
@@ -268,13 +262,7 @@ methods(Access=protected) % BVP stuff
     
     function skp = bvpInDomainOuter(skp)
         alpha = skp.parameter;
-        [d, q] = domainData(skp.domain);
-        
-        psi = @(z) 1;
-        for j = isclose(skp.domain, alpha);
-            thj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
-            psi = @(z) psi(z).*(z - thj(inv(alpha)))./(z - thj(z));
-        end
+        psi = calcPsi(skp, inv(alpha));
 
         imLogXhatInvp = primeRHS(inv(alpha), skp.vjFuns);
         phiInvp = solve(skp.phiFun, imLogXhatInvp);
@@ -353,6 +341,23 @@ methods(Access=protected) % BVP stuff
         skp.logXhatCont = @(z) logInvpPart(z) + skp.logXhatOutCont(z);
         
         skp = setCorrection(skp);
+    end
+    
+    function psi = calcPsi(skp, param)
+        [d, q] = domainData(skp.domain);
+        
+        psi = @(z) 1;
+        for j = isclose(skp.domain, param);
+            thj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
+            if param == 0
+                thjp = d(j);
+            elseif isinf(param)
+                thjp = d(j) - q(j)^2/conj(d(j));
+            else
+                thjp = thj(param);
+            end
+            psi = @(z) psi(z).*(z - thjp)./(z - thj(z));
+        end
     end
     
     function skp = solveBVPs(skp)

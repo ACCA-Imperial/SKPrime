@@ -56,8 +56,15 @@ methods
         thf = @(z) 1;
         for j = isclose(rhs.domain, param)
             thj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
+            if param == 0 || isinf(param)
+                thja = d(j);
+                thjia = d(j) - q(j)^2/conj(d(j));
+            else
+                thja = thj(param);
+                thjia = thj(inv(param));
+            end
             thf = @(z) thf(z).*(z - thj(z)).^2 ...
-                ./(z - thj(param))./(z - thj(inv(param)));
+                ./(z - thja)./(z - thjia);
         end
         rhs.prfact = thf;
 
