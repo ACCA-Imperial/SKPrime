@@ -349,7 +349,7 @@ methods(Access=protected) % BVP stuff
         psi = @(z) 1;
         for j = isclose(skp.domain, param);
             thj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
-            if param == 0
+            if abs(param) == 0
                 thjp = d(j);
             elseif isinf(param)
                 thjp = d(j) - q(j)^2/conj(d(j));

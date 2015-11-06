@@ -56,7 +56,7 @@ methods
         thf = @(z) 1;
         for j = isclose(rhs.domain, param)
             thj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
-            if param == 0 || isinf(param)
+            if abs(param) == 0 || isinf(param)
                 thja = d(j);
                 thjia = d(j) - q(j)^2/conj(d(j));
             else
