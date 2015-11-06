@@ -129,11 +129,11 @@ methods(Access=protected)
         alpha = rhs.parameter;
         thf = rhs.prfact;
 
-        if abs(alpha) == 0 || isinf(alpha)
-            val = thf(zj);
+        if all(thf(complex(rand(1,2), rand(1,2))) == 1)
+            val = complex(zeros(size(zj)));
         else
-            if all(thf(complex(rand(1,2), rand(1,2))) == 1)
-                val = complex(zeros(size(zj)));
+            if abs(alpha) == 0 || isinf(alpha)
+                val = unwrap(angle( thf(zj) ));
             else
                 val = unwrap(angle( alpha*zj.*thf(zj) ...
                     ./(zj - alpha)./(zj - inv(alpha)) ));
