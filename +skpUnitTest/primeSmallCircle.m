@@ -1,5 +1,8 @@
 classdef primeSmallCircle < skpUnitTest.primeBase
-%primeSmallCircle tests for small interior circles.
+%primeSmallCircle unit tests for small interior circles.
+%
+% Circles on the order of 1e-4 were known to cause problems for points
+% evaluated on the boundaries.
 
 % Copyright Everett Kropf, 2015
 % 
@@ -23,7 +26,7 @@ properties
 end
 
 methods(Test)
-    function pointsOnBoundary(test)
+    function evalPointsOnBoundary(test)
         [d, q] = domainDataB(test.D);
         np = 200;
         zt = bsxfun(@plus, d, ...

@@ -1,5 +1,7 @@
 classdef primeAnnulus < skpUnitTest.primeBase
-%prime function tests on 3-connected domain.
+%primeAnnulus unit tests on 3-connected concentric annular domain.
+%
+% Tests: see "methods(Test)" section of source code.
 
 % Copyright Everett Kropf, 2015
 % 
@@ -23,29 +25,29 @@ properties
 end
 
 methods(Test)
-    function alphaSmallInFD(test)
+    function parameterInsideDisk(test)
         checkViaSKProd(test, 0.5-0.6i, 1e-4)
     end
     
-    function alphaLargeInFD(test)
+    function parameterOutsideDisk(test)
         checkViaSKProd(test, 1/conj(0.5-0.6i), 1e-4)
     end
     
-    function alphaNearAnnBdry(test)
+    function parameterNearAnnularBoundary(test)
         checkViaSKProd(test, 0.21i, 1e-4)
     end
     
-    function unitParameter(test)
+    function parameterOnUnitCircle(test)
         checkViaSKProd(test, exp(2i*pi*rand(1)), 9e-5)
     end
     
-    function alphaOnAnnBdry(test)
+    function parameterOnAnnularBoundary(test)
         d = test.D.dv(1);
         q = test.D.qv(1);
         checkViaSKProd(test, d + q*exp(5i*pi/4), 2e-4)
     end
     
-    function alphaOnOtherBdry(test)
+    function parameterOnOtherBoundary(test)
         d = test.D.dv(2);
         q = test.D.qv(2);
         checkViaSKProd(test, d + q*exp(5i*pi/4), 2e-4)

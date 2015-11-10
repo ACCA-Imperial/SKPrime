@@ -1,5 +1,11 @@
 classdef primeBase < matlab.unittest.TestCase
-%Base class for prime unit tests.
+%primeBase abstract class for prime function unit tests.
+%
+% Properties:
+%   D (abstract) -- unit test domain
+%
+% Methods:
+%   checkViaSKProd -- Compare prime function using product formula.
 
 % Copyright Everett Kropf, 2015
 % 
@@ -42,6 +48,8 @@ end
 
 methods(TestClassSetup)
     function prodFunction(test)
+        %Provided to set domain data and product function.
+        
         [d, q, ~, di, qi] = domainData(test.D);
 
         test.dv = d;
@@ -52,6 +60,8 @@ methods(TestClassSetup)
     end
     
     function testPoints(test)
+        %Build set of test points on inner and outer boundaries.
+        
         d = test.dv;
         q = test.qv;
         np = 10;
@@ -76,6 +86,14 @@ end
 
 methods
     function checkViaSKProd(test, alpha, reltol, notouter)
+        %checkViaSKProd(testObj, alpha, reltol)
+        % Uses parameter alpha to check that boundary values of product
+        % formula (default truncation is skpUnitTest.primeBase.level) on
+        % inner and outer boundaries are within reltol relative tolerance.
+        %
+        %checkViaSKProd(..., 'noouter') skips the test on outer
+        % boundaries.
+        
         if nargin < 3 || isempty(reltol)
             reltol = 1e-6;
         end
@@ -99,6 +117,8 @@ end
 
 methods(Access=protected)
     function checkPoints(test, wfun, wref, ztest, reltol, ptloc)
+        %Provide granular check over provided points.
+        
         wval = wfun(ztest(:));
         refval = wref(ztest(:));
         relerr = abs(refval - wval)./abs(refval);
@@ -111,6 +131,8 @@ methods(Access=protected)
     end
     
     function diagString(test, str)
+        %Diagnostic string concatenation.
+        
         test.diagStr = sprintf('%s\n%s', test.diagStr, str);
     end
 end

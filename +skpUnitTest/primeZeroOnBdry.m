@@ -1,5 +1,12 @@
 classdef primeZeroOnBdry < skpUnitTest.primeBase
-%prime function tests on 3-connected domain.
+%primeZeroOnBdry unit tests on 3-connected domain.
+%
+% Put the origin on a boundary.
+%
+% The test for the parameter at the origin is conspicuously absent, since
+% the inverse of the parameter would be at infinity on a boundary, which
+% is not a covered case. So we make no claim for any functionality in this
+% case.
 
 % Copyright Everett Kropf, 2015
 % 
@@ -23,37 +30,39 @@ properties
 end
 
 methods(Test)
-    function alphaSmallInFD(test)
+    function parameterInsideDisk(test)
         checkViaSKProd(test, 0.6-0.4i, 1e-4)
     end
     
-    function alphaLargeInFD(test)
+    function parameterOutsideDisk(test)
         checkViaSKProd(test, 1/conj(0.6-0.4i), 1e-4)
     end
     
-    function alphaNearZero(test)
+    function parameterNearOrigin(test)
+        % Near origin and boundary.
         alpha = 0.09*exp(1i*angle(-test.D.dv(1)));
         checkViaSKProd(test, alpha, 3e-6)
     end
     
-    function alphaNearZeroBdry(test)
+    function parameterNearOriginBoundary(test)
+        % Near origin boundary, away from origin.
         d = test.D.dv(1);
         q = test.D.qv(1);
         alpha = d + (q + 0.09)*exp(1i*pi/2);
         checkViaSKProd(test, alpha, 1e-5)
     end
     
-    function unitParameter(test)
+    function parameterOnUnitCircle(test)
         checkViaSKProd(test, exp(2i*pi*rand(1)), 4e-5)
     end
     
-    function alphaOnZeroBdry(test)
+    function parameterOnOriginBoundary(test)
         d = test.D.dv(1);
         q = test.D.qv(1);
         checkViaSKProd(test, d + q*exp(5i*pi/4), 1e-5, 'noouter')
     end
     
-    function alphaOnOtherBdry(test)
+    function parameterOnOtherBoundary(test)
         d = test.D.dv(2);
         q = test.D.qv(2);
         checkViaSKProd(test, d + q*exp(5i*pi/4), 2e-5, 'noouter')

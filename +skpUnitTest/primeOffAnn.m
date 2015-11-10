@@ -1,5 +1,5 @@
 classdef primeOffAnn < skpUnitTest.primeBase
-%prime function tests on 3-connected domain.
+%primeOffAnn unit tests on 3-connected offset annular domain.
 
 % Copyright Everett Kropf, 2015
 % 
@@ -23,25 +23,25 @@ properties
 end
 
 methods(Test)
-    function alphaSmallInFD(test)
+    function parameterInsideDisk(test)
         checkViaSKProd(test, -0.3 + 0.3i, 1e-4)
     end
     
-    function alphaLargeInFD(test)
+    function parameterOutsideDisk(test)
         checkViaSKProd(test, 1/conj(-0.3 + 0.3i), 1e-4)
     end
     
-    function unitParameter(test)
+    function parameterOnUnitCircle(test)
         checkViaSKProd(test, exp(2i*pi*rand(1)), 9e-6)
     end
     
-    function alphaOnAnnBdry(test)
+    function parameterOnAnnularBoundary(test)
         d = test.D.dv(1);
         q = test.D.qv(1);
         checkViaSKProd(test, d + q*exp(5i*pi/4), 1e-4)
     end
     
-    function alphaOnOtherBdry(test)
+    function parameterOnOtherBoundary(test)
         d = test.D.dv(2);
         q = test.D.qv(2);
         checkViaSKProd(test, d + q*exp(5i*pi/4), 1e-4)

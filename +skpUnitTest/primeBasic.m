@@ -1,5 +1,9 @@
 classdef primeBasic < skpUnitTest.primeBase
-%prime function tests on 3-connected domain.
+%primeBasic unit tests on 3-connected domain.
+%
+% Tests: see "methods(Test)" section of source file.
+%
+% See also skpUnitTest.primeBase
 
 % Copyright Everett Kropf, 2015
 % 
@@ -23,47 +27,47 @@ properties
 end
 
 methods(Test)
-    function alphaSmallInFD(test)
+    function parameterInsideDisk(test)
         checkViaSKProd(test, -0.3 - 0.3i)
     end
     
-    function alphaLargeInFD(test)
+    function parameterOutsideDisk(test)
         checkViaSKProd(test, 1/conj(-0.3 - 0.3i))
     end
     
-    function alphaAtZeroInFD(test)
+    function parameterAtOrigin(test)
         checkViaSKProd(test, 0)
     end
     
-    function alphaAtInfinity(test)
+    function parameterAtInfinity(test)
         checkViaSKProd(test, inf)
     end
     
-    function unitParameter(test)
+    function parameterOnUnitCircle(test)
         checkViaSKProd(test, exp(2i*pi*rand(1)))
     end
     
-    function alphaOnBdry1(test)
+    function parameterOnInnerBoundary(test)
         d = test.D.dv(1);
         q = test.D.qv(1);
         alpha = d + q*exp(5i*pi/4);
         checkViaSKProd(test, alpha)
     end
     
-    function alphaOnBdry1prime(test)
+    function parameterOnOuterBoundary(test)
         d = test.D.dv(1);
         q = test.D.qv(1);
         alpha = 1/conj(d + q*exp(5i*pi/4));
         checkViaSKProd(test, alpha)
     end
     
-    function alphaNearBdry1(test)
+    function parameterNearBoundary(test)
         d = test.D.dv(1);
         q = test.D.qv(1);
         checkViaSKProd(test, d + q + 1e-6)
     end
     
-    function unitRootCheckIn(test)
+    function unitRootCheckInner(test)
         np = 200;
         zt = exp(2i*pi*(0:np-1)'/np);
         
@@ -83,7 +87,7 @@ methods(Test)
             'Computation produced NaN values.')
     end
     
-    function unitRootCheckOut(test)
+    function unitRootCheckOuter(test)
         np = 200;
         zt = exp(2i*pi*(0:np-1)'/np);
         zt = 1./conj(zt);
