@@ -1,5 +1,9 @@
 function uninstall()
-% SKPrime uninstall function.
+%uninstall removes SKPrime directory from search path.
+%
+% Calls "install -u".
+%
+% See also: install
 
 % E. Kropf, 2015
 % 

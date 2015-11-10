@@ -1,5 +1,9 @@
 function install(arg)
-% SKPrime install function.
+%install puts SKPrime in search path.
+%
+% Installation is defined simply to be the addition of the SKPrime
+% directory to MATLAB's search path. Uninstall removes this directory from
+% the search path.
 %
 % install
 %   performs installation operations for SKPrime.
@@ -23,10 +27,10 @@ function install(arg)
 % You should have received a copy of the GNU General Public License
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
-if exist('./schwarz.m', 'file') ~= 2 || ...
-        exist('./skprime.m', 'file') ~= 2 || ...
-        exist('./skpObject.m', 'file') ~= 2 || ...
-        exist('./paramState.m', 'file') ~= 2
+if exist('./@schwarz/schwarz.m', 'file') ~= 2 || ...
+        exist('./@skprime/skprime.m', 'file') ~= 2 || ...
+        exist('./@skpObject/skpObject.m', 'file') ~= 2 || ...
+        exist('./@paramState/paramState.m', 'file') ~= 2
     error('skprime:RuntimeError', ...
         'This utility must be run from the SKPrime directory.')
 end
