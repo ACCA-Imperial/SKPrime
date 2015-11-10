@@ -2,16 +2,22 @@ function result = skptests(select)
 %SKPTESTS runs unit tests for SKPrime.
 %
 % skptests
-%   Runs all tests in the SKPrime test suite.
-%
 % skptests prime
-%   Runs all the tests for the prime function in the test suite.
+%   Runs all the available tests for the prime function in the test suite.
 %
 % skptests g0
-%   Runs all the tests for the G0 function in the test suite.
+%   Runs all the available tests for the G0 function in the test suite.
+%
+% skptests all
+%   Runs all available tests in the SKPrime test suite.
 %
 % skptests <string>
-%   Runs a test in the test suite specified by <string>.
+%   Runs a test in the test suite specified by <string>. For example,
+%   using string 'skpUnitTest.prime*' is the same as calling
+%   `skptests prime`. See the TestSuite.fromPackage documentation
+%   for more information on string format.
+%
+% See also: matlab.unittest.TestSuite.fromPackage
 
 % Copyright Everett Kropf, 2015
 % 
@@ -35,13 +41,15 @@ import matlab.unittest.TestRunner
 
 runner = TestRunner.withTextOutput('Verbosity', 2);
 
-suiteArgs = {};
+suiteArgs = {'Name', 'skpUnitTest.prime*'};
 if nargin
     switch select
         case 'prime'
-            suiteArgs = {'Name', 'skpUnitTest.prime*'};
+            % Now set as default.
         case {'g0', 'G0'}
             suiteArgs = {'Name', 'skpUnitTest.G0*'};
+        case 'all'
+            suiteArgs = {};
         otherwise
             suiteArgs = {'Name', ['skpUnitTest.' select]};
     end
