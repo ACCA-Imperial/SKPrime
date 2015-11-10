@@ -1,5 +1,22 @@
 classdef skprime < bvpFun
 %SKPRIME is the Shottky-Klein prime function.
+%
+% skprime(alpha, dv, qv)
+% skprime(alpha, D)
+%   Solve the boundary value problem for the SK-prime function given the
+%   parameter alpha and the vectors dv and qv, respectively the centers and
+%   radii of the circles bounded by the unit circle. The domain may also be
+%   given as a skpDomain object.
+%
+% skprime(..., N)
+%   Specify the truncation level of the Fourier series on each boundary
+%   circle (same for all circles). See bvpFun.truncation for default.
+%
+% Garbage parameters are ignored, i.e., if the constructor has enough
+% information to build a valid object, there will be no warning given about
+% unused extra parameters.
+%
+% See also: skpDomain, bvpFun
 
 % E. Kropf, 2015
 % 
@@ -37,25 +54,31 @@ properties(Dependent, Access=protected)
 end
 
 methods
-    function skp = skprime(alpha, D, N)
+    function skp = skprime(alpha, dv, qv, N)
         vjfuns = {};
         phi = [];
         if ~nargin
             sargs = {};
         else
-            if iscell(D) && all(cellfun(@(c) isa(c, 'vjCauchy'), D(:)))
-                vjfuns = D;
-                D = D{1}.domain;
-            elseif isa(D, 'skprime')
-                vjfuns = D.vjFuns;
-                phi = D.phiFun;
-                D = D.domain;
+            if nargin < 4
+                N = [];
             end
-            if nargin > 2
-                sargs = {D, N, phi};
+            if iscell(dv) && all(cellfun(@(c) isa(c, 'vjCauchy'), dv(:)))
+                vjfuns = dv;
+                D = dv{1}.domain;
+            elseif isa(dv, 'skprime')
+                vjfuns = dv.vjFuns;
+                phi = dv.phiFun;
+                D = dv.domain;
+            elseif isa(dv, 'skpDomain')
+                D = dv;
+                if nargin > 2 && numel(qv) == 1
+                    N = qv;
+                end
             else
-                sargs = {D, [], phi};
+                D = skpDomain(dv, qv);
             end
+            sargs = {D, N, phi};
         end
         skp = skp@bvpFun(sargs{:});
         if ~nargin
