@@ -165,7 +165,7 @@ methods
             end
         end
         
-        dwCont = bmcCauchy(@dwBdry, skp.domain, skp.truncation);
+        dwCont = SKP.bmcCauchy(@dwBdry, skp.domain, skp.truncation);
         
         function val = dwEval(z)
             [val, onBdry] = dwBdry(z);
@@ -275,7 +275,7 @@ methods(Access=protected) % BVP stuff
         phi = solve(skp.phiFun, imLogXhat);
         skp.logXhatBdry = @(z) phi(z) + 1i*imLogXhat(z) + 2*log(psi(z));
         skp.logXhatCont = ...
-            bmcCauchy(skp.logXhatBdry, skp.domain, skp.truncation);
+            SKP.bmcCauchy(skp.logXhatBdry, skp.domain, skp.truncation);
         if abs(alpha) < 1 + eps(2)
             skp.normFactor = skp.logXhatCont(alpha);
         else
@@ -292,7 +292,7 @@ methods(Access=protected) % BVP stuff
         skp.logXhatOutBdry = ...
             @(z) phiInvp(z) + 1i*imLogXhatInvp(z) + 2*log(psi(z));
         skp.logXhatOutCont = ...
-            bmcCauchy(skp.logXhatOutBdry, skp.domain, skp.truncation);
+            SKP.bmcCauchy(skp.logXhatOutBdry, skp.domain, skp.truncation);
         if abs(alpha) >= 1 + eps(2)
             skp.normFactor = conj(skp.logXhatOutCont(1/conj(alpha)));
         end
@@ -306,12 +306,12 @@ methods(Access=protected) % BVP stuff
         skp.normFactor = phi(alpha) + 1i*imLogXhat(alpha);
         skp.logXhatBdry = @(z) phi(z) + 1i*imLogXhat(z) - skp.normFactor;
         skp.logXhatCont = ...
-            bmcCauchy(skp.logXhatBdry, skp.domain, skp.truncation);
+            SKP.bmcCauchy(skp.logXhatBdry, skp.domain, skp.truncation);
     end
     
     function skp = bvpIsUnitOuter(skp)
         skp.logXhatOutBdry = skp.logXhatBdry;
-        skp.logXhatOutCont = bmcCauchy(skp.logXhatOutBdry, ...
+        skp.logXhatOutCont = SKP.bmcCauchy(skp.logXhatOutBdry, ...
             skp.domain, skp.truncation);
     end
     
@@ -327,7 +327,7 @@ methods(Access=protected) % BVP stuff
         phi = solve(skp.phiFun, imLogXhat);
         skp.normFactor = phi(alpha) + 1i*imLogXhat(alpha);
         skp.logXhatBdry = @(z) phi(z) + 1i*imLogXhat(z) - skp.normFactor;
-        skp.logXhatCont = bmcCauchy(skp.logXhatBdry, D, N);
+        skp.logXhatCont = SKP.bmcCauchy(skp.logXhatBdry, D, N);
                 
         if alpha ~= 0
             logInvpPart = @(z) 2*log((z - alpha)./(z - 1/conj(alpha))) ...
@@ -339,7 +339,7 @@ methods(Access=protected) % BVP stuff
             imLogXhatInvp = primeRHS(inv(alpha), skp.vjFuns);
             phiInvp = solve(skp.phiFun, imLogXhatInvp);
             skp.logXhatOutBdry = @(z) phiInvp(z) + 1i*imLogXhatInvp(z);
-            skp.logXhatOutCont = bmcCauchy(skp.logXhatOutBdry, D, N);
+            skp.logXhatOutCont = SKP.bmcCauchy(skp.logXhatOutBdry, D, N);
         end        
     end
     
@@ -355,7 +355,7 @@ methods(Access=protected) % BVP stuff
         skp.logXhatOutBdry = @(z) phi(z) + 1i*imLogXhatInvp(z) ...
             - skp.normFactor;
         skp.logXhatOutCont = ...
-            bmcCauchy(skp.logXhatOutBdry, skp.domain, skp.truncation);
+            SKP.bmcCauchy(skp.logXhatOutBdry, skp.domain, skp.truncation);
         
         logInvpPart = @(z) 2*log((z - 1/conj(alpha))./(z - alpha)) ...
             + 4i*pi*(real(vj(alpha)) - vj(z)) ...

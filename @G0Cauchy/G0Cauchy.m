@@ -101,7 +101,7 @@ methods
         
         % Boundary function and Cauchy interpolant.
         g0.bdryFun = @(z) g0.phiFun(z) + 1i*ha(z);
-        g0.contFun = bmcCauchy(g0.bdryFun, g0.domain, 2*g0.truncation);
+        g0.contFun = SKP.bmcCauchy(g0.bdryFun, g0.domain, 2*g0.truncation);
     end
     
     function hatFun = G0hat(g0)

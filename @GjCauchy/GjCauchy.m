@@ -99,7 +99,7 @@ methods
         
         % Boundary function and Cauchy interpolant.
         gj.bdryFun = @(z) gj.phiFun(z) + 1i*ha(z) - normval;
-        gj.contFun = bmcCauchy(gj.bdryFun, gj.domain, 2*gj.truncation);
+        gj.contFun = SKP.bmcCauchy(gj.bdryFun, gj.domain, 2*gj.truncation);
     end
     
     function hatFun = Gjhat(gj)

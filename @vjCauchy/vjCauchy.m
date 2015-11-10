@@ -64,7 +64,7 @@ methods
         
         % Boundary function and Cauchy interpolant.
         vj.bdryFun = @(z) vj.phiFun(z) + 1i*hj(z);
-        vj.contFun = bmcCauchy(vj.bdryFun, vj.domain, vj.truncation);
+        vj.contFun = SKP.bmcCauchy(vj.bdryFun, vj.domain, vj.truncation);
     end
     
     function v = hat(vj, z)
