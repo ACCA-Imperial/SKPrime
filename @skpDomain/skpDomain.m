@@ -152,7 +152,7 @@ methods
         elseif abs(alpha) > 1
             je = abs(1/conj(alpha) - d);
         end
-        je = find(q + eps(2) < je & je < q + 0.1);
+        je = find(q + eps(2) < je & je < q + 0.15);
         je = je(:)';
     end
     
