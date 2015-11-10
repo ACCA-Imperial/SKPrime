@@ -210,11 +210,14 @@ methods(Access=protected)
         end
     end
     
-    function [logX, inUnit] = evalLogX(skp, z)        
+    function [logX, inUnit] = evalLogX(skp, z)
         logXhat = complex(nan(size(z)));
         
         inUnit = abs(z) < 1 + eps(2);
         if any(inUnit(:))
+            if ~isempty(skp.logXhatOutCont) && isempty(skp.primeCorrect)
+                setCorrection(skp);
+            end
             onB = onBoundary(skp, z);
             L = inUnit & onB;
             if any(L(:))
