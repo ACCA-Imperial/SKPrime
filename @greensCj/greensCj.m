@@ -1,4 +1,4 @@
-classdef GjCauchy < bvpFun
+classdef greensCj < bvpFun
 %GjCAUCHY is the modified Green's function for MC domains for Cj.
 %
 % The modified Green's function for multiply connected domains is given in
@@ -40,7 +40,7 @@ properties(SetAccess=protected)
 end
 
 methods
-    function gj = GjCauchy(alpha, j, D, N)
+    function gj = greensCj(alpha, j, D, N)
         if ~nargin
             sargs = {};
         else
