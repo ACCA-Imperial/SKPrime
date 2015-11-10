@@ -49,7 +49,7 @@ methods
             return
         end
 
-        rhs.g0fun = G0Cauchy(param, vjfuns{1});
+        rhs.g0fun = greensC0(param, vjfuns{1});
 
         % Is parameter near outer boundary?
         [d, q] = domainData(rhs.domain);

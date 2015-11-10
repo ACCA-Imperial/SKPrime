@@ -65,7 +65,7 @@ methods
             reltol = 1e-5;
         end
         
-        g0 = G0Cauchy(test.alpha, test.D);
+        g0 = greensC0(test.alpha, test.D);
         refval = refProd(test);
         relerr = abs(errval(test, refval, g0))./abs(refval);
         verifyLessThan(test, max(relerr), reltol)

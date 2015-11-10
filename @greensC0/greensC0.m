@@ -1,5 +1,5 @@
-classdef G0Cauchy < bvpFun
-%G0CAUCHY is the modified Green's function for MC domains for C0.
+classdef greensC0 < bvpFun
+%greensC0 is the modified Green's function for MC domains wrt C0.
 %
 % The modified Green's function for multiply connected domains is given in
 % terms of the Shottky-Klien prime function, w(z,a). That is
@@ -37,7 +37,7 @@ properties(SetAccess=protected)
 end
 
 methods
-    function g0 = G0Cauchy(alpha, D, N)
+    function g0 = greensC0(alpha, D, N)
         if ~nargin
             sargs = {};
         else
