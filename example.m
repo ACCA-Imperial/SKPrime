@@ -16,13 +16,13 @@
 % You should have received a copy of the GNU General Public License
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
+clear
 
 %% Create a bounded circular domain and pick a parameter point.
 
 dv = [0.0524476+0.365385i; -0.27972-0.127622i; 0.482517-0.281469i];
 qv = [0.151967; 0.179551; 0.209557];
 m = numel(dv);
-D = skpDomain(dv, qv);
 
 alpha = -0.5i;
 
@@ -31,7 +31,7 @@ alpha = -0.5i;
 % Note X is just the square of w, but using |Xeval| skips some root branch
 % checking done when evaluating the prime function.
 
-w = skprime(alpha, D);
+w = skprime(alpha, dv, qv);
 X = @(z) Xeval(w, z);
 
 
