@@ -1,5 +1,5 @@
 classdef skpinvparam < skprime
-%SKPINVPARAM is the inverted parameter prime functino.
+%SKPINVPARAM is the inverted parameter prime function.
 %
 % Given the S-K prime function w(zeta, alpha), this class represents the
 % inverted (w.r.t. the unit circle) parameter prime function
