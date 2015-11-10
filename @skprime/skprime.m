@@ -63,7 +63,7 @@ methods
             if nargin < 4
                 N = [];
             end
-            if iscell(dv) && all(cellfun(@(c) isa(c, 'vjCauchy'), dv(:)))
+            if iscell(dv) && all(cellfun(@(c) isa(c, 'vjFirstKind'), dv(:)))
                 vjfuns = dv;
                 D = dv{1}.domain;
             elseif isa(dv, 'skprime')
@@ -110,7 +110,7 @@ methods
         if isempty(vjfuns)
             skp.vjFuns = cell(m, 1);
             for j = 1:m
-                skp.vjFuns{j} = vjCauchy(j, skp);
+                skp.vjFuns{j} = vjFirstKind(j, skp);
             end
         elseif numel(vjfuns) ~= m
                 error('SKPrime:invalidArgument', ...

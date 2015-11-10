@@ -1,5 +1,15 @@
-classdef vjCauchy < bvpFun
-%vjCauchy represents v_j function via Cauchy's theorem.
+classdef vjFirstKind < bvpFun
+%vjFirstKind represents v_j function via Cauchy's theorem.
+%
+% vj = vjFirstKind(j, D)
+% vj = vjFirstKind(j, D, N)
+%   Solves the boundary value problem for the first-kind integral
+%   associated with circle boundary 0 < j < m, where m is the number of
+%   circles in the unit disk. The unit domain is specified by the skpDomain
+%   object D. Truncation level of the Fourier series on each boundary is
+%   given by N (see bvpFun.truncation for the default).
+%
+% See also: skpDomain, bvpFun
 
 % E. Kropf, 2015
 % 
@@ -27,7 +37,7 @@ properties(SetAccess=protected)
 end
 
 methods
-    function vj = vjCauchy(j, D, N)
+    function vj = vjFirstKind(j, D, N)
         if ~nargin
             sargs = {};
         else
@@ -118,4 +128,4 @@ methods
     end
 end
 
-end % vjCauchy
+end % vjFirstKind

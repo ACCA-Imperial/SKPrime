@@ -63,7 +63,7 @@ if nargin < 5
 end
 
 accel = false;
-if iscell(D) && all(cellfun(@(c) isa(c, 'vjCauchy'), D(:)))
+if iscell(D) && all(cellfun(@(c) isa(c, 'vjFirstKind'), D(:)))
     accel = true;
     vjFuns = D;
     D = vjFuns{1}.domain;
