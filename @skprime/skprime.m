@@ -6,7 +6,12 @@ classdef skprime < bvpFun
 %   Solve the boundary value problem for the SK-prime function given the
 %   parameter alpha and the vectors dv and qv, respectively the centers and
 %   radii of the circles bounded by the unit circle. The domain may also be
-%   given as a skpDomain object.
+%   given as a skpDomain object D.
+%
+% w = skprime(...)
+% w2 = skprime(param, w)
+%   Use a previously computed prime function to accelerate the computation
+%   of a new prime function on the same domain with a different parameter.
 %
 % skprime(..., N)
 %   Specify the truncation level of the Fourier series on each boundary
@@ -123,6 +128,10 @@ methods
     end % ctor
     
     function skp = invParam(skp)
+        %invParam gives the prime function with inverted parameter.
+        %  w = skprime(...);
+        %  wi = invParam(w);
+        %  Then isa(wi, 'skprime') is a true statememt.
         skp = skpinvparam(skp);
     end
     
@@ -193,6 +202,9 @@ methods
     end
     
     function X = Xeval(skp, z)
+        %Xeval returns the sqaure of the prime function.
+        %  w = skprime(...);
+        %  Xval = Xeval(w, z);
         if skp.domain.m == 0
             X = (z - skp.parameter).^2;
             return
