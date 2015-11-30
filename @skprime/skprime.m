@@ -75,8 +75,8 @@ methods
                 vjfuns = dv.vjFuns;
                 phi = dv.phiFun;
                 D = dv.domain;
-            elseif isa(dv, 'skpDomain')
-                D = dv;
+            elseif isa(dv, 'skpDomain') || isa(dv, 'circleRegion')
+                D = skpDomain(dv);
                 if nargin > 2 && numel(qv) == 1
                     N = qv;
                 end
