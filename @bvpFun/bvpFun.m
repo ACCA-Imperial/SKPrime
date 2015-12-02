@@ -1,5 +1,15 @@
 classdef bvpFun < skpObject
 %bvpFun is the base class for the BVP functions.
+%
+% obj = bvpFun(D, N, phi)
+%   Base class for SKPrime BVP based functions. Not a truly functional
+%   class.
+%
+% Provides properties:
+%   phiFun
+%   trunctation
+%
+% See also skpObject.
 
 % Everett Kropf, 2015
 % 
@@ -19,8 +29,8 @@ classdef bvpFun < skpObject
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 properties(SetAccess=protected)
-    phiFun
-    truncation = 64
+    phiFun                      % Unknown function object
+    truncation = 64             % Series truncation setting
 end
 
 methods

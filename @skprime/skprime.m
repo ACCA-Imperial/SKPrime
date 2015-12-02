@@ -41,21 +41,21 @@ classdef skprime < bvpFun
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 properties(SetAccess=protected)
-    parameter    
-    vjFuns = {}
+    parameter               % Prime function "parameter"
+    vjFuns = {}             % Cell array of first kind integral objects
 end
 
 properties(Access=protected)
-    refdata
-    logXhatBdry
-    logXhatCont
+    refdata                 % Shared memory state storage
+    logXhatBdry             % Boundary function handle
+    logXhatCont             % Continuation function handle
 end
 
 properties(Dependent, Access=protected)
-    primeCorrect
-    normFactor
-    logXhatOutBdry
-    logXhatOutCont
+    primeCorrect            % Root branch correction flag
+    normFactor              % Normalisation factor
+    logXhatOutBdry          % Outer boundary function handle
+    logXhatOutCont          % Outer domain function handle
 end
 
 methods
@@ -128,15 +128,18 @@ methods
     end % ctor
     
     function skp = invParam(skp)
-        %invParam gives the prime function with inverted parameter.
+        %gives the prime function with inverted parameter
+        %
         %  w = skprime(...);
         %  wi = invParam(w);
         %  Then isa(wi, 'skprime') is a true statememt.
+        
         skp = skpinvparam(skp);
     end
     
     function dw = diff(skp)
-        %DIFF Derivative of skprime via DFT and Cauchy continuation.
+        %gives derivative of skprime via DFT and Cauchy continuation
+        %
         %   dw = DIFF(skp), returns a function handle dw to the derivative
         %      of skp with repsect to the complex variable, restricted to
         %      the unit disk.
@@ -185,6 +188,10 @@ methods
     end
     
     function w = feval(skp, z)
+        %provides prime function evaluation
+        %
+        % w = feval(skp, z)
+        
         if skp.domain.m == 0
             w = z - skp.parameter;
             return
@@ -202,9 +209,11 @@ methods
     end
     
     function X = Xeval(skp, z)
-        %Xeval returns the sqaure of the prime function.
-        %  w = skprime(...);
-        %  Xval = Xeval(w, z);
+        %returns the square of the prime function
+        %
+        % w = skprime(...);
+        % Xval = Xeval(w, z);
+        
         if skp.domain.m == 0
             X = (z - skp.parameter).^2;
             return
@@ -215,6 +224,10 @@ end
 
 methods(Access=protected)
     function skps = copyProperties(skp)
+        %copies all object properties to structure
+        %
+        % Gives external access to a copy of object internals.
+        
         mco = ?skprime;
         for k = 1:numel(mco.PropertyList)
             pname = mco.PropertyList(k).Name;
@@ -223,6 +236,12 @@ methods(Access=protected)
     end
     
     function [logX, inUnit] = evalLogX(skp, z)
+        %computes values of log(X)
+        %
+        % [logX, inUnit] = evalLogX(skp, z)
+        %   The value inUnit is a logcal array size(z) such that true
+        %   indicates any abs(z) < 1.
+        
         logXhat = complex(nan(size(z)));
         
         inUnit = abs(z) < 1 + eps(2);
@@ -269,9 +288,12 @@ methods(Access=protected)
     end
     
     function skp = setCorrection(skp)
+        %does square root branch correction
+        %
         % Does the prime function need a correction to stay on the proper branch?
         % FIXME: This should check the test point is not in a circle! This should
         % have a maximum retry count on test point selection!
+        
         testpt = 1 - 1e-6;
         while abs(testpt - skp.parameter) < 1e-2
             testpt = (1 - 1e-6)*exp(2i*pi*rand(1));
@@ -283,6 +305,8 @@ end
 
 methods(Access=protected) % BVP stuff
     function skp = bvpInDomain(skp)
+        %solves BVP for parameter in unit disk
+        
         alpha = skp.parameter;
         psi = calcPsi(skp, alpha);
 
@@ -299,6 +323,8 @@ methods(Access=protected) % BVP stuff
     end
     
     function skp = bvpInDomainOuter(skp)
+        %solves BVP for parameter in unit disk for outer evaluation
+        
         alpha = skp.parameter;
         psi = calcPsi(skp, inv(alpha));
 
@@ -314,6 +340,8 @@ methods(Access=protected) % BVP stuff
     end
     
     function skp = bvpIsUnit(skp)
+        %solves BVP for parameter on unit circle
+        
         alpha = skp.parameter;
 
         imLogXhat = primeRHS(alpha, skp.vjFuns);
@@ -325,12 +353,16 @@ methods(Access=protected) % BVP stuff
     end
     
     function skp = bvpIsUnitOuter(skp)
+        %sovles BVP for unit parameter and outer evaluation
+        
         skp.logXhatOutBdry = skp.logXhatBdry;
         skp.logXhatOutCont = SKP.bmcCauchy(skp.logXhatOutBdry, ...
             skp.domain, skp.truncation);
     end
     
     function skp = bvpOnInner(skp)
+        %solves BVP for parameter on inner boundary
+        
         alpha = skp.parameter;
         D = skp.domain;
         N = skp.truncation;
@@ -359,6 +391,8 @@ methods(Access=protected) % BVP stuff
     end
     
     function skp = bvpOnOuter(skp)
+        %solves BVP for parameter on outer boundary
+        
         alpha = skp.parameter;
         [d, q] = domainDataB(skp.domain);
         j = alpha.ison;
@@ -382,6 +416,8 @@ methods(Access=protected) % BVP stuff
     end
     
     function psi = calcPsi(skp, param)
+        %computes parameter near boundary correction
+        
         [d, q] = domainData(skp.domain);
         
         psi = @(z) 1;
@@ -399,6 +435,8 @@ methods(Access=protected) % BVP stuff
     end
     
     function skp = solveBVPs(skp)
+        %calls proper BVP solver method
+        
         switch skp.parameter.state
             case {paramState.isZero, paramState.atInf, ...
                     paramState.innerFD, paramState.outerFD}
@@ -416,6 +454,8 @@ methods(Access=protected) % BVP stuff
     end
     
     function skp = solveBVPouter(skp)
+        %calls proper BVP solver method for outer evaluation
+        
         switch skp.parameter.state
             case {paramState.isZero, paramState.atInf, ...
                     paramState.innerFD, paramState.outerFD}

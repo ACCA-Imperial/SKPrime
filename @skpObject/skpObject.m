@@ -1,5 +1,11 @@
 classdef skpObject
-%skpObject abstract base utility class for SKPrime.
+%skpObject abstract base utility class for SKPrime
+%
+% obj = skpObject(domain)
+%   Abstract base utility class for the SKPrime kit. Must be subclassed.
+%
+% Abstract method:
+%   feval -- define to provide function evaluation behaviour
 
 % Everett Kropf, 2015
 % 
@@ -19,11 +25,11 @@ classdef skpObject
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 properties(SetAccess=protected)
-    domain
+    domain                      % skpDomain object
 end
 
 methods(Abstract)
-    v = feval(skp, z);
+    v = feval(skp, z)
 end
 
 methods
@@ -43,6 +49,12 @@ methods
     end
     
     function onB = onBoundary(skp, z)
+        %checks for points on boundary
+        %
+        % onB = onBoundary(skp, z)
+        %   Return boolean array of size(z) where true if a point z is on
+        %   the boundary, false otherwise.
+        
         onB = false(size(z));
         [d, q, m] = domainDataB(skp.domain);
         for j = 0:m
@@ -51,6 +63,11 @@ methods
     end
     
     function out = subsref(skp, S)
+        %provides function syntax
+        %
+        % Provides skp(z) evaluation syntax, passes all unrecognized
+        % subsref to builtin.
+        
         if numel(S) == 1 && strcmp(S.type, '()')
             out = feval(skp, S.subs{:});
         else
