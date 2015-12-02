@@ -1,15 +1,31 @@
 classdef schwarz < skpObject
-%schwarz attempts to solve the Schwarz problem.
+%schwarz attempts to solve the modified Schwarz problem
 %
 % phi = schwarz(r, D, N)
-% Attempts to solve the Schwarz problem on multiply connected domain D
-% given the imaginary part of a function r(z) = imag(f) analytic on D.
-% The resulting object evaluates the solution of the Schwarz problem on the
-% boundary of the circles C_j. That is, for z_j on C_j, 
+%   Attempts to solve the Schwarz problem on multiply connected domain D
+%   given the imaginary part of a function r(z) = imag(f) analytic on D.
+%   The resulting object evaluates the solution of the Schwarz problem on
+%   the boundary of the circles C_j. That is, for z_j on C_j, 
 %
-%   f(z_j) = phi(z_j) + 1i*r(z_j)
+%     f(z_j) = phi(z_j) + 1i*r(z_j) + 1i*gamma_j
 %
-% up to an imaginary constant.
+%   where the constant gamma_j is found as part of the solution.
+%
+% The current solution phi is given by the series
+%
+%                       -- N
+%                       \
+%   phi(z_j) = a(0,j) +  .     a(n,j)*eta(z_j)^n ...
+%                       /                  + conj(a(n,j))*eta(z_j)^(-n)
+%                       -- n=1
+% where
+%
+%   eta(z_j) = (z_j - d_j)/q_j
+%
+% and a(0,0) = 0 since the BVP is determined up to a real constant. Note
+% the constant gamma_j is the imaginary part of a(0,j).
+%
+% See also schwarzMatrix
 
 % E. Kropf, 2015
 % 
@@ -29,23 +45,23 @@ classdef schwarz < skpObject
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 properties
-    nTrapezoid = 100
+    nTrapezoid = 100    % number of points for trapezoidal rule
 end
 
 properties(SetAccess=protected)
-    theMatrix
-    phiCoef
-    rhsFun
-    truncation
+    theMatrix           % schwarzMatrix object
+    phiCoef             % solution series coefficients
+    rhsFun              % given function
+    truncation          % series truncation level
 end
 
 properties(Dependent)
-    rhsValue
+    rhsValue            % linear system RHS vector
 end
 
 properties(Access=protected)
-    kNumber
-    numBaseRows
+    kNumber             % number of transform "modes" to use
+    numBaseRows         % matrix construction value
 end
 
 methods
@@ -83,6 +99,10 @@ methods
     end
     
     function val = feval(phi, z)
+        %provides function evaluation
+        %
+        % val = feval(phi, z)
+        
         if isempty(phi.phiCoef)
             schwarz.noSolverWarn();
             val = nan(size(z));
@@ -105,6 +125,11 @@ methods
     end
     
     function phi = solve(phi, rfun)
+        %call the solver for the modified Schwarz problem
+        %
+        % phi = solve(phi, rfun)
+        %   Note this creates a new object.
+        
         phi.rhsFun = rfun;
         phi.phiCoef = solveSystem(phi);
     end
@@ -116,6 +141,8 @@ end
 
 methods(Access=protected)
     function b = calcRHS(phi)
+        %computes the RHS of the linear system
+        
         [d, q, m] = domainDataB(phi.domain);
         K = phi.kNumber;
         Q = phi.numBaseRows;
@@ -149,6 +176,8 @@ methods(Access=protected)
     end
     
     function L = makeL(phi)
+        %constructs the matrix for the linear system
+        
         [d, q, m] = domainDataB(phi.domain);
         N = phi.truncation;
         Q = phi.numBaseRows;
@@ -213,6 +242,8 @@ methods(Access=protected)
     end
     
     function a = solveSystem(phi)
+        %solves the linear system to find the coefficients
+        
         [~, ~, m] = domainDataB(phi.domain);
         N = phi.truncation;
         M = 1 + 2*N;

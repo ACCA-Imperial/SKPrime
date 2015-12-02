@@ -1,6 +1,9 @@
 classdef skpinvparam < skprime
 %SKPINVPARAM is the inverted parameter prime function.
 %
+% w = skprime(...)
+% winv = skpinvparam(w)
+%
 % Given the S-K prime function w(zeta, alpha), this class represents the
 % inverted (w.r.t. the unit circle) parameter prime function
 %
@@ -47,6 +50,8 @@ methods
     end
     
     function Xc = Xeval(skpc, z)
+        %gives the square of the prime function
+        
         Xc = conj(Xeval@skprime(skpc, 1./conj(z)));
         alpha = skpc.parameter;
         if 0 ~= alpha && ~isinf(alpha)
@@ -57,6 +62,8 @@ methods
     end
     
     function wc = feval(skpc, z)
+        %provides function evaluation
+        
         wc = conj(feval@skprime(skpc, 1./conj(z)));
         alpha = skpc.parameter;
         if 0 ~= alpha && ~isinf(alpha)
@@ -67,6 +74,8 @@ methods
     end
     
     function alphac = parameter(skpc)
+        %access inverted parameter
+        
         alphac = inv(skpc.parameter);
     end
 end

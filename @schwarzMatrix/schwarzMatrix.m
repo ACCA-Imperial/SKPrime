@@ -1,5 +1,12 @@
 classdef schwarzMatrix < handle
-%schwarzMatrix provides shared memory for domain matrix.
+%schwarzMatrix provides shared memory for domain matrix
+%
+% M = schwarzMatrix(mat)
+%   Returns a handle object M storing provided matrix mat. The standard
+%   matrix operators are supplied, use the methods command to see this
+%   list.
+%
+% See also schwarz, methods
 
 % Everett Kropf, 2015
 % 
@@ -19,7 +26,7 @@ classdef schwarzMatrix < handle
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 properties
-    matrix
+    matrix                  % matrix being stored
 end
 
 methods
