@@ -143,6 +143,35 @@ methods
         [dv, qv, m, di, qi] = deal(D.datCellB{:});
     end
     
+    function z = ginput(D, n, fig)
+        %ginput gets graphical input from the mouse
+        %  z = ginput(D, n) gets n points from domain D using the builtin
+        %  ginput. Plots (and closes when finished) the domain.
+        %
+        %  z = ginput(D, n, fig) uses existing figure fig instead of
+        %  drawing a new one.
+                
+        drawme = false;
+        if nargin < 3 || ~ishghandle(fig)
+            drawme = true;
+        end
+        if drawme
+            plot(D)
+            fig = figure(gcf);
+        end
+        
+        if nargin < 2 || isempty(n)
+            [x, y] = ginput;
+        else
+            [x, y] = ginput(n);
+        end
+        z = complex(x, y);
+        
+        if drawme && isa(fig, 'matlab.ui.Figure')
+            close(fig)
+        end
+    end
+    
     function je = isclose(D, alpha)
         %isclose gives inner boundary indices for a close parameter.
         
