@@ -70,6 +70,7 @@ methods
             end
             if iscell(dv) && all(cellfun(@(c) isa(c, 'vjFirstKind'), dv(:)))
                 vjfuns = dv;
+                phi = dv.phiFun;
                 D = dv{1}.domain;
             elseif isa(dv, 'skprime')
                 vjfuns = dv.vjFuns;
