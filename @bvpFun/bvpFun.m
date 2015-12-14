@@ -39,7 +39,9 @@ methods
             sarg = {};
         elseif isa(D, 'bvpFun')
             phi = D.phiFun;
-            N = D.truncation;
+            if nargin < 2
+                N = D.truncation;
+            end
             sarg = {D.domain};
         else
             sarg = {D};
