@@ -2,7 +2,7 @@
 
 SKPrime: A numerical implementation of the Schottky-Klein prime function in MATLAB.
 
-This software is still experimental, and as such should only be relied on for computations with caveats. Documentation is sparse and in progress. Any quesions should be directed to Everett.
+This software is in the pre-release stage. Help documentaiton for MATLAB is a work in progress. Theory documentation is in-process, to be submitted very soon. Any quesions should be directed to Everett.
 
 ### How do I get set up? ###
 
@@ -12,6 +12,7 @@ This software is still experimental, and as such should only be relied on for co
     * This will put the SKPrime directory on your MATLAB search path.
 * See the `example.m` file for usage examples.
 * See the `example_accuracy.m` file for an accuracy test example.
+* See the `example_slitmap.m` file for a slitmap with the prime function.
 
 ### Contribution guidelines ###
 
