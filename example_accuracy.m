@@ -33,15 +33,14 @@ f = @(z) reshape(sum(1./bsxfun(@minus, z(:), dv.'), 2), size(z));
 % Some random points to check.
 z0 = [0.4+0.5i; -0.5-0.5i; +0.5-0.5i; -0.5+0.1i; 0.8i];
 
-tic
 rerr = skpIntCheck(f, z0, acal, skpDomain(dv, qv));
-toc
 
 
 %%
 
-fprintf('\n    z0       rel.err.\n')
-fprintf(  ' ---------  ----------\n')
+fprintf('\nRelative error at the test points:\n\n')
+fprintf('    z0       rel.err.\n')
+fprintf(' ---------  ----------\n')
 for i = 1:numel(z0)
     fprintf(' %9s  %.5g\n', num2str(z0(i)), rerr(i))
 end
