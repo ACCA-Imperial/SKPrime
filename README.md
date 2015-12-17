@@ -14,6 +14,10 @@ This software is in the pre-release stage. Help documentaiton for MATLAB is a wo
 * See the `example_accuracy.m` file for an accuracy test example.
 * See the `example_slitmap.m` file for a slitmap with the prime function.
 
+### FMM acceleration ###
+
+If you have the [FMM2D software](http://www.cims.nyu.edu/cmcl/fmm2dlib/fmm2dlib.html) installed, and the `zfmm2dpart.m` file is in your MATLAB search path, then the SKPrime software will take advantage of this for evaluation of points in the domain.
+
 ### Contribution guidelines ###
 
 * Ask Everett.
