@@ -61,7 +61,14 @@ Hzb = exp(-1i*pi/2)*log(Pzb);
 aspecteq = @() set(gca, 'dataaspectratio', [1, 1, 1]);
 
 figure(1), clf
+plot(zb([1:end, 1],:))
+aspecteq()
+axis off
 
+figure(2), clf
+plot(Pzb)
+aspecteq()
+axis off
 
 figure(3), clf
 plot(Hzb)
