@@ -1,6 +1,7 @@
 %% Prime function usage example.
-% E. Kropf, 2015
 
+% Everett Kropf, 2015
+%
 % This file is part of SKPrime.
 % 
 % SKPrime is free software: you can redistribute it and/or modify
@@ -49,10 +50,17 @@ Xp = X(zp);
 
 
 %% Make a complex potential.
-% Note using the first prime function to construct the second reduces the
-% amount of work done (the v_j functions do not need recomputed, and may be
-% copied).
+% Note that calling the |invParam| method (from the |skprime| class) is
+% equivalent to calling
+%
+%    w2 = skprime(1/conj(alpha), w);
+%
+% where using the previous instance of |skprime| accelerates the
+% construction of the next (e.g., the first-kind integral functions do not
+% need to be recomputed). Both methods are faster than calling
+%
+%    w2 = skprime(1/conj(alpha), dv, qv);
 
-w2 = skprime(1./conj(alpha), w);
+w2 = invParam(w);
 W = @(z) log(w(z)./(abs(alpha)*w2(z)))/(2i*pi);
 Wp = W(zp);

@@ -2,6 +2,8 @@
 % Quick check of prime function accuracy. See help text in skpIntCheck for
 % more information.
 
+% Everett Kropf, 2015
+%
 % This file is part of SKPrime.
 % 
 % SKPrime is free software: you can redistribute it and/or modify
@@ -34,4 +36,13 @@ z0 = [0.4+0.5i; -0.5-0.5i; +0.5-0.5i; -0.5+0.1i; 0.8i];
 tic
 rerr = skpIntCheck(f, z0, acal, skpDomain(dv, qv));
 toc
-disp(rerr)
+
+
+%%
+
+fprintf('\n    z0       rel.err.\n')
+fprintf(  ' ---------  ----------\n')
+for i = 1:numel(z0)
+    fprintf(' %9s  %.5g\n', num2str(z0(i)), rerr(i))
+end
+fprintf('\n')
