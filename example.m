@@ -61,6 +61,39 @@ Xp = X(zp);
 %
 %    w2 = skprime(1/conj(alpha), dv, qv);
 
-w2 = invParam(w);
-W = @(z) log(w(z)./(abs(alpha)*w2(z)))/(2i*pi);
+wi = invParam(w);
+W = @(z) log(w(z)./(abs(alpha)*wi(z)))/(2i*pi);
 Wp = W(zp);
+
+
+%%
+% Slightly more complicated potential; sum of 2 logarithmic singularities.
+
+a2 = 0.50789+0.29737i;
+w2 = skprime(a2, w);
+w2i = invParam(w2);
+W2 = @(z) W(z) + log(w2(z)./(abs(a2)*w2i(z)))/(2i*pi);
+
+
+%%
+% Plot some equipotential lines.
+
+% Grid points in domain.
+[X, Y] = meshgrid(linspace(-1, 1, 200));
+zg = complex(X, Y);
+zg(abs(zg) >= 1-eps(2)) = nan;
+for j = 1:m
+    zg(abs(zg - dv(j)) < qv(j)+eps(2)) = nan;
+end
+
+% Boundary points.
+zb = exp(2i*pi*(0:200)'/200);
+zb = bsxfun(@plus, [0; dv].', bsxfun(@times, [1; qv]', zb));
+
+clf
+contour(real(zg), imag(zg), imag(W2(zg)), 20, 'color', lines(1))
+hold on
+plot(zb, 'k-', 'linewidth', 1.5)
+hold off
+set(gca, 'dataaspectratio', [1, 1, 1])
+axis off
