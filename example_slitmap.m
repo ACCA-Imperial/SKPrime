@@ -125,9 +125,9 @@ Hzb = H(zb);
 
 figure(3), clf
 hold on
-plot(H(zv), '.', 'color', zcolor(1,:))
-plot(H(zh), '.', 'color', zcolor(2,:))
-plot(Hzb, 'k-', 'linewidth', 1.5)
+plotv(H(zv))
+ploth(H(zh))
+plotb(Hzb)
 hold off
 aspecteq()
 axis off
