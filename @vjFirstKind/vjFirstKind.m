@@ -36,6 +36,10 @@ properties(SetAccess=protected)
     contFun
 end
 
+properties(Dependent)
+    constants
+end
+
 methods
     function vj = vjFirstKind(j, D, N)
         if ~nargin
@@ -76,7 +80,7 @@ methods
         vj.bdryFun = @(z) vj.phiFun(z) + 1i*hj(z);
         vj.contFun = SKP.bmcCauchy(vj.bdryFun, vj.domain, vj.truncation);
     end
-    
+        
     function v = hat(vj, z)
         v = vjHatEval(vj, z);
     end
@@ -125,6 +129,14 @@ methods
     
     function v = logPlus(vj, z)
         v = vj.logjFun(z) + vj.vjHatEval(z);
+    end
+end
+
+methods % Property access.
+    function gjk = get.constants(vj)
+        %Returns the constant values of imag(v_j) on circles C_k.
+        
+        gjk = imag(vj.phiFun.phiCoef(1,2:end));
     end
 end
 
