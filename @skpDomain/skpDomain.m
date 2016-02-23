@@ -176,7 +176,8 @@ methods
         %isclose gives inner boundary indices for a close parameter.
         
         [d, q] = domainData(D);
-        if abs(alpha) < 1
+        % Consider |alpha| = 1 to be in D_zeta.
+        if abs(alpha) <= 1
             je = abs(alpha - d);
         elseif abs(alpha) > 1
             je = abs(1/conj(alpha) - d);
