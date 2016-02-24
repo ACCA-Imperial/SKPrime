@@ -4,6 +4,16 @@ classdef skpDomain
 % The skpDomain is defined by the vectors `dv` and `qv`, which represent
 % respectively the centers and radii of the circles containted in the unit
 % disk.
+%
+% D = skpDomain(dv, qv)
+%
+% Methods of interest (see help for each):
+%   domainData
+%   boundaryPts
+%   ginput
+%   plot
+%
+% See also skprime.
 
 % Everett Kropf, 2015
 % 
@@ -36,8 +46,8 @@ properties(Dependent)
 end
 
 properties(Access=private)
-    datCell
-    datCellB
+    datCell                     % Cached data for quick access.
+    datCellB                    % Cached data.
 end
 
 methods
