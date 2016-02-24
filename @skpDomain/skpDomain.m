@@ -131,10 +131,24 @@ methods
     end
     
     function [dv, qv, m, di, qi] = domainData(D)
+        %Returns domain data for inner circles.
+        %  dv = centers vector
+        %  qv = radii vector
+        %  m = number of inner circles
+        %  di = reflected (through unit) circle centers
+        %  qi = reflected circle radii
+        
         [dv, qv, m, di, qi] = deal(D.datCell{:});
     end
     
     function [dv, qv, m, di, qi] = domainDataB(D)
+        %Returns domain data for inner circles with unit data.
+        %  dv = centers vector
+        %  qv = radii vector
+        %  m = number of inner circles
+        %  di = reflected (through unit) circle centers
+        %  qi = reflected circle radii
+
         [dv, qv, m, di, qi] = deal(D.datCellB{:});
     end
     
