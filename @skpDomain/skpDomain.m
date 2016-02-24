@@ -48,6 +48,8 @@ end
 properties(Access=private)
     datCell                     % Cached data for quick access.
     datCellB                    % Cached data.
+    
+    npDefault = 200             % Default number of boundary pts.
 end
 
 methods
@@ -116,7 +118,7 @@ methods
         %   tb is the size np vector of angles to construct zb.
         
         if nargin < 2
-            np = 200;
+            np = D.npDefault;
         end
         
         tb = 2*pi*(0:np-1)/np;
