@@ -36,8 +36,6 @@ properties(SetAccess=protected)
     dv                          % vector of centers
     qv                          % vector of radii
     m                           % number of circles
-
-    alpha                       % domain parameter point
 end
 
 properties(Dependent)
@@ -53,27 +51,20 @@ properties(Access=private)
 end
 
 methods
-    function D = skpDomain(dv, qv, alpha)
+    function D = skpDomain(dv, qv)
         if ~nargin
             return
         end
 
-        if nargin < 3
-            alpha = [];
-        end
         if isa(dv, 'skpDomain')
             if nargin > 1
                 error('SKPrime:invalidArgument', 'Too many arguments given.')
             end
-            alpha = dv.alpha;
             qv = dv.qv;
             dv = dv.dv;
         elseif isa(dv, 'circleRegion')
             if nargin > 2
                 error('SKPrime:invalidArgument', 'Too many arguments given.')
-            end
-            if nargin == 2
-                alpha = qv;
             end
             qv = dv.radii(2:end);
             dv = dv.centers(2:end);
@@ -99,14 +90,6 @@ methods
         
         D.datCell = {dv, qv, D.m, di, qi};
         D.datCellB = {[0; dv], [1; qv], D.m, di, qi};
-        
-        if ~isempty(alpha)
-            if ~isnumeric(alpha) || numel(alpha) > 1
-                error('SKPrime:invalidArgument', ...
-                    'The parameter alpha must be a scalar value.')
-            end
-            D.alpha = skpDomain.normalizeParameter(alpha);
-        end
     end
     
     function [zb, tb] = boundaryPts(D, np)
@@ -225,20 +208,6 @@ methods
     function q = get.radii(D)
         q = D.qv;
     end    
-end
-
-methods(Static)
-    function param = normalizeParameter(param)
-        if 0 < abs(param) && abs(param) < eps
-            param = 0;
-            warning('SKPrime:normalising', ...
-                'Treating "small" alpha as zero.')
-        elseif ~isinf(param) && 1/eps < abs(param)
-            param = inf;
-            warning('SKPrime:normalising', ...
-                'Treating "large" alpha as infinity.')
-        end
-    end
 end
 
 methods(Access=private, Static)
