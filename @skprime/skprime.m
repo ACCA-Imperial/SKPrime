@@ -138,56 +138,6 @@ methods
         skp = skpinvparam(skp);
     end
     
-    function dw = diff(skp)
-        %gives derivative of skprime via DFT and Cauchy continuation
-        %
-        %   dw = DIFF(skp), returns a function handle dw to the derivative
-        %      of skp with repsect to the complex variable, restricted to
-        %      the unit disk.
-        
-        nf = 256;
-        [d, q, m] = domainDataB(skp.domain);
-        zf = bsxfun(@plus, d.', ...
-            bsxfun(@times, q', exp(2i*pi/nf*(0:nf-1)')));
-        dmult = [0:nf/2-1, 0, -nf/2+1:-1]';
-        ipos = nf/2:-1:1;
-        ineg = nf/2+1:nf;
-
-        dk = complex(nan(nf, m+1));
-        p = cell(1, m+1);
-        for j = 1:m+1
-            dk(:,j) = 1i*dmult.*fft(feval(skp, zf(:,j)))/nf;
-            p{j} = @(z) polyval(dk(ipos,j), z) ...
-                + polyval([dk(ineg,j); 0], 1./z);
-        end
-        
-        function [val, onBdry] = dwBdry(z)
-            val = complex(nan(size(z)));
-            if nargout > 1
-                onBdry = false(size(z));
-            end
-            for i = 1:m+1
-                onCj = abs(q(i) - abs(z - d(i))) < eps(2);
-                if any(onCj(:))
-                    eij = (z(onCj) - d(i))/q(i);
-                    val(onCj) = p{i}(eij)./(1i*q(i)*eij);
-                    if nargout > 1
-                        onBdry = onBdry | onCj;
-                    end
-                end
-            end
-        end
-        
-        dwCont = SKP.bmcCauchy(@dwBdry, skp.domain, skp.truncation);
-        
-        function val = dwEval(z)
-            [val, onBdry] = dwBdry(z);
-            val(~onBdry) = dwCont(z(~onBdry));
-        end
-        
-        dw = @dwEval;
-    end
-    
     function w = feval(skp, z)
         %provides prime function evaluation
         %
