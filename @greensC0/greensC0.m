@@ -61,7 +61,7 @@ methods
         aj = isclose(g0.domain, alpha);
         
         if ~isempty(alpha.ison) && alpha.ison == 0
-            % Alpha on the unit circle is const zero.
+            % Alpha on the unit circle means const zero.
             g0.logaFun = @(z) zeros(size(z));
             g0.singCorrFact = sf;
             g0.bdryFun = @(z) zeros(size(z));
@@ -102,6 +102,35 @@ methods
         % Boundary function and Cauchy interpolant.
         g0.bdryFun = @(z) g0.phiFun(z) + 1i*ha(z);
         g0.contFun = SKP.bmcCauchy(g0.bdryFun, g0.domain, 2*g0.truncation);
+    end
+    
+    function dg0 = diff(g0)
+        %gives the derivative of the Green's function.
+        %
+        % dvj = diff(g0)
+        %   Returns function handle to derivative of g0 function by way of
+        %   DFT on the boundary and Cauchy continuation for the interior.
+        
+        dg0h = diff@bvpFun(g0, @g0.hat);
+        
+        function dval = deval(z)
+            alpha = g0.parameter;
+            if ~isempty(alpha.ison) && alpha.ison == 0
+                dval = complex(zeros(size(z)));
+                return
+            end
+            
+            dval = dg0h(z);
+            if alpha == 0
+                dval = dval + 1./z./(2i*pi);
+            elseif isinf(alpha)
+                dval = dval - 1./z./(2i*pi);
+            else
+                dval = dval + (1./(z - alpha) - 1./(z - conj(alpha)))/(2i*pi);
+            end
+        end
+        
+        dg0 = @deval;
     end
     
     function hatFun = G0hat(g0)
