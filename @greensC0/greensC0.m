@@ -110,8 +110,9 @@ methods
         % dvj = diff(g0)
         %   Returns function handle to derivative of g0 function by way of
         %   DFT on the boundary and Cauchy continuation for the interior.
+        %   Derivative is restricted to the unit disk.
         
-        dg0h = diff@bvpFun(g0, @g0.hat);
+        dg0h = diffh(g0);
         
         function dval = deval(z)
             alpha = g0.parameter;
@@ -131,6 +132,17 @@ methods
         end
         
         dg0 = @deval;
+    end
+    
+    function dgh = diffh(g0)
+        %gives derivative of the analytic part.
+        %
+        % dvh = diffh(vj)
+        %   Returns function handle to derivative of vj.hat by way of
+        %   DFT on the boundary and Cauchy continuation for the interior.
+        %   Derivative is restricted to the unit disk.
+        
+        dgh = dftDerivative(g0, @g0.hat);
     end
     
     function hatFun = G0hat(g0)
