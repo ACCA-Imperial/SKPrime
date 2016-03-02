@@ -76,12 +76,21 @@ methods
         end
     end
     
-    function dw = diff(bvp)
+    function dw = diff(bvp, F)
         %gives derivative of BVP function via DFT and Cauchy continuation.
         %
-        %   dw = DIFF(skp), returns a function handle dw to the derivative
-        %      of the function with repsect to the complex variable,
-        %      restricted to the unit disk.
+        %   dw = DIFF(bvp)
+        %      Returns a function handle dw to the derivative of the bvpFun
+        %      object with repsect to the complex variable via
+        %      bvpFun.feval(). The derivative is restricted to the unit disk.
+        %
+        %   dw = DIFF(bvp, F)
+        %      Returns the derivative of function handle F instead of
+        %      using bvpFun.feval().
+        
+        if nargin < 2
+            F = @bvp.feval;
+        end
         
         nf = 256;
         [d, q, m] = domainDataB(bvp.domain);
@@ -94,7 +103,7 @@ methods
         dk = complex(nan(nf, m+1));
         p = cell(1, m+1);
         for j = 1:m+1
-            dk(:,j) = 1i*dmult.*fft(feval(bvp, zf(:,j)))/nf;
+            dk(:,j) = 1i*dmult.*fft(F(zf(:,j)))/nf;
             p{j} = @(z) polyval(dk(ipos,j), z) ...
                 + polyval([dk(ineg,j); 0], 1./z);
         end
