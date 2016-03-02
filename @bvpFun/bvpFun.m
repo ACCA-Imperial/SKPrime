@@ -76,21 +76,26 @@ methods
         end
     end
     
-    function dw = diff(bvp, F)
+    function dw = diff(bvp)
         %gives derivative of BVP function via DFT and Cauchy continuation.
         %
-        %   dw = DIFF(bvp)
+        %   dw = dftDeriv(bvp)
         %      Returns a function handle dw to the derivative of the bvpFun
         %      object with repsect to the complex variable via
         %      bvpFun.feval(). The derivative is restricted to the unit disk.
-        %
-        %   dw = DIFF(bvp, F)
-        %      Returns the derivative of function handle F instead of
-        %      using bvpFun.feval().
         
-        if nargin < 2
-            F = @bvp.feval;
-        end
+        dw = dftDerivative(bvp, @bvp.feval);
+    end
+end
+
+methods(Access=protected)
+    function dw = dftDerivative(bvp, F)
+        %gives derivative via DFT and continuation.
+        %
+        %   dw = dftDeriv(bvp, F)
+        %      Returns the derivative of function handle F using the DFT
+        %      and Cauchy continuation. The derivative is restricted to the
+        %      unit disk.
         
         nf = 256;
         [d, q, m] = domainDataB(bvp.domain);
