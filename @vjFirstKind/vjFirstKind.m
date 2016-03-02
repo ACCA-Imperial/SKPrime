@@ -80,6 +80,28 @@ methods
         vj.bdryFun = @(z) vj.phiFun(z) + 1i*hj(z);
         vj.contFun = SKP.bmcCauchy(vj.bdryFun, vj.domain, vj.truncation);
     end
+    
+    function dvj = diff(vj)
+        %gives first-kind integral derivative.
+        %
+        % dvj = diff(vj)
+        %   Returns function handle to derivative of vj function by way of
+        %   DFT on the boundary and Cauchy continuation for the interior.
+        
+        dvh = diff@bvpFun(vj, @vj.hat);
+        
+        function dval = deval(z)
+            j = vj.boundary;
+            [dv, qv, ~, dvi] = domainData(vj.domain);
+            
+            dval = dvh(z) + 1./(z - dv(j))/(2i*pi);
+            if abs(dv(j)) > qv(j)
+                dval = dval - 1./(z - dvi(j))/(2i*pi);
+            end
+        end
+        
+        dvj = @deval;
+    end
         
     function v = hat(vj, z)
         v = vjHatEval(vj, z);
