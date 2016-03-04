@@ -55,9 +55,7 @@ methods
             return
         end
         
-        if ~isa(alpha, 'skpParameter')
-            alpha = skpParameter(alpha, D);
-        end
+        alpha = skpParameter(alpha, gj.domain);
         gj.parameter = alpha;
         [d, q] = domainData(gj.domain);
         
