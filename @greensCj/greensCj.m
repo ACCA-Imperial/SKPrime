@@ -32,7 +32,8 @@ classdef greensCj < bvpFun
 
 properties(SetAccess=protected)
     parameter
-        
+    boundary
+    
     logaFun
     singCorrFact
     bdryFun
@@ -55,6 +56,7 @@ methods
             return
         end
         
+        gj.boundary = j;
         alpha = skpParameter(alpha, gj.domain);
         gj.parameter = alpha;
         [d, q] = domainData(gj.domain);
@@ -98,6 +100,16 @@ methods
         % Boundary function and Cauchy interpolant.
         gj.bdryFun = @(z) gj.phiFun(z) + 1i*ha(z) - normval;
         gj.contFun = SKP.bmcCauchy(gj.bdryFun, gj.domain, 2*gj.truncation);
+    end
+    
+    function dgp = diffp(gj)
+        %gives derivative with respect to parameter.
+        %
+        % dgp = diffp(g0)
+        %   Derivative of g0 with respect to the parameter. The returned
+        %   object has the parameter fixed and is a function of zeta.
+        
+        dgp = greensCjDa(gj.parameter, gj.boundary, gj);
     end
     
     function hatFun = Gjhat(gj)

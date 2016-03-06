@@ -135,7 +135,7 @@ methods
     end
     
     function dgh = diffh(g0)
-        %gives derivative of the analytic part.
+        %gives derivative of the analytic part wrt zeta variable.
         %
         % dvh = diffh(vj)
         %   Returns function handle to derivative of vj.hat by way of
@@ -143,6 +143,16 @@ methods
         %   Derivative is restricted to the unit disk.
         
         dgh = dftDerivative(g0, @g0.hat);
+    end
+    
+    function dgp = diffp(g0)
+        %gives derivative with respect to parameter.
+        %
+        % dgp = diffp(g0)
+        %   Derivative of g0 with respect to the parameter. The returned
+        %   object has the parameter fixed and is a function of zeta.
+        
+        dgp = greensCjDa(g0.parameter, 0, g0);
     end
     
     function hatFun = G0hat(g0)
