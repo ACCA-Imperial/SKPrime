@@ -46,7 +46,7 @@ methods
         
         [~, j] = max(abs([double(alpha); alpha - dv]));
         j = j - 1;
-        assert(alpha ~= 0 || j > 0, ...
+        assert(alpha ~= 0 || j > 0, 'SKPrime:logicError', ...
             'Something went horribly wrong!')
         
         if j == 0
@@ -57,9 +57,9 @@ methods
         
         da.greensDeriv = greensCjDa(alpha, j, w);
         
-        warning('SKP:warning', ...
+        warning('SKPrime:warning', ...
             ['Prime parameter derivative is experimental. ', ...
-            'Evaluation is acually the square of the derivative.'])
+            'Evaluation is actually the derivative of the square.'])
     end
     
     function v = feval(da, z)
