@@ -129,6 +129,16 @@ methods
         aobj.state = inv(aobj.state);
         aobj = skpParameter(1/conj(aobj), aobj);
     end
+
+    function out = horzcat(varargin)
+        varargin = cellfun(@double, varargin, 'UniformOutput', false);
+        out = horzcat(varargin{:});
+    end
+    
+    function out = vertcat(varargin)
+        varargin = cellfun(@double, varargin, 'UniformOutput', false);
+        out = vertcat(varargin{:});
+    end
 end
 
 methods(Static)
