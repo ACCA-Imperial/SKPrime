@@ -38,6 +38,7 @@ end
 
 properties(Dependent)
     constants
+    taujj
 end
 
 methods
@@ -171,6 +172,18 @@ methods % Property access.
         %Returns the constant values of imag(v_j) on circles C_k.
         
         gjk = imag(vj.phiFun.phiCoef(1,2:end));
+    end
+    
+    function tau = get.taujj(vj)
+        %computes the tau_jj constant associated with the function.
+        
+        j = vj.boundary;
+        
+        % Chose any point on Cj.
+        [dv, qv] = domainData(vj.domain);
+        z = dv(j) + qv(j);
+        
+        tau = vj.feval(z) - vj.feval(1/conj(z));
     end
 end
 
