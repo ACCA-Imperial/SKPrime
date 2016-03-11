@@ -92,22 +92,33 @@ methods
         D.datCellB = {[0; dv], [1; qv], D.m, di, qi};
     end
     
-    function [zb, tb] = boundaryPts(D, np)
+    function [zb, tb] = boundaryPts(D, np, outer)
         % Give np evenly spaced points on each boundary.
         %
         % [zb, tb] = boundaryPts(D, np)
         %   np default is 200.
-        %   zb is the (np, 2*m+1) array of boundary points.
+        %   zb is the (np, m+1) array of boundary points.
         %   tb is the size np vector of angles to construct zb.
+        %
+        % [zb, tb] = boundaryPts(D, np, outer)
+        %   If outer is true, then zb includes the boundaries reflected
+        %   through the unit circle.
         
         if nargin < 2
             np = D.npDefault;
+        end
+        if nargin < 3
+            outer = false;
         end
         
         tb = 2*pi*(0:np-1)/np;
         eit = exp(1i*tb);
         [d, q, ~, di, qi] = domainDataB(D);
-        zb = bsxfun(@plus, [d; di], bsxfun(@times, [q; qi], eit)).';
+        if outer
+            zb = bsxfun(@plus, [d; di], bsxfun(@times, [q; qi], eit)).';
+        else
+            zb = bsxfun(@plus, d, bsxfun(@times, q, eit)).';
+        end
     end
     
     function D = circleRegion(D)
