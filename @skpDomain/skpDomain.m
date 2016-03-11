@@ -214,6 +214,20 @@ methods
         end
     end
     
+    function ostr = string(D)
+        %gives defining properties of domain as string.
+        
+        function str = printv(label, var)
+            str = sprintf('%s = [', label);
+            s = num2str(var);
+            for k = 1:size(s, 1)
+                str = [str, sprintf('\n  %s', s(k,:))]; %#ok<AGROW>
+            end
+            str = [str, sprintf('];\n')];
+        end
+        ostr = [printv('dv', D.dv),  printv('qv', D.qv)];
+    end
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     function d = get.centers(D)
         d = D.dv;
