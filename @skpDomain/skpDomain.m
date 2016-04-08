@@ -225,7 +225,7 @@ methods
         end
     end
     
-    function ostr = string(D)
+    function ostr = char(D)
         %gives defining properties of domain as string.
         
         function str = printv(label, var)
