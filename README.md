@@ -22,7 +22,7 @@ When citing this software please mention this repository (current author is Ever
 
 ### FMM acceleration ###
 
-If you have the [FMM2D software](http://www.cims.nyu.edu/cmcl/fmm2dlib/fmm2dlib.html) installed, and the `zfmm2dpart.m` file is in your MATLAB search path, then the SKPrime software will take advantage of this for evaluation of points in the domain.
+If you have the [FMM2D software](http://www.cims.nyu.edu/cmcl/fmm2dlib/fmm2dlib.html) installed, and the `zfmm2dpart.m` file is in your MATLAB search path, then the SKPrime software will take advantage of this for evaluation of large numbers of points in the domain.
 
 ### Contribution guidelines ###
 
