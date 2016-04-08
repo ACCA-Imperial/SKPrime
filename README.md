@@ -2,7 +2,13 @@
 
 SKPrime: A numerical implementation of the Schottky-Klein prime function in MATLAB.
 
-This software is in the pre-release stage. Help documentaiton for MATLAB is a work in progress. Theory documentation is in-process, to be submitted very soon. Any quesions should be directed to Everett.
+This software is in the pre-release stage. Comprehensive help documentaiton for MATLAB is a work in progress. The theory behind the numerics is given in the paper listed in the citation section below.
+
+### Citing the software ###
+
+When citing this software please mention this repository (current author is Everett Kropf), and the paper
+
+> D.G. Crowdy, C.C. Green, E.H. Kropf, M.M.S. Nasser. "The Schottky-Klein prime function: a theoretical and computational tool for applications." IMA Journal of Applied Mathematics, in press, 2016.
 
 ### How do I get set up? ###
 
