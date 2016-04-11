@@ -52,8 +52,9 @@ end
 
 methods
     function D = skpDomain(dv, qv)
-        if ~nargin
-            return
+        if ~nargin || (nargin == 1 && isempty(dv))
+            dv = [];
+            qv = [];
         end
 
         if isa(dv, 'skpDomain')
@@ -121,7 +122,7 @@ methods
         end
     end
     
-    function D = circleRegion(D)
+    function C = circleRegion(D)
         % Convert to circleRegion if possible.
         
         [d, q, mu] = domainData(D);
@@ -131,7 +132,10 @@ methods
             for j = 2:mu+1
                 circs{j} = circle(d(j-1), q(j-1));
             end
-            D = circleRegion(circs{:});
+            C = circleRegion(circs{:});
+            if D.m == 0
+                C.bounded = true;
+            end
         catch me
             if strcmp(me.identifier, 'MATLAB:UndefinedFunction')
                 skpDomain.cmtError('circle or circleRegion')
