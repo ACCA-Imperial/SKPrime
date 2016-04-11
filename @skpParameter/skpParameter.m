@@ -101,6 +101,10 @@ methods
         aobj.ison = aon;
     end
     
+    function disp(aobj)
+        disp(double(aobj))
+    end
+    
     function out = subsref(aobj, S)
         if S(1).type == '.'
             switch S(1).subs
