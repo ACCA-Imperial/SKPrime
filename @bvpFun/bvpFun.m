@@ -1,4 +1,4 @@
-classdef bvpFun < skpObject
+classdef(Abstract) bvpFun < skpObject
 %bvpFun is the base class for the BVP functions.
 %
 % obj = bvpFun(D, N, phi)
@@ -65,10 +65,11 @@ methods
             bvp.truncation = N;
         end
         
-        if isempty(phi)
+        if isempty(phi) && bvp.domain.m > 0
             bvp.phiFun = schwarz(bvp.domain, bvp.truncation);
         else
-            if ~isa(phi, 'schwarz')
+            if (isempty(phi) && bvp.domain.m > 0) ...
+                    || ~(isempty(phi) || isa(phi, 'schwarz'))
                 error('SKPrime:invalidArgument', ...
                     '"phi" must be a "schwarz" object.')
             end
