@@ -164,6 +164,34 @@ methods
         dw = @dwEval;
     end
     
+    function dwh = diffh(skp)
+        %derivative of prime "hat" function wrt z.
+        
+        if skp.domain.m == 0
+            dwh = @(z) complex(zeros(size(z)));
+            return
+        end
+        
+        din = dftDerivative(skp, @skp.hat);
+        wi = invParam(skp);
+        dwih = dftDerivative(skp, @wi.hat);
+        dout = @(z) -conj(dwih(1./conj(z)))./z.^2;
+        
+        function val = dwhEval(z)
+            val = complex(nan(size(z)));
+            
+            mask = abs(z) <= 1;
+            if any(mask(:))
+                val(mask) = din(z(mask));
+            end
+            if any(~mask(:))
+                val(~mask) = dout(z(~mask));
+            end
+        end
+        
+        dwh = @dwhEval;
+    end
+    
     function skp = invParam(skp)
         %gives the prime function with inverted parameter
         %
