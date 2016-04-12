@@ -137,11 +137,31 @@ methods
         %
         %See also bvpFun.diff.
         
-        if skp.domain.m > 0
-            dw = diff@bvpFun(skp);
-        else
-            dw = @(z) -double(skp.parameter);
+        alpha = skp.parameter;
+        if skp.domain.m == 0
+            dw = @(z) -double(alpha);
+            return
         end
+        
+        din = diff@bvpFun(skp);
+        wi = invParam(skp);
+        dwi = diff@bvpFun(wi);
+        dout = @(z) ...
+            alpha*(conj(dwi(1./conj(z)))./z - conj(wi.feval(1./conj(z))));
+        
+        function val = dwEval(z)
+            val = complex(nan(size(z)));
+            
+            mask = abs(z) <= 1;
+            if any(mask(:))
+                val(mask) = din(z(mask));
+            end
+            if any(~mask(:))
+                val(~mask) = dout(z(~mask));
+            end
+        end
+        
+        dw = @dwEval;
     end
     
     function skp = invParam(skp)
