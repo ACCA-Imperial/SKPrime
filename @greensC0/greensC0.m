@@ -32,7 +32,7 @@ properties(SetAccess=protected)
         
     logaFun
     singCorrFact
-    normConstant
+    normConstant = 0
     bdryFun
     contFun
 end
@@ -93,6 +93,11 @@ methods
         end
         g0.logaFun = loga;
         g0.singCorrFact = sf;
+        
+        if g0.domain.m == 0
+            % Nothing more to do.
+            return
+        end
         
         % Known part on the boundary.
         ha = @(z) -imag(loga(z));
@@ -164,6 +169,13 @@ methods
     end
     
     function v = g0hatEval(g0, z)
+        %evaluate the "analytic" part.
+        
+        if g0.domain.m == 0
+            v = complex(zeros(size(z)));
+            return
+        end
+        
         v = complex(nan(size(z)));
         z = z(:);
         
@@ -187,7 +199,7 @@ methods
     end
     
     function v = feval(g0, z)
-        v = nan(size(z));
+        v = complex(nan(size(z)));
         
         inUnit = abs(z) <= 1 + eps(2);
         notNan = ~isnan(z);
