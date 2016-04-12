@@ -195,6 +195,25 @@ methods
         end
     end
     
+    function wh = hat(skp, z)
+        %evaluates the prime function with the zero factored out.
+        
+        if skp.domain.m == 0
+            wh = complex(zeros(size(z)));
+            return
+        end
+        
+        [wh, L] = evalLogXhat(skp, z);
+        wh = exp(wh/2);
+        
+        if ~isempty(skp.primeCorrect) && skp.primeCorrect
+            if abs(skp.parameter) < 1 + eps(2)
+                L = ~L;
+            end
+            wh(L) = -wh(L);
+        end
+    end
+    
     function X = Xeval(skp, z)
         %returns the square of the prime function
         %
@@ -207,6 +226,17 @@ methods
         end
         
         X = exp(evalLogX(skp, z));
+    end
+    
+    function Xh = Xhat(skp, z)
+        %evaluate Xhat at z.
+        
+        if skp.domain.m == 0
+            Xh = complex(zeros(size(z)));
+            return
+        end
+        
+        Xh = exp(evalLogXhat(skp, z));
     end
 end
 
@@ -229,6 +259,15 @@ methods(Access=protected)
         % [logX, inUnit] = evalLogX(skp, z)
         %   The value inUnit is a logcal array size(z) such that true
         %   indicates any abs(z) < 1.
+        
+        [logX, inUnit] = evalLogXhat(skp, z);
+        if skp.parameter.state ~= paramState.atInf
+            logX = logX + 2*log(z - skp.parameter);
+        end
+    end
+    
+    function [logXhat, inUnit] = evalLogXhat(skp, z)
+        %evaluate the log of Xhat.
         
         logXhat = complex(nan(size(z)));
         
@@ -265,13 +304,9 @@ methods(Access=protected)
                 logXhat(L) = conj(skp.logXhatOutCont(1./conj(z(L))));
             end
         end
-        
-        logX = logXhat;
-        if skp.parameter.state ~= paramState.atInf
-            logX = logX + 2*log(z - skp.parameter);
-        end
+            
         if isempty(skp.parameter.ison)
-            logX = logX - skp.normFactor;
+            logXhat = logXhat - skp.normFactor;
         end
     end
     
