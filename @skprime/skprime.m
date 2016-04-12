@@ -139,7 +139,7 @@ methods
         
         alpha = skp.parameter;
         if skp.domain.m == 0
-            dw = @(z) -double(alpha);
+            dw = @(z) complex(ones(size(z)));
             return
         end
         
