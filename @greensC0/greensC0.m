@@ -32,6 +32,7 @@ properties(SetAccess=protected)
         
     logaFun
     singCorrFact
+    normConstant
     bdryFun
     contFun
 end
@@ -102,6 +103,9 @@ methods
         % Boundary function and Cauchy interpolant.
         g0.bdryFun = @(z) g0.phiFun(z) + 1i*ha(z);
         g0.contFun = SKP.bmcCauchy(g0.bdryFun, g0.domain, 2*g0.truncation);
+        
+        % Normalization factor.
+        g0.normConstant = real(g0.g0hatEval(alpha) + log(sf(alpha))/(2i*pi));
     end
     
     function dg0 = diff(g0)
@@ -202,7 +206,7 @@ methods
     end
     
     function v = logPlus(g0, z)
-        v = g0.logaFun(z) + g0.g0hatEval(z);
+        v = g0.logaFun(z) + g0.g0hatEval(z) - g0.normConstant;
     end
 end
 

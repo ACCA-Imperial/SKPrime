@@ -36,6 +36,7 @@ properties(SetAccess=protected)
     
     logaFun
     singCorrFact
+    normConstant
     bdryFun
     contFun
 end
@@ -94,12 +95,16 @@ methods
         % Solve for unknown part on the boundary.
         gj.phiFun = solve(gj.phiFun, ha);
         
-        % Normalisation from Schwarz problem -- G_j is zero on C_j.
-        normval = gj.phiFun.phiCoef(1,j+1);
+        % First normalization -- imag(Gj) is zero on C_j
+        zeroCj = gj.phiFun.phiCoef(1,j+1);
         
         % Boundary function and Cauchy interpolant.
-        gj.bdryFun = @(z) gj.phiFun(z) + 1i*ha(z) - normval;
+        gj.bdryFun = @(z) gj.phiFun(z) + 1i*ha(z) - zeroCj;
         gj.contFun = SKP.bmcCauchy(gj.bdryFun, gj.domain, 2*gj.truncation);
+        
+        % Second normalisztion -- adjusts the real part of the Schwarz
+        % problem correctly.
+        gj.normConstant = real(gj.contFun(alpha) + log(sf(alpha))/(2i*pi));
     end
     
     function dgp = diffp(gj)
@@ -159,7 +164,7 @@ methods
     end
     
     function v = logPlus(gj, z)
-        v = gj.logaFun(z) + gj.gjHatEval(z);
+        v = gj.logaFun(z) + gj.gjHatEval(z) - gj.normConstant;
     end
 end
 

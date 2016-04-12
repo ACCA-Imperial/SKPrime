@@ -68,7 +68,10 @@ methods
             if nargin < 4
                 N = [];
             end
-            if iscell(dv) && all(cellfun(@(c) isa(c, 'vjFirstKind'), dv(:)))
+            if nargin == 1 || (isempty(dv) && isempty(qv))
+                D = skpDomain;
+            elseif iscell(dv) ...
+                    && all(cellfun(@(c) isa(c, 'vjFirstKind'), dv(:)))
                 vjfuns = dv;
                 phi = dv.phiFun;
                 D = dv{1}.domain;
@@ -98,6 +101,7 @@ methods
         skp.parameter = param;
         
         m = skp.domain.m;
+        % We're done if the domain is simply connected.
         if m == 0
             return
         end
@@ -127,6 +131,38 @@ methods
         
         skp = solveBVPs(skp);
     end % ctor
+    
+    function dw = diff(skp)
+        %derivative of prime function with respect to variable z.
+        %
+        %See also bvpFun.diff.
+        
+        alpha = skp.parameter;
+        if skp.domain.m == 0
+            dw = @(z) -double(alpha);
+            return
+        end
+        
+        din = diff@bvpFun(skp);
+        wi = invParam(skp);
+        dwi = diff@bvpFun(wi);
+        dout = @(z) ...
+            alpha*(conj(dwi(1./conj(z)))./z - conj(wi.feval(1./conj(z))));
+        
+        function val = dwEval(z)
+            val = complex(nan(size(z)));
+            
+            mask = abs(z) <= 1;
+            if any(mask(:))
+                val(mask) = din(z(mask));
+            end
+            if any(~mask(:))
+                val(~mask) = dout(z(~mask));
+            end
+        end
+        
+        dw = @dwEval;
+    end
     
     function skp = invParam(skp)
         %gives the prime function with inverted parameter
@@ -169,6 +205,7 @@ methods
             X = (z - skp.parameter).^2;
             return
         end
+        
         X = exp(evalLogX(skp, z));
     end
 end

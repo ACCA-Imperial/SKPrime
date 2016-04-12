@@ -1,17 +1,44 @@
 classdef schwarz < skpObject
 %schwarz attempts to solve the modified Schwarz problem
 %
-% phi = schwarz(r, D, N)
-%   Attempts to solve the Schwarz problem on multiply connected domain D
-%   given the imaginary part of a function r(z) = imag(f) analytic on D.
-%   The resulting object evaluates the solution of the Schwarz problem on
-%   the boundary of the circles C_j. That is, for z_j on C_j, 
+% # Usage.
+%
+% S = schwarz(domain, N)
+% S = schwarz(domain, N, nt)
+% Constructs the Schwarz object by creating the matrix for the linear
+% system in preparation for solving a given problem (see below). The domain
+% is a skpDomain object, N is the series truncation level on each circle,
+% and nt is the number of collocation points to use when applying the
+% trapezoidal rule to the integrals on the RHS. The matrix is stored as a
+% handle class object, and is shared between copies of the originating
+% Schwrz object.
+%
+% phi = solve(S, r)
+% Copmutes the RHS of the linear system and solve for the series
+% coefficients. Given a Schwarz object S and the function handle r to the
+% imaginary part of an anlytic function restricted to the boundaries, the
+% returned Schwarz object phi has the coefficients for the series
+% representation from the solution.
+%
+% w = phi(z)
+% If phi is the output of the solve method, then it may be subsequently
+% used as one would a function handle to evaluate points z on the boundary
+% of the domain.
+% 
+% # Discussion.
+%
+% This class encapsulates solving the modified Schwarz problem on a
+% multiply connected domain D given the imaginary part of a function
+% f analytic on D, r(z) = imag(f(z)). The resulting object evaluates
+% the solution of the Schwarz problem on the boundary of the circles
+% C_j. That is, for z_j on C_j, 
 %
 %     f(z_j) = phi(z_j) + 1i*r(z_j) + 1i*gamma_j
 %
-%   where the constant gamma_j is found as part of the solution.
+% where the boundary function phi and the constants gamma_j are found
+% as part of the solution.
 %
-% The current solution phi is given by the series
+% The solution phi is given by the series
 %
 %                       -- N
 %                       \
@@ -22,8 +49,12 @@ classdef schwarz < skpObject
 %
 %   eta(z_j) = (z_j - d_j)/q_j
 %
-% and a(0,0) = 0 since the BVP is determined up to a real constant. Note
-% the constant gamma_j is the imaginary part of a(0,j).
+% for circle centers d_j and radii q_j. The series coefficients are the
+% solution to a linear system where the matrix is determined by the domain
+% geometry and the right-hand side by the geometry and the given imaginary
+% part of the function to be found. The normalisation a(0,0) = 0 is chosen
+% for the problem since the BVP is determined up to a real constant. Note
+% the constants gamma_j are the imaginary parts of a(0,j).
 %
 % See also schwarzMatrix
 
