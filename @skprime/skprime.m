@@ -206,21 +206,17 @@ methods
         %provides prime function evaluation
         %
         % w = feval(skp, z)
-        
-        if skp.domain.m == 0
+
+        if skp.parameter.state ~= paramState.atInf
             w = z - skp.parameter;
+        else
+            w = 1;
+        end
+        if skp.domain.m == 0
             return
         end
         
-        [w, L] = evalLogX(skp, z);
-        w = exp(w/2);
-        
-        if ~isempty(skp.primeCorrect) && skp.primeCorrect
-            if abs(skp.parameter) < 1 + eps(2)
-                L = ~L;
-            end
-            w(L) = -w(L);
-        end
+        w = w.*hat(skp, z);
     end
     
     function wh = hat(skp, z)
@@ -248,12 +244,16 @@ methods
         % w = skprime(...);
         % Xval = Xeval(w, z);
         
-        if skp.domain.m == 0
+        if skp.parameter.state ~= paramState.atInf
             X = (z - skp.parameter).^2;
+        else
+            X = 1;
+        end
+        if skp.domain.m == 0
             return
         end
         
-        X = exp(evalLogX(skp, z));
+        X = X.*Xhat(skp, z);
     end
     
     function Xh = Xhat(skp, z)
@@ -278,19 +278,6 @@ methods(Access=protected)
         for k = 1:numel(mco.PropertyList)
             pname = mco.PropertyList(k).Name;
             skps.(pname) = skp.(pname);
-        end
-    end
-    
-    function [logX, inUnit] = evalLogX(skp, z)
-        %computes values of log(X)
-        %
-        % [logX, inUnit] = evalLogX(skp, z)
-        %   The value inUnit is a logcal array size(z) such that true
-        %   indicates any abs(z) < 1.
-        
-        [logX, inUnit] = evalLogXhat(skp, z);
-        if skp.parameter.state ~= paramState.atInf
-            logX = logX + 2*log(z - skp.parameter);
         end
     end
     
