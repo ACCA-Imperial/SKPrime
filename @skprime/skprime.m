@@ -146,8 +146,12 @@ methods
         din = diff@bvpFun(skp);
         wi = invParam(skp);
         dwi = diff@bvpFun(wi);
-        dout = @(z) ...
-            alpha*(conj(dwi(1./conj(z)))./z - conj(wi.feval(1./conj(z))));
+        if ~(alpha == 0 || alpha == inf)
+            dout = @(z) ...
+                alpha*(conj(dwi(1./conj(z)))./z - conj(wi.feval(1./conj(z))));
+        else
+            dout = @(z) conj(wi.feval(1./conj(z))) - conj(dwi(1./conj(z)))./z;
+        end
         
         function val = dwEval(z)
             val = complex(nan(size(z)));
