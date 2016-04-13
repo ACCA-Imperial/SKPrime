@@ -93,10 +93,12 @@ methods(Access=protected)
     function dw = dftDerivative(bvp, F)
         %gives derivative via DFT and continuation.
         %
-        %   dw = dftDeriv(bvp, F)
-        %      Returns the derivative of function handle F using the DFT
-        %      and Cauchy continuation. The derivative is restricted to the
-        %      unit disk.
+        %  dw = dftDeriv(bvp, F)
+        %    Returns the derivative of function handle F using the DFT
+        %    and Cauchy continuation for values of F on the boundary of
+        %    the domain. The derivative is restricted to the bounded unit
+        %    domain. It is assumed that F represents the boundary values of
+        %    a function analytic at all points in the bounded unit domain.
         
         nf = 256;
         [d, q, m] = domainDataB(bvp.domain);
