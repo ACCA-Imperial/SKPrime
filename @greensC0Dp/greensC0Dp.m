@@ -40,8 +40,9 @@ methods
         if ~nargin
             args = {};
         elseif (isa(g0, 'double') || isa(g0, 'skpParameter')) ...
-                && nargin == 2 && isa(varargin{1}, 'skpDomain')
-            alpha = skpParameter(g0, varargin{1});
+                && nargin == 2 && (isa(varargin{1}, 'skpDomain') ...
+                || isa(varargin{1}, 'bvpFun'))
+            alpha = g0;
             args = varargin(1);
         elseif isa(g0, 'greensC0')
             alpha = g0.parameter;
@@ -56,6 +57,7 @@ methods
             return
         end
         
+        alpha = skpParameter(alpha, dpg0.domain);
         dpg0.parameter = alpha;
         
         resx = @(z) (1./(alpha - z) + 1./(conj(alpha) ...
