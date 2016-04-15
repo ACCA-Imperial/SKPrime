@@ -226,11 +226,11 @@ methods
         end
     end
     
-    function X = Xeval(skp, z)
+    function X = X(skp, z)
         %returns the square of the prime function
         %
         % w = skprime(...);
-        % Xval = Xeval(w, z);
+        % Xval = X(w, z);
         
         if skp.parameter.state ~= paramState.atInf
             X = (z - skp.parameter).^2;

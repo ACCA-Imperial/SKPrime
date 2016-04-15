@@ -49,10 +49,10 @@ methods
         end
     end
     
-    function Xc = Xeval(skpc, z)
+    function Xc = X(skpc, z)
         %gives the square of the prime function
         
-        Xc = conj(Xeval@skprime(skpc, 1./conj(z)));
+        Xc = conj(X@skprime(skpc, 1./conj(z)));
         alpha = skpc.parameter;
         if 0 ~= alpha && ~isinf(alpha)
             Xc = (z/conj(alpha)).^2.*Xc;

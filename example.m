@@ -29,11 +29,11 @@ alpha = -0.5i;
 
 
 %% Compute the prime function (and its square).
-% Note X is just the square of w, but using |Xeval| skips some root branch
+% Note X is just the square of w, but using |X| skips some root branch
 % checking done when evaluating the prime function.
 
 w = skprime(alpha, dv, qv);
-X = @(z) Xeval(w, z);
+X = @(z) w.X(z);
 
 
 %% Evalutate the functions at various points.

@@ -70,7 +70,7 @@ methods
         idx = inUnit & notNan;
         if any(idx(:))
             v(idx) = (4i*pi*da.greensDeriv(z(idx)) ...
-                + da.constant).*da.primeFun.Xeval(z(idx));
+                + da.constant).*da.primeFun.X(z(idx));
         end
     end
 end
