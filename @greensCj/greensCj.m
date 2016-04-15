@@ -37,8 +37,6 @@ properties(SetAccess=protected)
     logaFun
     singCorrFact
     normConstant
-    bdryFun
-    contFun
 end
 
 methods
@@ -65,8 +63,8 @@ methods
         if ~isempty(alpha.ison) && alpha.ison == j
             % Alpha on C_j is const zero.
             gj.logaFun = @(z) zeros(size(z));
-            gj.bdryFun = @(z) zeros(size(z));
-            gj.contFun = @(z) zeros(size(z));
+            gj.boundaryFunction = @(z) zeros(size(z));
+            gj.continuedFunction = @(z) zeros(size(z));
             return
         elseif isinf(alpha)
             error('SKPrime:invalidArgument', ...
@@ -99,12 +97,13 @@ methods
         zeroCj = gj.phiFun.phiCoef(1,j+1);
         
         % Boundary function and Cauchy interpolant.
-        gj.bdryFun = @(z) gj.phiFun(z) + 1i*ha(z) - zeroCj;
-        gj.contFun = SKP.bmcCauchy(gj.bdryFun, gj.domain, 2*gj.truncation);
+        gj.boundaryFunction = @(z) gj.phiFun(z) + 1i*ha(z) - zeroCj;
+        gj.continuedFunction = SKP.bmcCauchy(...
+            gj.boundaryFunction, gj.domain, 2*gj.truncation);
         
         % Second normalisztion -- adjusts the real part of the Schwarz
         % problem correctly.
-        gj.normConstant = real(gj.contFun(alpha) + log(sf(alpha))/(2i*pi));
+        gj.normConstant = real(gj.continuedFunction(alpha) + log(sf(alpha))/(2i*pi));
     end
     
     function dgp = diffp(gj)
@@ -115,33 +114,6 @@ methods
         %   object has the parameter fixed and is a function of zeta.
         
         dgp = greensCjDa(gj.parameter, gj.boundary, gj);
-    end
-    
-    function hatFun = Gjhat(gj)
-        hatFun = @gj.gjHatEval;
-    end
-    
-    function v = gjHatEval(gj, z)
-        v = complex(nan(size(z)));
-        z = z(:);
-        
-        % Points not "on" boundary.
-        inD = true(size(z));
-        inD(abs(1 - abs(z)) < eps(2)) = false;
-        [d, q, m] = domainData(gj.domain);
-        for p = 1:m
-            inD(abs(q(p) - abs(z - d(p))) < eps(2)) = false;
-        end
-        
-        % Evaluate boundary points.
-        if any(~inD(:))
-            v(~inD) = gj.bdryFun(z(~inD));
-        end
-        
-        % Points not on boundary.
-        if any(inD(:))
-            v(inD) = gj.contFun(z(inD));
-        end
     end
     
     function v = feval(gj, z)
@@ -160,11 +132,11 @@ methods
     end
     
     function v = hat(gj, z)
-        v = gjHatEval(gj, z);
+        v = bvpEval(gj, z);
     end
     
     function v = logPlus(gj, z)
-        v = gj.logaFun(z) + gj.gjHatEval(z) - gj.normConstant;
+        v = gj.logaFun(z) + gj.hat(z) - gj.normConstant;
     end
 end
 
