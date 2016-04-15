@@ -207,6 +207,11 @@ methods
                 ['The case when alpha is at the origin is undefined ' ...
                 'as currently implemented.'])
         end
+        if ~isempty(alpha.ison)
+            error('SKPrime:undefinedState', ...
+                ['The case when alpha is on a boundary is undefined ' ...
+                'as currently implemented.'])
+        end
         
         dag0 = greensC0Dp(alpha, skp);
         din = @(z) (4i*pi*dag0(z) + 1/alpha).*skp.X(z);
