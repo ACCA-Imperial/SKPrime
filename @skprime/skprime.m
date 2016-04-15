@@ -180,6 +180,63 @@ methods
         dwh = @(z) (dw(z) - skp.hat(z))./(z - skp.parameter);
     end
     
+    function dwp = diffp(skp)
+        %derivative of the prime function wrt the parameter.
+        %Note the returned function is a function of the variable
+        %with the parameter *fixed*.
+        %
+        %See also skprime/diffXp.
+        
+        warning('SKPrime:underDevelopment', ...
+            'This method is under development. Do not trust its output.')
+
+        dXp = diffXp(skp);
+        dwp = @(z) dXp(z)./sqrt(skp.X(z))/2;
+    end
+    
+    function dXp = diffXp(skp)
+        %derivative of the square of the prime function wrt the parameter.
+        %Note the returned function is a function of the variable
+        %with the parameter *fixed*.
+        %
+        %See also skprime/diffp.
+        
+        alpha = skp.parameter;
+        if alpha == 0
+            error('SKPrime:undefinedState', ...
+                ['The case when alpha is at the origin is undefined ' ...
+                'as currently implemented.'])
+        end
+        
+        dag0 = greensC0Dp(alpha, skp);
+        din = @(z) (4i*pi*dag0(z) + 1/alpha).*skp.X(z);
+        
+        dig0 = greensC0Dp(1/conj(alpha), skp);
+        wi = invParam(skp);
+        dXip = @(z) (4i*pi*dig0(z) + conj(alpha)).*wi.X(z);
+        dout = @(z) z.^2.*(2*alpha*conj(wi.X(1./conj(z))) ...
+            - conj(dXip(1./conj(z))));
+        
+        function v = dXpEval(z)
+            v = complex(nan(size(z)));
+            
+            mask = abs(z) <= 1;
+            if any(mask(:))
+                v(mask) = din(z(mask));
+            end
+            if any(~mask(:))
+                v(~mask) = dout(z(~mask));
+                
+                warning('SKPrime:undefinedState', ...
+                    ['Evaluation of points outside the unit disk ' ...
+                    'is currently under development. Results of such ' ...
+                    'evaluation is not to be trusted.'])
+            end
+        end
+        
+        dXp = @dXpEval;
+    end
+    
     function skp = invParam(skp)
         %gives the prime function with inverted parameter
         %
