@@ -109,7 +109,7 @@ methods
             g0.boundaryFunction, g0.domain, 2*g0.truncation);
         
         % Normalization factor.
-        g0.normConstant = real(g0.g0hatEval(alpha) + log(sf(alpha))/(2i*pi));
+        g0.normConstant = real(g0.hat(alpha) + log(sf(alpha))/(2i*pi));
     end
     
     function dg0 = diff(g0)
@@ -163,21 +163,6 @@ methods
         dgp = greensCjDa(g0.parameter, 0, g0);
     end
     
-    function hatFun = G0hat(g0)
-        hatFun = @g0.g0hatEval;
-    end
-    
-    function v = g0hatEval(g0, z)
-        %evaluate the "analytic" part.
-        
-        if g0.domain.m == 0
-            v = complex(zeros(size(z)));
-            return
-        end
-        
-        v = bvpEval(g0, z);
-    end
-    
     function v = feval(g0, z)
         v = complex(nan(size(z)));
         
@@ -194,11 +179,21 @@ methods
     end
     
     function v = hat(g0, z)
-        v = g0hatEval(g0, z);
+        %evaluate the "analytic" part of the function.
+        %
+        %  g0 = greensC0(...);
+        %  v = g0.hat(z);
+        
+        if g0.domain.m == 0
+            v = complex(zeros(size(z)));
+            return
+        end
+        
+        v = bvpEval(g0, z);
     end
     
     function v = logPlus(g0, z)
-        v = g0.logaFun(z) + g0.g0hatEval(z) - g0.normConstant;
+        v = g0.logaFun(z) + g0.hat(z) - g0.normConstant;
     end
 end
 
