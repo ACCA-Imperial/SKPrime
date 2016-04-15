@@ -33,8 +33,6 @@ properties(SetAccess=protected)
     logaFun
     singCorrFact
     normConstant = 0
-    bdryFun
-    contFun
 end
 
 methods
@@ -65,8 +63,8 @@ methods
             % Alpha on the unit circle means const zero.
             g0.logaFun = @(z) zeros(size(z));
             g0.singCorrFact = sf;
-            g0.bdryFun = @(z) zeros(size(z));
-            g0.contFun = @(z) zeros(size(z));
+            g0.boundaryFunction = @(z) zeros(size(z));
+            g0.continuedFunction = @(z) zeros(size(z));
             return
         elseif alpha == 0
             for j = aj
@@ -106,8 +104,9 @@ methods
         g0.phiFun = solve(g0.phiFun, ha);
         
         % Boundary function and Cauchy interpolant.
-        g0.bdryFun = @(z) g0.phiFun(z) + 1i*ha(z);
-        g0.contFun = SKP.bmcCauchy(g0.bdryFun, g0.domain, 2*g0.truncation);
+        g0.boundaryFunction = @(z) g0.phiFun(z) + 1i*ha(z);
+        g0.continuedFunction = SKP.bmcCauchy(...
+            g0.boundaryFunction, g0.domain, 2*g0.truncation);
         
         % Normalization factor.
         g0.normConstant = real(g0.g0hatEval(alpha) + log(sf(alpha))/(2i*pi));
@@ -176,26 +175,7 @@ methods
             return
         end
         
-        v = complex(nan(size(z)));
-        z = z(:);
-        
-        % Points not "on" boundary.
-        inD = true(size(z));
-        inD(abs(1 - abs(z)) < eps(2)) = false;
-        [d, q, m] = domainData(g0.domain);
-        for p = 1:m
-            inD(abs(q(p) - abs(z - d(p))) < eps(2)) = false;
-        end
-        
-        % Evaluate boundary points.
-        if any(~inD(:))
-            v(~inD) = g0.bdryFun(z(~inD));
-        end
-        
-        % Points not on boundary.
-        if any(inD(:))
-            v(inD) = g0.contFun(z(inD));
-        end
+        v = bvpEval(g0, z);
     end
     
     function v = feval(g0, z)
