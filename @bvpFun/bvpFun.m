@@ -31,6 +31,9 @@ classdef(Abstract) bvpFun < skpObject
 properties(SetAccess=protected)
     phiFun                      % Unknown function object
     truncation = 64             % Series truncation setting
+    
+    boundaryFunction            % Function to evaluate on the boundary
+    continuedFunction           % Function for non-boundary points
 end
 
 methods
@@ -74,6 +77,43 @@ methods
                     '"phi" must be a "schwarz" object.')
             end
             bvp.phiFun = phi;
+        end
+    end
+    
+    function v = bvpEval(bvp, z)
+        %evaluate the BVP solution.
+        %Subclass must define boundaryFunction and continuedFunction
+        %properties. Returns NaN for points not in the closure of the
+        %domain.
+        %
+        %  v = bvpEval(bvp, z)
+        
+        v = complex(nan(size(z)));
+        inD = boundaryMask(bvp, z);
+        
+        % Points on the boundary.
+        if any(~inD(:))
+            v(~inD) = bvp.boundaryFunction(z(~inD));
+        end
+        
+        % Points in the domain.
+        if any(inD(:))
+            v(inD) = bvp.continuedFunction(z(inD));
+        end
+    end
+    
+    function mask = boundaryMask(bvp, z)
+        %return logical mask blocking boundary points.
+        %The mask is a logical array the same size as z and is false for
+        %points on the boundary.
+        %
+        %  mask = boundaryMask(bvp, z)
+        
+        mask = true(size(z));
+        mask(abs(1 - abs(z(:))) < eps(2)) = false;
+        [dv, qv, m] = domainData(bvp.domain);
+        for j = 1:m
+            mask(abs(qv(j) - abs(z(:) - dv(j))) < eps(2)) = false;
         end
     end
     
