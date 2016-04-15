@@ -160,7 +160,7 @@ methods
         %   Derivative of g0 with respect to the parameter. The returned
         %   object has the parameter fixed and is a function of zeta.
         
-        dgp = greensCjDa(g0.parameter, 0, g0);
+        dgp = greensC0Dp(g0);
     end
     
     function v = feval(g0, z)

@@ -26,12 +26,29 @@ classdef greensC0Dp < bvpFun
 % You should have received a copy of the GNU General Public License
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
+properties(SetAccess=protected)
+    parameter
+    
+    partialWrtX
+    partialWrtY
+    normalizeConstant = 0
+end
+
 methods
     function dpg0 = greensC0Dp(g0, varargin)
+        alpha = [];
         if ~nargin
             args = {};
+        elseif (isa(g0, 'double') || isa(g0, 'skpParameter')) ...
+                && nargin == 2 && isa(varargin{1}, 'skpDomain')
+            alpha = skpParameter(g0, varargin{1});
+            args = varargin(1);
+        elseif isa(g0, 'greensC0')
+            alpha = g0.parameter;
+            args = {g0};
         else
-            args = {things};
+            error(PoTk.ErrorIdString.InvalidArgument, ...
+                'Arguments not recognized.')
         end
         
         dpg0 = dpg0@bvpFun(args{:});
@@ -39,27 +56,35 @@ methods
             return
         end
         
-        dpg0 = solveBVPs(dpg0);
+        dpg0.parameter = alpha;
+        
+        resx = @(z) (1./(alpha - z) + 1./(conj(alpha) ...
+            - z*conj(alpha)^2))/2i/pi;
+        dpg0.partialWrtX = ...
+            genericPlusSingular(resx, @(z) -imag(resx(z)), dpg0);        
+        
+        resy = @(z) (1./(alpha - z) - 1./(conj(alpha) ...
+            - z*conj(alpha)^2))/2/pi;
+        dpg0.partialWrtY = ...
+            genericPlusSingular(resy, @(z) -imag(resy(z)), dpg0);
+        
+        dpg0.normalizeConstant = dpg0.hat(alpha) + 1/(4i*pi*alpha);
     end
     
     function v = feval(dp, z)
+        v = (dp.partialWrtX(z) - 1i*dp.partialWrtY(z))/2 ...
+            - dp.normalizeConstant;
+    end
+    
+    function v = hat(dp, z)
+        %evalutate the "analytic" part of the function.
         
+        v = (dp.partialWrtX.hat(z) - 1i*dp.partialWrtY.hat(z))/2 ...
+            - dp.normalizeConstant;
     end
 end
 
 methods(Access=protected)
-    function dp = solveBVPs(dp)
-        resx = @(z) (1./(alpha - z) + 1./(conj(alpha) - z*conj(alpha)^2))/2i/pi;
-        phix = solve(g0.phiFun, @(z) -imag(resx(z)));
-        pxg0h = @(z) phix(z) - 1i*imag(resx(z));
-        pxg0 = @(z) pxg0h(z) + resx(z);
-        
-        
-        resy = @(z) (1./(alpha - z) - 1./(conj(alpha) - z*conj(alpha)^2))/2/pi;
-        phiy = solve(g0.phiFun, @(z) -imag(resy(z)));
-        pyg0h = @(z) phiy(z) - 1i*imag(resy(z));
-        pyg0 = @(z) pyg0h(z) + resy(z);
-    end
 end
 
 end
