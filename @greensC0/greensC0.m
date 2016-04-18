@@ -189,11 +189,11 @@ methods
             return
         end
         
-        v = bvpEval(g0, z);
+        v = bvpEval(g0, z) - g0.normConstant;
     end
     
     function v = logPlus(g0, z)
-        v = g0.logaFun(z) + g0.hat(z) - g0.normConstant;
+        v = g0.logaFun(z) + g0.hat(z);
     end
 end
 
