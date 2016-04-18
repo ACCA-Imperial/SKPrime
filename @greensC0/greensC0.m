@@ -168,6 +168,8 @@ methods
     end
     
     function v = feval(g0, z)
+        %provides function evaluation for the Green's function.
+        
         v = complex(nan(size(z)));
         
         inUnit = abs(z) <= 1 + eps(2);
@@ -193,15 +195,33 @@ methods
             return
         end
         
-        v = g0.psign*bvpEval(g0, z) - g0.normConstant;
-    end
-    
-    function v = logPlus(g0, z)
-        v = g0.psign*g0.logaFun(z) + g0.hat(z);
+        v = complex(nan(size(z)));
+        
+        inUnit = abs(z) <= 1 + eps(2);
+        notNan = ~isnan(z);
+        idx = inUnit & notNan;
+        if any(idx(:))
+            v(idx) = innerHat(g0, z(idx));
+        end
+        idx = ~inUnit & notNan;
+        if any(idx(:))
+            v(idx) = conj(innerHat(g0, 1./conj(z(idx)))) ...
+                + 1i*log(abs(g0.parameter))/pi;
+        end
     end
 end
 
 methods(Access=protected)
+    function v = innerHat(g0, z)
+        %hat function for points inside the unit disk.
+        
+        v = g0.psign*bvpEval(g0, z) - g0.normConstant;
+    end
+    
+    function v = logPlus(g0, z)
+        v = g0.psign*g0.logaFun(z) + innerHat(g0, z);
+    end
+    
     function pm = psign(g0)
         %proper sign for g0 based on parameter location.
         
