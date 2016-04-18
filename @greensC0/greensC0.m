@@ -135,7 +135,7 @@ methods
             elseif isinf(alpha)
                 dval = dval - 1./z./(2i*pi);
             else
-                dval = dval + (1./(z - alpha) - 1./(z - conj(alpha)))/(2i*pi);
+                dval = dval + (1./(z - alpha) - 1./(z - 1./conj(alpha)))/(2i*pi);
             end
         end
         
