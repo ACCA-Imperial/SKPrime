@@ -266,26 +266,13 @@ methods
             return
         end
         
-        w = w.*hat(skp, z);
+        w = w.*primeHat(skp, z);
     end
     
     function wh = hat(skp, z)
         %evaluates the prime function with the zero factored out.
         
-        if skp.domain.m == 0
-            wh = complex(zeros(size(z)));
-            return
-        end
-        
-        [wh, L] = evalLogXhat(skp, z);
-        wh = exp(wh/2);
-        
-        if ~isempty(skp.primeCorrect) && skp.primeCorrect
-            if abs(skp.parameter) < 1 + eps(2)
-                L = ~L;
-            end
-            wh(L) = -wh(L);
-        end
+        wh = primeHat(skp, z);
     end
     
     function X = X(skp, z)
@@ -303,11 +290,46 @@ methods
             return
         end
         
-        X = X.*Xhat(skp, z);
+        X = X.*primeXhat(skp, z);
     end
     
     function Xh = Xhat(skp, z)
         %evaluate Xhat at z.
+        
+        Xh = primeXhat(skp, z);
+    end
+end
+
+methods(Access=protected, Sealed)
+    function wh = primeHat(skp, z)
+        %prime function with zero factored out.
+        %
+        %Provided here so this functionality can't be overriden.
+        %
+        %See skpinvparam.
+        
+        if skp.domain.m == 0
+            wh = complex(zeros(size(z)));
+            return
+        end
+        
+        [wh, L] = evalLogXhat(skp, z);
+        wh = exp(wh/2);
+        
+        if ~isempty(skp.primeCorrect) && skp.primeCorrect
+            if abs(skp.parameter) < 1 + eps(2)
+                L = ~L;
+            end
+            wh(L) = -wh(L);
+        end
+    end
+    
+    function Xh = primeXhat(skp, z)
+        %prime function square with zeros factored out.
+        %
+        %Provided here so this functionality can't be overriden.
+        %
+        %See skpinvparam.
         
         if skp.domain.m == 0
             Xh = complex(zeros(size(z)));

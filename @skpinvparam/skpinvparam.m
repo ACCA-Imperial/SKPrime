@@ -49,18 +49,6 @@ methods
         end
     end
     
-    function Xc = X(skpc, z)
-        %gives the square of the prime function
-        
-        Xc = conj(X@skprime(skpc, 1./conj(z)));
-        alpha = skpc.parameter;
-        if 0 ~= alpha && ~isinf(alpha)
-            Xc = (z/conj(alpha)).^2.*Xc;
-        else
-            Xc = z.^2*Xc;
-        end
-    end
-    
     function wc = feval(skpc, z)
         %provides function evaluation
         
@@ -73,10 +61,34 @@ methods
         end
     end
     
+    function v = hat(skpc, z)
+        %provides hat function evaluation.
+        
+        v = conj(primeHat(skpc, 1./conj(z)));
+    end
+    
     function alphac = parameter(skpc)
         %access inverted parameter
         
         alphac = inv(skpc.parameter);
+    end
+    
+    function Xc = X(skpc, z)
+        %gives the square of the prime function
+        
+        Xc = conj(X@skprime(skpc, 1./conj(z)));
+        alpha = skpc.parameter;
+        if 0 ~= alpha && ~isinf(alpha)
+            Xc = (z/conj(alpha)).^2.*Xc;
+        else
+            Xc = z.^2*Xc;
+        end
+    end
+    
+    function v = Xhat(skpc, z)
+        %provides square of the hat function.
+        
+        v = conj(primeXhat(skpc, 1./conj(z)));
     end
 end
 
