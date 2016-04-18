@@ -51,8 +51,12 @@ methods
             return
         end
   
-        alpha = skpParameter(alpha, g0.domain);
-        g0.parameter = alpha;
+        g0.parameter = skpParameter(alpha, g0.domain);
+        if abs(g0.parameter) > 1 + eps(2)
+            alpha = inv(g0.parameter);
+        else
+            alpha = g0.parameter;
+        end
         [d, q] = domainData(g0.domain);
         
         % Singularity correction factor.
@@ -189,11 +193,23 @@ methods
             return
         end
         
-        v = bvpEval(g0, z);
+        v = g0.psign*bvpEval(g0, z) - g0.normConstant;
     end
     
     function v = logPlus(g0, z)
-        v = g0.logaFun(z) + g0.hat(z) - g0.normConstant;
+        v = g0.psign*g0.logaFun(z) + g0.hat(z);
+    end
+end
+
+methods(Access=protected)
+    function pm = psign(g0)
+        %proper sign for g0 based on parameter location.
+        
+        if abs(g0.parameter) > 1 + eps(2)
+            pm = -1;
+        else
+            pm = 1;
+        end
     end
 end
 
