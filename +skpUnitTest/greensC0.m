@@ -21,7 +21,7 @@ classdef greensC0 < matlab.unittest.TestCase
 properties
     dv = [-0.2517+0.3129i; 0.2307-0.4667i]
     qv = [0.2377; 0.1557]
-    m = 2
+    alpha = -0.4863-0.37784i
 
     domain
     innerBdryPoints
@@ -31,6 +31,8 @@ properties
     wprod
     g0prod
     g0hatProd
+    
+    g0object
 end
 
 methods(TestClassSetup)
@@ -45,27 +47,27 @@ methods(TestClassSetup)
         test.domain = skpDomain(test.dv, test.qv);
         test.innerBdryPoints = boundaryPts(test.domain, 5);
         test.innerPoint = 0.66822-0.11895i;
+        
+        test.g0object = greensC0(test.alpha, test.domain);
     end
 end
 
 methods(Test)
     function hatAlphaOffBoundary(test)
-        alpha = -0.4863-0.37784i;
-        g0 = greensC0(alpha, test.domain);
-        
-        test.compareAllPoints(@(z) test.g0hatProd(z, alpha), @g0.hat, 1e-5)
+        g0 = test.g0object;
+        test.compareAllPoints(...
+            @(z) test.g0hatProd(z, test.alpha), @g0.hat, 1e-5)
     end
     
     function alphaOffBoundary(test)
-        alpha = -0.4863-0.37784i;
-        g0 = greensC0(alpha, test.domain);
+        g0 = test.g0object;
         
-        test.compareAllPoints(@(z) test.g0prod(z, alpha), g0, 1e-5)
+        test.compareAllPoints(...
+            @(z) test.g0prod(z, test.alpha), g0, 1e-5)
     end
     
     function diffVarHatAlphaOffBoundary(test)
-        alpha = -0.4863-0.37784i;
-        g0 = greensC0(alpha, test.domain);
+        g0 = test.g0object;
         
         d2g0h = diffh(g0, 2);
         d3g0h = diffh(g0, 3);
@@ -77,8 +79,7 @@ methods(Test)
     end
     
     function diffVarAlphaOffBoundary(test)
-        alpha = -0.4863-0.37784i;
-        g0 = greensC0(alpha, test.domain);
+        g0 = test.g0object;
         
         d2g0 = diff(g0, 2);
         d3g0 = diff(g0, 3);
