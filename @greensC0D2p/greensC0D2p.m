@@ -75,7 +75,9 @@ methods
         d2pg0.partialWrtO2 = ...
             genericPlusSingular(res2, @(z) -imag(res2(z)), d2pg0);
         
-        d2pg0.normalizeConstant = d2pg0.hat(alpha) - 1/(4i*pi*alpha^2);
+        ncp = diffh(greensC0Dp(alpha, d2pg0.domain));
+        d2pg0.normalizeConstant = d2pg0.hat(alpha) + ncp(alpha) ...
+                                  - 1/(4i*pi*alpha^2);
     end
     
     function v = feval(dp, z)

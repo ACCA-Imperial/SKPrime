@@ -73,6 +73,12 @@ methods
         dpg0.normalizeConstant = dpg0.hat(alpha) + 1/(4i*pi*alpha);
     end
     
+    function ddpgh = diffh(dpg0)
+        %gives derivative of the analytic part wrt zeta variable.
+        
+        ddpgh = dftDerivative(dpg0, @dpg0.hat);
+    end
+    
     function v = feval(dp, z)
         v = (dp.partialWrtX(z) - 1i*dp.partialWrtY(z))/2 ...
             - dp.normalizeConstant;
