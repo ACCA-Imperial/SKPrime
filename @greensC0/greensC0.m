@@ -116,45 +116,66 @@ methods
         g0.normConstant = real(g0.hat(alpha) + log(sf(alpha))/(2i*pi));
     end
     
-    function dg0 = diff(g0)
-        %gives the derivative of the Green's function.
+    function dg0 = diff(g0, n)
+        %gives the variable derivative of the Green's function.
         %
-        % dvj = diff(g0)
-        %   Returns function handle to derivative of g0 function by way of
-        %   DFT on the boundary and Cauchy continuation for the interior.
-        %   Derivative is restricted to the unit disk.
+        % dg0 = diff(g0
+        % dg0 = diff(g0, n)
+        %   Returns function handle to derivative of g0 with respect to the
+        %   variable by way of DFT on the boundary and Cauchy continuation
+        %   for the interior. Derivative is restricted to the unit disk.
+        %   The order of the derivative is given by n, which is computed
+        %   by recursive application (default n=1).
+
+        alpha = g0.parameter;
+        if ~isempty(alpha.ison) && alpha.ison == 0
+            dg0 = @(z) complex(zeros(size(z)));
+            return
+        end
+            
+        if nargin < 2
+            n = 1;
+        end
         
-        dg0h = diffh(g0);
+        dg0h = diffh(g0, n);
+        dmult = (-1)^(n-1)*factorial(n-1);
         
         function dval = deval(z)
-            alpha = g0.parameter;
-            if ~isempty(alpha.ison) && alpha.ison == 0
-                dval = complex(zeros(size(z)));
-                return
-            end
-            
             dval = dg0h(z);
             if alpha == 0
-                dval = dval + 1./z./(2i*pi);
-            elseif isinf(alpha)
-                dval = dval - 1./z./(2i*pi);
+                dval = dval + dmult./z.^n/2i/pi;
             else
-                dval = dval + (1./(z - alpha) - 1./(z - 1./conj(alpha)))/(2i*pi);
+                dval = dval + dmult*(1./(z - alpha).^n ...
+                    - 1./(z - 1/conj(alpha)).^n)/2i/pi;
             end
         end
         
         dg0 = @deval;
     end
     
-    function dgh = diffh(g0)
+    function dgh = diffh(g0, n)
         %gives derivative of the analytic part wrt zeta variable.
         %
-        % dvh = diffh(vj)
-        %   Returns function handle to derivative of vj.hat by way of
+        % dgh = diffh(g0)
+        % dgh = diffh(g0, n)
+        %   Returns function handle to derivative of g0.hat by way of
         %   DFT on the boundary and Cauchy continuation for the interior.
-        %   Derivative is restricted to the unit disk.
+        %   Derivative is restricted to the unit disk. The order of the
+        %   derivative is given by integer n > 0 (default = 1), computed by
+        %   recursive application of the DFT.
         
-        dgh = dftDerivative(g0, @g0.hat);
+        if nargin < 2
+            n = 1;
+        end
+        
+        function dngh = rDftDiff(fun, n)
+            if n > 1
+                fun = rDftDiff(fun, n-1);
+            end
+            dngh = dftDerivative(g0, fun);
+        end
+        
+        dgh = rDftDiff(@g0.hat, n);
     end
     
     function dgp = diffp(g0)

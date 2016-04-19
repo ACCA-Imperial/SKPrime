@@ -21,18 +21,18 @@ classdef greensC0 < matlab.unittest.TestCase
 properties
     dv = [-0.2517+0.3129i; 0.2307-0.4667i]
     qv = [0.2377; 0.1557]
-    m = 2
+    alpha = -0.4863-0.37784i
 
     domain
     innerBdryPoints
     innerPoint
-    outerBdryPoints
-    outerPoint
     
     prodLevel = 6
     wprod
     g0prod
     g0hatProd
+    
+    g0object
 end
 
 methods(TestClassSetup)
@@ -47,38 +47,47 @@ methods(TestClassSetup)
         test.domain = skpDomain(test.dv, test.qv);
         test.innerBdryPoints = boundaryPts(test.domain, 5);
         test.innerPoint = 0.66822-0.11895i;
-        test.outerBdryPoints = 1./conj(test.innerBdryPoints(:,2:end));
-        test.outerPoint = 1/conj(test.innerPoint);
+        
+        test.g0object = greensC0(test.alpha, test.domain);
     end
 end
 
 methods(Test)
-    function alphaSmallOffBoundary(test)
-        alpha = -0.4863-0.37784i;
-        g0 = greensC0(alpha, test.domain);
-        
-        test.compareAllPoints(@(z) test.g0prod(z, alpha), g0, 1e-5)
+    function hatAlphaOffBoundary(test)
+        g0 = test.g0object;
+        test.compareAllPoints(...
+            @(z) test.g0hatProd(z, test.alpha), @g0.hat, 1e-5)
     end
     
-    function alphaSmallOffBoundaryHat(test)
-        alpha = -0.4863-0.37784i;
-        g0 = greensC0(alpha, test.domain);
+    function alphaOffBoundary(test)
+        g0 = test.g0object;
         
-        test.compareAllPoints(@(z) test.g0hatProd(z, alpha), @g0.hat, 1e-5)
+        test.compareAllPoints(...
+            @(z) test.g0prod(z, test.alpha), g0, 1e-5)
     end
     
-    function alphaLargeOffBoundary(test)
-        alpha = 1/conj(-0.4863-0.37784i);
-        g0 = greensC0(alpha, test.domain);
+    function diffVarHatAlphaOffBoundary(test)
+        g0 = test.g0object;
         
-        test.compareAllPoints(@(z) test.g0prod(z, alpha), g0, 1e-5)
+        d2g0h = diffh(g0, 2);
+        d3g0h = diffh(g0, 3);
+        
+        h = 1e-6;
+        d3ref = @(z) (d2g0h(z + h) - d2g0h(z - h))/2/h;
+        
+        test.compareAllPoints(d3ref, d3g0h, 1e-6)
     end
     
-    function alphaLargeOffBoundaryHat(test)
-        alpha = 1/conj(-0.4863-0.37784i);
-        g0 = greensC0(alpha, test.domain);
+    function diffVarAlphaOffBoundary(test)
+        g0 = test.g0object;
         
-        test.compareAllPoints(@(z) test.g0hatProd(z, alpha), @g0.hat, 1e-5)
+        d2g0 = diff(g0, 2);
+        d3g0 = diff(g0, 3);
+        
+        h = 1e-6;
+        d3ref = @(z) (d2g0(z + h) - d2g0(z - h))/2/h;
+        
+        test.compareAllPoints(d3ref, d3g0, 1e-6)
     end
 end
 
@@ -87,8 +96,6 @@ methods
         testPointCell = {
             test.innerBdryPoints, 'inner boundary'
             test.innerPoint, 'inner point'
-            test.outerBdryPoints, 'outer boundary'
-            test.outerPoint, 'outer point'
             };
         
         for i = 1:size(testPointCell, 1)
@@ -101,29 +108,3 @@ methods
 end
 
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
