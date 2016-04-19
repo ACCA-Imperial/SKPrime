@@ -26,8 +26,6 @@ properties
     domain
     innerBdryPoints
     innerPoint
-    outerBdryPoints
-    outerPoint
     
     prodLevel = 6
     wprod
@@ -47,38 +45,22 @@ methods(TestClassSetup)
         test.domain = skpDomain(test.dv, test.qv);
         test.innerBdryPoints = boundaryPts(test.domain, 5);
         test.innerPoint = 0.66822-0.11895i;
-        test.outerBdryPoints = 1./conj(test.innerBdryPoints(:,2:end));
-        test.outerPoint = 1/conj(test.innerPoint);
     end
 end
 
 methods(Test)
-    function alphaSmallOffBoundary(test)
-        alpha = -0.4863-0.37784i;
-        g0 = greensC0(alpha, test.domain);
-        
-        test.compareAllPoints(@(z) test.g0prod(z, alpha), g0, 1e-5)
-    end
-    
-    function alphaSmallOffBoundaryHat(test)
+    function hatAlphaOffBoundary(test)
         alpha = -0.4863-0.37784i;
         g0 = greensC0(alpha, test.domain);
         
         test.compareAllPoints(@(z) test.g0hatProd(z, alpha), @g0.hat, 1e-5)
     end
     
-    function alphaLargeOffBoundary(test)
-        alpha = 1/conj(-0.4863-0.37784i);
+    function alphaOffBoundary(test)
+        alpha = -0.4863-0.37784i;
         g0 = greensC0(alpha, test.domain);
         
         test.compareAllPoints(@(z) test.g0prod(z, alpha), g0, 1e-5)
-    end
-    
-    function alphaLargeOffBoundaryHat(test)
-        alpha = 1/conj(-0.4863-0.37784i);
-        g0 = greensC0(alpha, test.domain);
-        
-        test.compareAllPoints(@(z) test.g0hatProd(z, alpha), @g0.hat, 1e-5)
     end
 end
 
@@ -87,8 +69,6 @@ methods
         testPointCell = {
             test.innerBdryPoints, 'inner boundary'
             test.innerPoint, 'inner point'
-            test.outerBdryPoints, 'outer boundary'
-            test.outerPoint, 'outer point'
             };
         
         for i = 1:size(testPointCell, 1)
