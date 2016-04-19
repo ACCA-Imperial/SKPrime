@@ -46,8 +46,8 @@ if nargin
     switch select
         case 'prime'
             % Now set as default.
-        case {'g0', 'G0'}
-            suiteArgs = {'Name', 'skpUnitTest.G0*'};
+        case {'greens'}
+            suiteArgs = {'Name', 'skpUnitTest.greens*'};
         case 'all'
             suiteArgs = {};
         otherwise
