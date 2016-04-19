@@ -62,6 +62,19 @@ methods(Test)
         
         test.compareAllPoints(@(z) test.g0prod(z, alpha), g0, 1e-5)
     end
+    
+    function diffVarHatAlphaOffBoundary(test)
+        alpha = -0.4863-0.37784i;
+        g0 = greensC0(alpha, test.domain);
+        
+        d2g0h = diffh(g0, 2);
+        d3g0h = diffh(g0, 3);
+        
+        h = 1e-6;
+        d3ref = @(z) (d2g0h(z + h) - d2g0h(z - h))/2/h;
+        
+        test.compareAllPoints(d3ref, d3g0h, 1e-6)
+    end
 end
 
 methods
@@ -81,29 +94,3 @@ methods
 end
 
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -146,15 +146,29 @@ methods
         dg0 = @deval;
     end
     
-    function dgh = diffh(g0)
+    function dgh = diffh(g0, n)
         %gives derivative of the analytic part wrt zeta variable.
         %
-        % dvh = diffh(vj)
-        %   Returns function handle to derivative of vj.hat by way of
+        % dgh = diffh(g0)
+        % dgh = diffh(g0, n)
+        %   Returns function handle to derivative of g0.hat by way of
         %   DFT on the boundary and Cauchy continuation for the interior.
-        %   Derivative is restricted to the unit disk.
+        %   Derivative is restricted to the unit disk. The order of the
+        %   derivative is given by integer n > 0 (default = 1), computed by
+        %   recursive application of the DFT.
         
-        dgh = dftDerivative(g0, @g0.hat);
+        if nargin < 2
+            n = 1;
+        end
+        
+        function dngh = rDftDiff(fun, n)
+            if n > 1
+                fun = rDftDiff(fun, n-1);
+            end
+            dngh = dftDerivative(g0, fun);
+        end
+        
+        dgh = rDftDiff(@g0.hat, n);
     end
     
     function dgp = diffp(g0)
