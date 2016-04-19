@@ -10,7 +10,7 @@ classdef greensC0D2p < bvpFun
 %
 %See also greensC0, bvpFun.
 
-% E. Kropf, 2016
+% Rhodri Nelson, 2016
 % 
 % This file is part of SKPrime.
 % 
@@ -95,20 +95,3 @@ methods(Access=protected)
 end
 
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
