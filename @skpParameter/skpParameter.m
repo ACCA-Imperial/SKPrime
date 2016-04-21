@@ -28,8 +28,8 @@ classdef skpParameter < double
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 properties(SetAccess=protected)
-    state
-    ison
+    state                   % paramState object
+    ison                    % boundary number where parameter is located
 end
 
 methods
