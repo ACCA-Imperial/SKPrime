@@ -46,16 +46,17 @@ methods
                 sargs = {D};
             end
         end
+        
         g0 = g0@bvpFun(sargs{:});
         if ~nargin
             return
         end
   
         g0.parameter = skpParameter(alpha, g0.domain);
-        if abs(g0.parameter) > 1 + eps(2)
-            alpha = inv(g0.parameter);
-        else
-            alpha = g0.parameter;
+        alpha = g0.parameter;
+        if ~alpha.inUnitDomain
+            error('SKPrime:InvalidArgument', ...
+                'Parameter must have magnitude <= 1.')
         end
         [d, q] = domainData(g0.domain);
         
@@ -77,13 +78,6 @@ methods
                 sf = @(z) sf(z).*(z - thj0)./(z - thjinf);
             end            
             loga = @(z) log(z.*sf(z))/(2i*pi);
-        elseif isinf(alpha)
-            for j = aj
-                thj0 = d(j);
-                thjinf = d(j) - q(j)^2/conj(d(j));
-                sf = @(z) sf(z).*(z - thjinf)./(z - thj0);
-            end
-            loga = @(z) log(sf(z)./z)/(2i*pi);
         else
             for j = isclose(g0.domain, alpha)
                 thj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
@@ -191,18 +185,7 @@ methods
     function v = feval(g0, z)
         %provides function evaluation for the Green's function.
         
-        v = complex(nan(size(z)));
-        
-        inUnit = abs(z) <= 1 + eps(2);
-        notNan = ~isnan(z);
-        idx = inUnit & notNan;
-        if any(idx(:))
-            v(idx) = g0.logPlus(z(idx));
-        end
-        idx = ~inUnit & notNan;
-        if any(idx(:))
-            v(idx) = conj(g0.logPlus(1./conj(z(idx))));
-        end
+        v = g0.logaFun(z) + g0.hat(z);
     end
     
     function v = hat(g0, z)
@@ -216,19 +199,7 @@ methods
             return
         end
         
-        v = complex(nan(size(z)));
-        
-        inUnit = abs(z) <= 1 + eps(2);
-        notNan = ~isnan(z);
-        idx = inUnit & notNan;
-        if any(idx(:))
-            v(idx) = innerHat(g0, z(idx));
-        end
-        idx = ~inUnit & notNan;
-        if any(idx(:))
-            v(idx) = conj(innerHat(g0, 1./conj(z(idx)))) ...
-                + 1i*log(abs(g0.parameter))/pi;
-        end
+        v = bvpEval(g0, z) - g0.normConstant;
     end
 end
 
@@ -236,21 +207,7 @@ methods(Access=protected)
     function v = innerHat(g0, z)
         %hat function for points inside the unit disk.
         
-        v = g0.psign*bvpEval(g0, z) - g0.normConstant;
-    end
-    
-    function v = logPlus(g0, z)
-        v = g0.psign*g0.logaFun(z) + innerHat(g0, z);
-    end
-    
-    function pm = psign(g0)
-        %proper sign for g0 based on parameter location.
-        
-        if abs(g0.parameter) > 1 + eps(2)
-            pm = -1;
-        else
-            pm = 1;
-        end
+        v = bvpEval(g0, z) - g0.normConstant;
     end
 end
 

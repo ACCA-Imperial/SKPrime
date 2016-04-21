@@ -27,9 +27,15 @@ classdef skpParameter < double
 % You should have received a copy of the GNU General Public License
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
+% FIXME: Until subsref automatically reads properties from metadata, it
+% must be modified to match property definitions.
 properties(SetAccess=protected)
-    state
-    ison
+    state                   % paramState object
+    ison                    % boundary number where parameter is located
+end
+
+properties(Dependent)
+    inUnitDomain            % boolean value for abs(alpha) <= 1
 end
 
 methods
@@ -105,6 +111,11 @@ methods
         disp(double(aobj))
     end
     
+    function aobj = inv(aobj)
+        aobj.state = inv(aobj.state);
+        aobj = skpParameter(1/conj(aobj), aobj);
+    end
+
     function out = subsref(aobj, S)
         if S(1).type == '.'
             switch S(1).subs
@@ -114,6 +125,10 @@ methods
                     
                 case 'ison'
                     out = aobj.ison;
+                    return
+                    
+                case 'inUnitDomain'
+                    out = aobj.inUnitDomain;
                     return
                     
                 otherwise
@@ -129,11 +144,6 @@ methods
             'Not a supported subscripted reference.')
     end
     
-    function aobj = inv(aobj)
-        aobj.state = inv(aobj.state);
-        aobj = skpParameter(1/conj(aobj), aobj);
-    end
-
     function out = horzcat(varargin)
         varargin = cellfun(@double, varargin, 'UniformOutput', false);
         out = horzcat(varargin{:});
@@ -142,6 +152,12 @@ methods
     function out = vertcat(varargin)
         varargin = cellfun(@double, varargin, 'UniformOutput', false);
         out = vertcat(varargin{:});
+    end
+    
+    function bool = get.inUnitDomain(alpha)
+        %true if abs(parameter) <= 1.
+        
+        bool = alpha.state <= 0;
     end
 end
 
