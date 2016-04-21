@@ -1,4 +1,4 @@
-classdef greensC0 < bvpFun
+classdef greensC0 < bvpFun & analyticUnitDifferentiable
 %greensC0 is the modified Green's function for MC domains wrt C0.
 %
 % The modified Green's function for multiply connected domains is given in
@@ -162,14 +162,7 @@ methods
             n = 1;
         end
         
-        function dngh = rDftDiff(fun, n)
-            if n > 1
-                fun = rDftDiff(fun, n-1);
-            end
-            dngh = dftDerivative(g0, fun);
-        end
-        
-        dgh = rDftDiff(@g0.hat, n);
+        dgh = nthOrderDerivative(g0, @g0.hat, n);
     end
     
     function dgp = diffp(g0)
