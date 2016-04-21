@@ -1,12 +1,16 @@
 function result = skptests(select)
 %SKPTESTS runs unit tests for SKPrime.
 %
+% Unit tests (used as verification tests) are defined as subclasses of
+% matlab.unittest.TestCase in the skpUnitTest package.
+%
 % skptests
 % skptests prime
 %   Runs all the available tests for the prime function in the test suite.
 %
-% skptests g0
-%   Runs all the available tests for the G0 function in the test suite.
+% skptests greens
+%   Runs all the available tests for the Green's functions in the test
+%   suite.
 %
 % skptests all
 %   Runs all available tests in the SKPrime test suite.
@@ -17,7 +21,7 @@ function result = skptests(select)
 %   `skptests prime`. See the TestSuite.fromPackage documentation
 %   for more information on string format.
 %
-% See also: matlab.unittest.TestSuite.fromPackage
+% See also: matlab.unittest, matlab.unittest.TestSuite.fromPackage
 
 % Copyright Everett Kropf, 2015
 % 
