@@ -1,0 +1,4 @@
+Author contributions in reverse chronological order.
+
+* Rhodri Nelson drove derivative development, 2016.
+* Initially written by Everett Kropf, 2015-2016.
