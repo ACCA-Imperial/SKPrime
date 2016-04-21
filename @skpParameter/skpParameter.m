@@ -105,6 +105,11 @@ methods
         disp(double(aobj))
     end
     
+    function aobj = inv(aobj)
+        aobj.state = inv(aobj.state);
+        aobj = skpParameter(1/conj(aobj), aobj);
+    end
+
     function out = subsref(aobj, S)
         if S(1).type == '.'
             switch S(1).subs
@@ -129,11 +134,6 @@ methods
             'Not a supported subscripted reference.')
     end
     
-    function aobj = inv(aobj)
-        aobj.state = inv(aobj.state);
-        aobj = skpParameter(1/conj(aobj), aobj);
-    end
-
     function out = horzcat(varargin)
         varargin = cellfun(@double, varargin, 'UniformOutput', false);
         out = horzcat(varargin{:});
