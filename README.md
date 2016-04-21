@@ -6,7 +6,7 @@ This software is in the pre-release stage. Comprehensive help documentaiton for 
 
 ### Citing the software ###
 
-When citing this software please mention this repository (current author is Everett Kropf), and the paper
+When citing this software please mention the URL of the master repository (https://github.com/ehkropf/SKPrime), and the paper
 
 > D.G. Crowdy, C.C. Green, E.H. Kropf, M.M.S. Nasser. "The Schottky-Klein prime function: a theoretical and computational tool for applications." IMA Journal of Applied Mathematics, in press, 2016.
 
