@@ -1,4 +1,4 @@
-classdef(Abstract) skpObject < evaluatable
+classdef(Abstract) skpObject < evaluable
 %skpObject abstract base utility class for SKPrime
 %
 % obj = skpObject(domain)
