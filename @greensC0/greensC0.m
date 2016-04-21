@@ -79,13 +79,6 @@ methods
                 sf = @(z) sf(z).*(z - thj0)./(z - thjinf);
             end            
             loga = @(z) log(z.*sf(z))/(2i*pi);
-        elseif isinf(alpha)
-            for j = aj
-                thj0 = d(j);
-                thjinf = d(j) - q(j)^2/conj(d(j));
-                sf = @(z) sf(z).*(z - thjinf)./(z - thj0);
-            end
-            loga = @(z) log(sf(z)./z)/(2i*pi);
         else
             for j = isclose(g0.domain, alpha)
                 thj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
