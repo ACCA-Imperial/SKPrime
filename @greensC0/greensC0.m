@@ -40,11 +40,6 @@ methods
         if ~nargin
             sargs = {};
         else
-            if abs(alpha) > 1 + eps(2)
-                error('SKPrime:InvalidArgument', ...
-                    'Parameter must have magnitude <= 1.')
-            end
-            
             if nargin > 2
                 sargs = {D, N};
             else
@@ -59,6 +54,10 @@ methods
   
         g0.parameter = skpParameter(alpha, g0.domain);
         alpha = g0.parameter;
+        if ~alpha.inUnitDomain
+            error('SKPrime:InvalidArgument', ...
+                'Parameter must have magnitude <= 1.')
+        end
         [d, q] = domainData(g0.domain);
         
         % Singularity correction factor.
