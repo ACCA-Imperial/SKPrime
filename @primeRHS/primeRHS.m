@@ -22,7 +22,7 @@ properties(SetAccess=protected)
     parameter
     
     vjFuns
-    g0fun
+    g0hat
     prfact
 end
 
@@ -49,7 +49,14 @@ methods
             return
         end
 
-        rhs.g0fun = greensC0(param, vjfuns{1});
+        if param.inUnitDomain
+            g0 = greensC0(param, vjfuns{1});
+            rhs.g0hat = @g0.hat;
+        else
+            g0 = greensC0(inv(param), vjfuns{1});
+            rhs.g0hat = @(z) -g0.hat(z);
+        end
+%         rhs.g0fun = greensC0(param, vjfuns{1});
 
         % Is parameter near outer boundary?
         [d, q] = domainData(rhs.domain);
@@ -91,7 +98,7 @@ end
 
 methods(Access=protected)
     function val = inDomainFun(rhs, j, zj)
-        val = 2*pi*real(rhs.g0fun.hat(zj));
+        val = 2*pi*real(rhs.g0hat(zj));
         if j > 0
             vj = rhs.vjFuns{j};
             val = val + ...
