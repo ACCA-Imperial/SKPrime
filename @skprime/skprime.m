@@ -168,16 +168,60 @@ methods
         dw = @dwEval;
     end
     
-    function dwh = diffh(skp)
+    function dwh = diffh(skp, n)
         %derivative of prime "hat" function wrt z.
+        
+        % FIXME: Validate 1 <= n <= 3.
+        if nargin < 2
+            n = 1;
+        end
+        if n > 3
+            error('SKPrime:invalidArgument', ...
+                'Derivatives only supported to 3rd order.')
+        end
         
         if skp.domain.m == 0
             dwh = @(z) complex(zeros(size(z)));
             return
         end
         
-        dw = diff(skp);
-        dwh = @(z) (dw(z) - skp.hat(z))./(z - skp.parameter);
+        dw = nthOrderDftDerivative(skp, @skp.hat, n);
+        
+        wi = invParam(skp);
+        dwi = dftDerivative(skp, @wi.hat);
+        if n > 1
+            dw2i = dftDerivative(skp, dwi);
+        end
+        if n > 2
+            dw3i = dftDerivative(skp, dw2i);
+        end
+        
+        function v = dwhEval(z)
+            v = complex(nan(size(z)));
+            
+            inUnit = abs(z) <= 1 + eps(2);
+            if any(inUnit(:))
+                v(inUnit) = dw(z(inUnit));
+            end
+            if any(~inUnit(:))
+                zz = z(~inUnit);
+                switch n
+                    case 1
+                        v(~inUnit) = -conj(dwi(1./conj(zz)))./zz.^2;
+                        
+                    case 2
+                        v(~inUnit) = 2*conj(dwi(1./conj(zz)))./zz.^3 ...
+                            + conj(dw2i(1./conj(zz)))./zz.^4;
+                        
+                    case 3
+                        v(~inUnit) = -6*conj(dwi(1./conj(zz)))./zz.^4 ...
+                            - 6*conj(dw2i(1./conj(zz)))./zz.^5 ...
+                            - conj(dw3i(1./conj(zz)))./zz.^6;
+                end
+            end
+        end
+        
+        dwh = @dwhEval;
     end
     
     function dwp = diffp(skp)
