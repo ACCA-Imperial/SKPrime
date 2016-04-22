@@ -93,7 +93,4 @@ methods
     end
 end
 
-methods(Access=protected)
-end
-
 end
