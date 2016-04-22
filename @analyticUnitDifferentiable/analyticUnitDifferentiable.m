@@ -25,7 +25,7 @@ properties(Access=protected)
 end
 
 methods(Access=protected)
-    function dfun = nthOrderDerivative(obj, afun, n)
+    function dfun = nthOrderDftDerivative(obj, afun, n)
         %provides the nth order derivative of a given analytic function.
         
         if n > 1
