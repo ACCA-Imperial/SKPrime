@@ -132,36 +132,67 @@ methods
         skp = solveBVPs(skp);
     end % ctor
     
-    function dw = diff(skp)
+    function dw = diff(skp, n)
         %derivative of prime function with respect to variable z.
         %
         %See also bvpFun.diff.
         
-        alpha = skp.parameter;
         if skp.domain.m == 0
             dw = @(z) complex(ones(size(z)));
             return
         end
         
-        din = diff@bvpFun(skp);
-        wi = invParam(skp);
-        dwi = diff@bvpFun(wi);
-        if ~(alpha == 0 || alpha == inf)
-            dout = @(z) ...
-                alpha*(conj(dwi(1./conj(z)))./z - conj(wi.feval(1./conj(z))));
-        else
-            dout = @(z) conj(wi.feval(1./conj(z))) - conj(dwi(1./conj(z)))./z;
+        % FIXME: validate 1 <= n <= 3.
+        if nargin < 2
+            n = 1;
+        end
+        if n > 3
+            error('SKPrime:invalidArgument', ...
+                'Derivatives only supported to 3rd order.')
         end
         
-        function val = dwEval(z)
-            val = complex(nan(size(z)));
+        din = nthOrderDftDerivative(skp, @skp.feval, n);
+        
+        wi = invParam(skp);        
+        alpha = skp.parameter;
+        switch n
+            case 1
+                dwi = dftDerivative(skp, @wi.feval);
+                if alpha.state == paramState.isZero ...
+                        || alpha.state == paramState.atInf
+                else
+                    dout = @(z) -alpha*conj(wi.feval(1./conj(z))) ...
+                        + alpha*conj(dwi(1./conj(z)))./z;
+                end
+                
+            case 2
+                d2wi = nthOrderDftDerivative(skp, @wi.feval, 2);
+                if alpha.state == paramState.isZero ...
+                        || alpha.state == paramState.atInf
+                else
+                    dout = @(z) -alpha*conj(d2wi(1./conj(z)))./z.^3;
+                end
+                
+            case 3
+                d2wi = nthOrderDftDerivative(skp, @wi.feval, 2);
+                d3wi = dftDerivative(skp, d2wi);
+                if alpha.state == paramState.isZero ...
+                        || alpha.state == paramState.atInf
+                else
+                    dout = @(z) 3*alpha*conj(d2wi(1./conj(z)))./z.^4 ...
+                        + alpha*conj(d3wi(1./conj(z)))./z.^5;
+                end
+        end
+        
+        function v = dwEval(z)
+            v = complex(nan(size(z)));
             
-            mask = abs(z) <= 1;
+            mask = abs(z) <= 1 + eps;
             if any(mask(:))
-                val(mask) = din(z(mask));
+                v(mask) = din(z(mask));
             end
             if any(~mask(:))
-                val(~mask) = dout(z(~mask));
+                v(~mask) = dout(z(~mask));
             end
         end
         
@@ -185,15 +216,25 @@ methods
             return
         end
         
-        dw = nthOrderDftDerivative(skp, @skp.hat, n);
+        din = nthOrderDftDerivative(skp, @skp.hat, n);
         
         wi = invParam(skp);
         dwi = dftDerivative(skp, @wi.hat);
-        if n > 1
-            dw2i = dftDerivative(skp, dwi);
-        end
-        if n > 2
-            dw3i = dftDerivative(skp, dw2i);
+        switch n
+            case 1
+                dout = @(z) -conj(dwi(1./conj(z)))./z.^2;
+                
+            case 2
+                d2wi = dftDerivative(skp, dwi);
+                dout = @(z) 2*conj(dwi(1./conj(z)))./z.^3 ...
+                            + conj(d2wi(1./conj(z)))./z.^4;
+                
+            case 3
+                d2wi = dftDerivative(skp, dwi);
+                d3wi = dftDerivative(skp, d2wi);
+                dout = @(z) -6*conj(dwi(1./conj(z)))./z.^4 ...
+                            - 6*conj(d2wi(1./conj(z)))./z.^5 ...
+                            - conj(d3wi(1./conj(z)))./z.^6;
         end
         
         function v = dwhEval(z)
@@ -201,23 +242,10 @@ methods
             
             inUnit = abs(z) <= 1 + eps(2);
             if any(inUnit(:))
-                v(inUnit) = dw(z(inUnit));
+                v(inUnit) = din(z(inUnit));
             end
             if any(~inUnit(:))
-                zz = z(~inUnit);
-                switch n
-                    case 1
-                        v(~inUnit) = -conj(dwi(1./conj(zz)))./zz.^2;
-                        
-                    case 2
-                        v(~inUnit) = 2*conj(dwi(1./conj(zz)))./zz.^3 ...
-                            + conj(dw2i(1./conj(zz)))./zz.^4;
-                        
-                    case 3
-                        v(~inUnit) = -6*conj(dwi(1./conj(zz)))./zz.^4 ...
-                            - 6*conj(dw2i(1./conj(zz)))./zz.^5 ...
-                            - conj(dw3i(1./conj(zz)))./zz.^6;
-                end
+                v(~inUnit) = dout(z(~inUnit));
             end
         end
         
