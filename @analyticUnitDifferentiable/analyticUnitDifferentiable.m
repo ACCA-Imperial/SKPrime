@@ -28,8 +28,38 @@ methods(Access=protected)
     function dfun = nthOrderDftDerivative(obj, afun, n)
         %provides the nth order derivative of a given analytic function.
         
+        % Catch case that subclass hasn't defined domain property from
+        % somewhere.
+        try
+            if ~isa(obj.domain, 'skpDomain')
+                error('SKPrime:runtimeError', ...
+                    ['Expected "skpDomain" object, but "%s.domain" is ' ...
+                    'a "%s" instead.'], class(obj), class(obj.domain))
+            end
+        catch err
+            switch err.identifier
+                case {'MATLAB:noSuchMethodOrField', ...
+                        'SKPrime:invalidReference'}
+                    error('SKPrime:logicError', ...
+                        ['Classes implementing protocol %s must have ' ...
+                        'defined the "domain" property.'], ...
+                        mfilename('class'))
+                    
+                otherwise
+                    rethrow(err)
+            end
+        end
+        
+        dfun = recursiveDftDerivative(obj, afun, n);
+    end
+end
+   
+methods(Access=private)
+    function dfun = recursiveDftDerivative(obj, afun, n)
+        %nth order derivative via recursion.
+        
         if n > 1
-            afun = nthOrderDerivative(obj, afun, n - 1);
+            afun = recursiveDftDerivative(obj, afun, n - 1);
         end
         dfun = dftDerivative(obj, afun);
     end
