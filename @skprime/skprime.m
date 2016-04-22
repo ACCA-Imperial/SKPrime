@@ -152,7 +152,7 @@ methods
                 'Derivatives only supported to 3rd order.')
         end
         
-        din = nthOrderDftDerivative(skp, @skp.feval, n);
+        din = dftDerivative(skp, @skp.feval, n);
         
         wi = invParam(skp);        
         alpha = skp.parameter;
@@ -167,7 +167,7 @@ methods
                 end
                 
             case 2
-                d2wi = nthOrderDftDerivative(skp, @wi.feval, 2);
+                d2wi = dftDerivative(skp, @wi.feval, 2);
                 if alpha.state == paramState.isZero ...
                         || alpha.state == paramState.atInf
                 else
@@ -175,7 +175,7 @@ methods
                 end
                 
             case 3
-                d2wi = nthOrderDftDerivative(skp, @wi.feval, 2);
+                d2wi = dftDerivative(skp, @wi.feval, 2);
                 d3wi = dftDerivative(skp, d2wi);
                 if alpha.state == paramState.isZero ...
                         || alpha.state == paramState.atInf
@@ -220,7 +220,7 @@ methods
             return
         end
         
-        din = nthOrderDftDerivative(skp, @skp.hat, n);
+        din = dftDerivative(skp, @skp.hat, n);
         
         wi = invParam(skp);
         dwi = dftDerivative(skp, @wi.hat);

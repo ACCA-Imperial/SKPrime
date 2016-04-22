@@ -49,28 +49,40 @@ methods(Access=protected)
         end
     end
     
-    function dfun = nthOrderDftDerivative(obj, afun, n)
-        %provides the nth order derivative of a given analytic function via
-        %recursion.
+    function dfun = dftDerivative(obj, afun, n)
+        %provides the nth order DFT derivative of a given analytic
+        %function.
+        %
+        % dfun = dftDerivative(obj, afun)
+        % dfun = dftDerivative(obj, afun, n)
         
-        if n > 1
-            afun = nthOrderDftDerivative(obj, afun, n - 1);
+        % FIXME: Validate argument n.
+        if nargin < 3
+            n = 1;
         end
-        dfun = dftDerivative(obj, afun);
+        
+        checkSubclass(obj)
+        dfun = recursiveDftDerivative(obj, afun, n);
     end
     
-    function dF = dftDerivative(obj, F)
+    function dfun = recursiveDftDerivative(obj, afun, n)
+        %apply DFT derivative recursively.
+        
+        if n > 1
+            afun = recursiveDftDerivative(obj, afun, n - 1);
+        end
+        dfun = takeDftDerivative(obj, afun);
+    end
+    
+    function dF = takeDftDerivative(obj, F)
         %gives derivative via DFT and continuation.
         %
-        %  dF = dftDeriv(bvp, F)
+        %  dF = takeDftDerivative(bvp, F)
         %    Returns the derivative of function handle F using the DFT
         %    and Cauchy continuation for values of F on the boundary of
         %    the domain. The derivative is restricted to the bounded unit
         %    domain. It is assumed that F represents the boundary values of
         %    a function analytic at all points in the bounded unit domain.
-        
-        % FIXME: Ideally this should be done once, not every recursive call.
-        checkSubclass(obj)
         
         nf = obj.derivativeFourierPoints;
         D = obj.domain;

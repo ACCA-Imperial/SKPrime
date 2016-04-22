@@ -87,7 +87,7 @@ methods
             n = 1;
         end
         
-        dh = nthOrderDftDerivative(g0, @g0.hat, n);
+        dh = dftDerivative(g0, @g0.hat, n);
     end
     
     function v = feval(dp, z)

@@ -162,7 +162,7 @@ methods
             n = 1;
         end
         
-        dgh = nthOrderDftDerivative(g0, @g0.hat, n);
+        dgh = dftDerivative(g0, @g0.hat, n);
     end
     
     function dgp = diffp(g0)

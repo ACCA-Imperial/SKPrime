@@ -80,7 +80,7 @@ methods
             n = 1;
         end
         
-        ddpgh = nthOrderDftDerivative(dpg0, @dpg0.hat, n);
+        ddpgh = dftDerivative(dpg0, @dpg0.hat, n);
     end
     
     function v = feval(dp, z)
