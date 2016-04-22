@@ -196,12 +196,4 @@ methods
     end
 end
 
-methods(Access=protected)
-    function v = innerHat(g0, z)
-        %hat function for points inside the unit disk.
-        
-        v = bvpEval(g0, z) - g0.normConstant;
-    end
-end
-
 end
