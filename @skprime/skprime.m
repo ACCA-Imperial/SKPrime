@@ -270,6 +270,54 @@ methods
         dwp = @(z) dXp(z)./sqrt(skp.X(z))/2;
     end
     
+    function dX = diffX(skp, n)
+        %Variable derivative of X to nth order (up to 3).
+        %
+        % dX = diffX(w)
+        % dX = diffX(w, n)
+        
+        if nargin < 2
+            n = 1;
+        end
+        
+        dw = diff(skp);
+        if n == 1
+            dX = @(z) 2*skp.feval(z).*dw(z);
+        else
+            d2w = diff(skp, 2);
+            if n < 3
+                dX = @(z) 2*(dw(z).^2 + skp.feval(z).*d2w(z));
+            else
+                d3w = diff(skp, 3);
+                dX = @(z) 2*(3*dw(z).*d2w(z) + skp.feval(z).*d3w(z));
+            end
+        end
+    end
+    
+    function dXh = diffXh(skp, n)
+        %Variable derivative of X.hat to nth order (up to 3).
+        %
+        % dXh = diffXh(w)
+        % dXh = diffXh(w, n)
+        
+        if nargin < 2
+            n = 1;
+        end
+        
+        dwh = diffh(skp);
+        if n == 1
+            dXh = @(z) 2*skp.hat(z).*dwh(z);
+        else
+            d2wh = diffh(skp, 2);
+            if n < 3
+                dXh = @(z) 2*(dwh(z).^2 + skp.hat(z).*d2wh(z));
+            else
+                d3wh = diffh(skp, 3);
+                dXh = @(z) 2*(3*dwh(z).*d2wh(z) + skp.hat(z).*d3wh(z));
+            end
+        end
+    end
+    
     function dXp = diffXp(skp)
         %derivative of the square of the prime function wrt the parameter.
         %Note the returned function is a function of the variable
