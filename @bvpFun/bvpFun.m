@@ -1,4 +1,4 @@
-classdef(Abstract) bvpFun < skpObject
+classdef(Abstract) bvpFun < skpObject & analyticUnitDifferentiable
 %bvpFun is the base class for the BVP functions.
 %
 % obj = bvpFun(D, N, phi)
@@ -115,72 +115,6 @@ methods
         for j = 1:m
             mask(abs(qv(j) - abs(z(:) - dv(j))) < eps(2)) = false;
         end
-    end
-    
-    function dw = diff(bvp)
-        %gives derivative of BVP function via DFT and Cauchy continuation.
-        %
-        %   dw = dftDeriv(bvp)
-        %      Returns a function handle dw to the derivative of the bvpFun
-        %      object with repsect to the complex variable via
-        %      bvpFun.feval(). The derivative is restricted to the unit disk.
-        
-        dw = dftDerivative(bvp, @bvp.feval);
-    end
-end
-
-methods(Access=protected)
-    function dw = dftDerivative(bvp, F)
-        %gives derivative via DFT and continuation.
-        %
-        %  dw = dftDeriv(bvp, F)
-        %    Returns the derivative of function handle F using the DFT
-        %    and Cauchy continuation for values of F on the boundary of
-        %    the domain. The derivative is restricted to the bounded unit
-        %    domain. It is assumed that F represents the boundary values of
-        %    a function analytic at all points in the bounded unit domain.
-        
-        nf = 256;
-        [d, q, m] = domainDataB(bvp.domain);
-        zf = bsxfun(@plus, d.', ...
-            bsxfun(@times, q', exp(2i*pi/nf*(0:nf-1)')));
-        dmult = [0:nf/2-1, 0, -nf/2+1:-1]';
-        ipos = nf/2:-1:1;
-        ineg = nf/2+1:nf;
-
-        dk = complex(nan(nf, m+1));
-        p = cell(1, m+1);
-        for j = 1:m+1
-            dk(:,j) = 1i*dmult.*fft(F(zf(:,j)))/nf;
-            p{j} = @(z) polyval(dk(ipos,j), z) ...
-                + polyval([dk(ineg,j); 0], 1./z);
-        end
-        
-        function [val, onBdry] = dwBdry(z)
-            val = complex(nan(size(z)));
-            if nargout > 1
-                onBdry = false(size(z));
-            end
-            for i = 1:m+1
-                onCj = abs(q(i) - abs(z - d(i))) < eps(2);
-                if any(onCj(:))
-                    eij = (z(onCj) - d(i))/q(i);
-                    val(onCj) = p{i}(eij)./(1i*q(i)*eij);
-                    if nargout > 1
-                        onBdry = onBdry | onCj;
-                    end
-                end
-            end
-        end
-        
-        dwCont = SKP.bmcCauchy(@dwBdry, bvp.domain, bvp.truncation);
-        
-        function val = dwEval(z)
-            [val, onBdry] = dwBdry(z);
-            val(~onBdry) = dwCont(z(~onBdry));
-        end
-        
-        dw = @dwEval;
     end
 end
 

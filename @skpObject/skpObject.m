@@ -1,11 +1,8 @@
-classdef skpObject
+classdef(Abstract) skpObject < evaluable
 %skpObject abstract base utility class for SKPrime
 %
 % obj = skpObject(domain)
 %   Abstract base utility class for the SKPrime kit. Must be subclassed.
-%
-% Abstract method:
-%   feval -- define to provide function evaluation behaviour
 
 % Everett Kropf, 2015
 % 
@@ -26,10 +23,6 @@ classdef skpObject
 
 properties(SetAccess=protected)
     domain                      % skpDomain object
-end
-
-methods(Abstract)
-    v = feval(skp, z)
 end
 
 methods
@@ -59,19 +52,6 @@ methods
         [d, q, m] = domainDataB(skp.domain);
         for j = 0:m
             onB(abs(q(j+1) - abs(z - d(j+1))) < eps(2)) = true;
-        end
-    end
-    
-    function out = subsref(skp, S)
-        %provides function syntax
-        %
-        % Provides skp(z) evaluation syntax, passes all unrecognized
-        % subsref to builtin.
-        
-        if numel(S) == 1 && strcmp(S.type, '()')
-            out = feval(skp, S.subs{:});
-        else
-            out = builtin('subsref', skp, S);
         end
     end
 end

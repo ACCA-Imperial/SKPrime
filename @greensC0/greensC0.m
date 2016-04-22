@@ -162,14 +162,7 @@ methods
             n = 1;
         end
         
-        function dngh = rDftDiff(fun, n)
-            if n > 1
-                fun = rDftDiff(fun, n-1);
-            end
-            dngh = dftDerivative(g0, fun);
-        end
-        
-        dgh = rDftDiff(@g0.hat, n);
+        dgh = dftDerivative(g0, @g0.hat, n);
     end
     
     function dgp = diffp(g0)
@@ -198,14 +191,6 @@ methods
             v = complex(zeros(size(z)));
             return
         end
-        
-        v = bvpEval(g0, z) - g0.normConstant;
-    end
-end
-
-methods(Access=protected)
-    function v = innerHat(g0, z)
-        %hat function for points inside the unit disk.
         
         v = bvpEval(g0, z) - g0.normConstant;
     end

@@ -80,6 +80,16 @@ methods
                                   - 1/(4i*pi*alpha^2);
     end
     
+    function dh = diffh(g0, n)
+        %gives nth order derivative of the "hat" function wrt the variable.
+        
+        if nargin < 2
+            n = 1;
+        end
+        
+        dh = dftDerivative(g0, @g0.hat, n);
+    end
+    
     function v = feval(dp, z)
         v = (dp.partialWrtO1(z) - 2i*dp.partialWrtO2(z))/4 ...
             - dp.normalizeConstant;
@@ -91,9 +101,6 @@ methods
         v = (dp.partialWrtO1.hat(z) - 2i*dp.partialWrtO2.hat(z))/4 ...
             - dp.normalizeConstant;
     end
-end
-
-methods(Access=protected)
 end
 
 end
