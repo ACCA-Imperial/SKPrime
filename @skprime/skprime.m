@@ -135,7 +135,8 @@ methods
     function dw = diff(skp, n)
         %derivative of prime function with respect to variable z.
         %
-        %See also bvpFun.diff.
+        % dw = diff(skp)
+        % dw = diff(skp, n)
         
         if skp.domain.m == 0
             dw = @(z) complex(ones(size(z)));
@@ -201,6 +202,9 @@ methods
     
     function dwh = diffh(skp, n)
         %derivative of prime "hat" function wrt z.
+        %
+        % dwh = diffh(skp)
+        % dwh = diffh(skp, n)
         
         % FIXME: Validate 1 <= n <= 3.
         if nargin < 2
