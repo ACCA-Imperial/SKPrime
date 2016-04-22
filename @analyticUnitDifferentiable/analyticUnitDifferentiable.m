@@ -34,10 +34,10 @@ methods(Access=protected)
         dfun = dftDerivative(obj, afun);
     end
     
-    function dw = dftDerivative(obj, F)
+    function dF = dftDerivative(obj, F)
         %gives derivative via DFT and continuation.
         %
-        %  dw = dftDeriv(bvp, F)
+        %  dF = dftDeriv(bvp, F)
         %    Returns the derivative of function handle F using the DFT
         %    and Cauchy continuation for values of F on the boundary of
         %    the domain. The derivative is restricted to the bounded unit
@@ -65,7 +65,7 @@ methods(Access=protected)
                 + polyval([dk(ineg,j); 0], 1./z);
         end
         
-        function [val, onBdry] = dwBdry(z)
+        function [val, onBdry] = dfBdry(z)
             val = complex(nan(size(z)));
             if nargout > 1
                 onBdry = false(size(z));
@@ -82,14 +82,14 @@ methods(Access=protected)
             end
         end
         
-        dwCont = SKP.bmcCauchy(@dwBdry, D, obj.derivativeCollocationPoints);
+        dfCont = SKP.bmcCauchy(@dfBdry, D, obj.derivativeCollocationPoints);
         
-        function val = dwEval(z)
-            [val, onBdry] = dwBdry(z);
-            val(~onBdry) = dwCont(z(~onBdry));
+        function val = dfEval(z)
+            [val, onBdry] = dfBdry(z);
+            val(~onBdry) = dfCont(z(~onBdry));
         end
         
-        dw = @dwEval;
+        dF = @dfEval;
     end
 end
 
