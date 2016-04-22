@@ -25,9 +25,7 @@ properties(Access=protected)
 end
 
 methods(Access=protected)
-    function dfun = nthOrderDftDerivative(obj, afun, n)
-        %provides the nth order derivative of a given analytic function.
-        
+    function checkSubclass(obj)
         % Catch case that subclass hasn't defined domain property from
         % somewhere.
         try
@@ -49,17 +47,14 @@ methods(Access=protected)
                     rethrow(err)
             end
         end
-        
-        dfun = recursiveDftDerivative(obj, afun, n);
     end
-end
-   
-methods(Access=private)
-    function dfun = recursiveDftDerivative(obj, afun, n)
-        %nth order derivative via recursion.
+    
+    function dfun = nthOrderDftDerivative(obj, afun, n)
+        %provides the nth order derivative of a given analytic function via
+        %recursion.
         
         if n > 1
-            afun = recursiveDftDerivative(obj, afun, n - 1);
+            afun = nthOrderDftDerivative(obj, afun, n - 1);
         end
         dfun = dftDerivative(obj, afun);
     end
@@ -74,8 +69,8 @@ methods(Access=private)
         %    domain. It is assumed that F represents the boundary values of
         %    a function analytic at all points in the bounded unit domain.
         
-        % FIXME: Check that obj is of class 'skpObject' so we know it has
-        % the domain property.
+        % FIXME: Ideally this should be done once, not every recursive call.
+        checkSubclass(obj)
         
         nf = obj.derivativeFourierPoints;
         D = obj.domain;
