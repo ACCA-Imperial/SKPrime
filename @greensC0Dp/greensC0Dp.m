@@ -1,4 +1,4 @@
-classdef greensC0Dp < bvpFun & analyticUnitDifferentiable
+classdef greensC0Dp < bvpFun
 %greensC0Dp is the derivative with respect to the parameter of G0.
 %
 %  dpg0 = greensC0Dp(g0)

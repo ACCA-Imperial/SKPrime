@@ -1,4 +1,4 @@
-classdef greensC0D2p < bvpFun & analyticUnitDifferentiable
+classdef greensC0D2p < bvpFun
 %greensC0D2p is the 2nd order derivative with respect to the 
 %parameter of G0.
 %

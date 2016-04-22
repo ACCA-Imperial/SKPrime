@@ -1,4 +1,4 @@
-classdef greensC0 < bvpFun & analyticUnitDifferentiable
+classdef greensC0 < bvpFun
 %greensC0 is the modified Green's function for MC domains wrt C0.
 %
 % The modified Green's function for multiply connected domains is given in
