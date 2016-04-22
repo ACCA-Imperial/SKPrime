@@ -1,4 +1,4 @@
-classdef greensC0D2p < bvpFun
+classdef greensC0D2p < bvpFun & analyticUnitDifferentiable
 %greensC0D2p is the 2nd order derivative with respect to the 
 %parameter of G0.
 %
@@ -78,6 +78,16 @@ methods
         ncp = diffh(greensC0Dp(alpha, d2pg0.domain));
         d2pg0.normalizeConstant = d2pg0.hat(alpha) + ncp(alpha) ...
                                   - 1/(4i*pi*alpha^2);
+    end
+    
+    function dh = diffh(g0, n)
+        %gives nth order derivative of the "hat" function wrt the variable.
+        
+        if nargin < 2
+            n = 1;
+        end
+        
+        dh = nthOrderDftDerivative(g0, @g0.hat, n);
     end
     
     function v = feval(dp, z)

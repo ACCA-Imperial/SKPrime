@@ -1,4 +1,4 @@
-classdef greensC0Dp < bvpFun
+classdef greensC0Dp < bvpFun & analyticUnitDifferentiable
 %greensC0Dp is the derivative with respect to the parameter of G0.
 %
 %  dpg0 = greensC0Dp(g0)
@@ -73,10 +73,14 @@ methods
         dpg0.normalizeConstant = dpg0.hat(alpha) + 1/(4i*pi*alpha);
     end
     
-    function ddpgh = diffh(dpg0)
+    function ddpgh = diffh(dpg0, n)
         %gives derivative of the analytic part wrt zeta variable.
         
-        ddpgh = dftDerivative(dpg0, @dpg0.hat);
+        if nargin < 2
+            n = 1;
+        end
+        
+        ddpgh = nthOrderDftDerivative(dpg0, @dpg0.hat, n);
     end
     
     function v = feval(dp, z)
