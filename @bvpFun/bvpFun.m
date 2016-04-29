@@ -1,4 +1,4 @@
-classdef(Abstract) bvpFun < skpObject & analyticUnitDifferentiable
+classdef(Abstract) bvpFun < skpObject & SKP.analyticUnitDifferentiable
 %bvpFun is the base class for the BVP functions.
 %
 % obj = bvpFun(D, N, phi)
