@@ -96,4 +96,11 @@ methods
     end
 end
 
+methods(Hidden)
+    function [dxG, dyG] = getPartialXyDerivatives(dpg0)
+        dxG = dpg0.partialWrtX;
+        dyG = dpg0.partialWrtY;
+    end
+end
+
 end
