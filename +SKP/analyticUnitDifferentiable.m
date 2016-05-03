@@ -29,7 +29,7 @@ methods(Access=protected)
         % Catch case that subclass hasn't defined domain property from
         % somewhere.
         try
-            if ~isa(obj.domain, 'skpDomain')
+            if ~isa(obj.domain, 'skpDomain') %#ok<*MCNPN>
                 error('SKPrime:runtimeError', ...
                     ['Expected "skpDomain" object, but "%s.domain" is ' ...
                     'a "%s" instead.'], class(obj), class(obj.domain))
