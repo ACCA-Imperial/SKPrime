@@ -1,4 +1,4 @@
-classdef SingularityCorrectionG0 < evaluable
+classdef SingularityCorrectionG0 < SKP.evaluable
 %SingularityCorrectionG0 encapsulates the singularity correction factor for
 %the Greens function wrt C0.
 %
