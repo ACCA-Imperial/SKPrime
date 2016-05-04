@@ -69,7 +69,7 @@ methods
             cfn = sf.correctionNumerators;
             cfd = sf.correctionDenominators;
             for i = 1:numel(cfn)
-                dv = dv + dmult*(1./cfn{i}(z) - 1./cfd{i}(z));
+                dv = dv + dmult*(1./cfn{i}(z).^n - 1./cfd{i}(z).^n);
             end
         end
         
