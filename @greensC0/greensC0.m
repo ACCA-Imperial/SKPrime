@@ -123,11 +123,12 @@ methods
         
         function dval = deval(z)
             dval = dg0h(z);
+            dsf = diff(g0.singCorrFact);
             if alpha == 0
-                dval = dval + dmult./z.^n/2i/pi;
+                dval = dval + (dmult./z.^n + dsf(z))/2i/pi;
             else
-                dval = dval + dmult*(1./(z - alpha).^n ...
-                    - 1./(z - 1/conj(alpha)).^n)/2i/pi;
+                dval = dval + (dmult*(1./(z - alpha).^n ...
+                    - 1./(z - 1/conj(alpha)).^n) + dsf(z))/2i/pi;
             end
         end
         
