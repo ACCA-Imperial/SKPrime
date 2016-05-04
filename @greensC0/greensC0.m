@@ -58,37 +58,24 @@ methods
             error('SKPrime:InvalidArgument', ...
                 'Parameter must have magnitude <= 1.')
         end
-        [d, q] = domainData(g0.domain);
         
         % Singularity correction factor.
-        sf = @(z) 1;
-        aj = isclose(g0.domain, alpha);
-        
+        sf = SKP.SingularityCorrectionG0(alpha, g0.domain);
+        g0.singCorrFact = sf;
+
         if ~isempty(alpha.ison) && alpha.ison == 0
             % Alpha on the unit circle means const zero.
             g0.logaFun = @(z) zeros(size(z));
-            g0.singCorrFact = sf;
             g0.boundaryFunction = @(z) zeros(size(z));
             g0.continuedFunction = @(z) zeros(size(z));
             return
         elseif alpha == 0
-            for j = aj
-                thj0 = d(j);
-                thjinf = d(j) - q(j)^2/conj(d(j));
-                sf = @(z) sf(z).*(z - thj0)./(z - thjinf);
-            end            
             loga = @(z) log(z.*sf(z))/(2i*pi);
         else
-            for j = isclose(g0.domain, alpha)
-                thj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
-                sf = @(z) sf(z).*(z - thj(alpha))./(z - thj(inv(alpha)));
-            end
-            
             loga = @(z) ...
                 log((z - alpha)./(z - inv(alpha)).*sf(z))/(2i*pi);
         end
         g0.logaFun = loga;
-        g0.singCorrFact = sf;
         
         if g0.domain.m == 0
             % Nothing more to do.
