@@ -65,8 +65,7 @@ methods
         dmult = (-1)^(n-1)*factorial(n-1);
         
         function dv = deval(z)
-            dv = complex(zeros(size(z)));
-            
+            dv = 0;
             cfn = sf.correctionNumerators;
             cfd = sf.correctionDenominators;
             for i = 1:numel(cfn)
@@ -80,7 +79,7 @@ methods
     function v = feval(sf, z)
         %Provide function evaluation behaviour.
         
-        v = complex(ones(size(z)));
+        v = 1;
         cfn = sf.correctionNumerators;
         cfd = sf.correctionDenominators;
         for i = 1:numel(cfn)
