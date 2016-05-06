@@ -1,7 +1,7 @@
 classdef domainSimple3 < skpUnitTest.domainForTest
 %domainSimple is simple 3-connected domain.
     
-% Copyright Everett Kropf, 2015
+% Everett Kropf, 2016
 % 
 % This file is part of SKPrime.
 % 
