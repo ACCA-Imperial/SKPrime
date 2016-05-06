@@ -92,6 +92,11 @@ methods(Access=protected)
             dom.defaultParameterKeys, dom.defaultParameterValues);
     end
     
+    function dom = useDefaultParameterMapMinusOrigin(dom)
+        dom = useDefaultParameterMap(dom);
+        remove(dom.parameterMap, 'origin');
+    end
+    
     function dom = useDefaultTestPointMap(dom)
         dom.testPointMap = containers.Map(...
             dom.defaultTestPointKeys, dom.defaultTestPointValues);
