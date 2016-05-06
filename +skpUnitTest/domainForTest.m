@@ -84,6 +84,14 @@ methods
         
         out = builtin('subsref', td, S);
     end
+    
+    function castr = parameterLocations(dom)
+        castr = dom.parameterMap.keys;
+    end
+    
+    function castr = testPointLocations(dom)
+        castr = dom.testPointMap.keys;
+    end
 end
 
 methods(Access=protected)

@@ -20,11 +20,12 @@ classdef greensC0 < matlab.unittest.TestCase
 
 properties(ClassSetupParameter)
     domainInput = struct(...
-        'simple3', skpUnitTest.domainSimple3);
+        'simple3', skpUnitTest.domainSimple3, ...
+        'annulus3', skpUnitTest.domainAnnulus3);
 end
 
 properties(MethodSetupParameter)
-    parameterAt = {'inside'}
+    parameterAt = {'inside', 'origin'}
 end
 
 properties

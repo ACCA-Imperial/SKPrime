@@ -30,4 +30,7 @@ properties
     testPointInside = 0.66822-0.11895i
 end
 
+methods
+end
+
 end
