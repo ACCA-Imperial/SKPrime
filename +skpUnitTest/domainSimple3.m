@@ -1,4 +1,4 @@
-classdef domainSimple < skpUnitTest.domainForTest
+classdef domainSimple3 < skpUnitTest.domainForTest
 %domainSimple is simple 3-connected domain.
     
 % Copyright Everett Kropf, 2015
@@ -25,6 +25,9 @@ properties
     qv = [
         0.2377
         0.1557]
+    
+    parameterInside = -0.4863-0.37784i
+    testPointInside = 0.66822-0.11895i
 end
 
 end

@@ -18,55 +18,70 @@ classdef greensC0 < matlab.unittest.TestCase
 % You should have received a copy of the GNU General Public License
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
-properties
-    dv = [-0.2517+0.3129i; 0.2307-0.4667i]
-    qv = [0.2377; 0.1557]
-    alpha = -0.4863-0.37784i
+properties(ClassSetupParameter)
+    domainInput = struct(...
+        'simple3', skpUnitTest.domainSimple3);
+end
 
+properties(MethodSetupParameter)
+    parameterAt = {'inside'}
+end
+
+properties
+    domainData
     domain
-    innerBdryPoints
-    innerPoint
+    alpha
     
     prodLevel = 6
     wprod
     g0prod
     g0hatProd
+
+    innerBdryPoints
+    innerPoint
     
     g0object
 end
 
 methods(TestClassSetup)
-    function simpleDomain(test)
-        wp = skprod(test.dv, test.qv, test.prodLevel);
+    function classSetup(test, domainInput)
+        test.domainData = domainInput;
+        test.domain = skpDomain(domainInput);
+        
+        wp = skprod(test.domain.dv, test.domain.qv, test.prodLevel);
         test.wprod = wp;
         test.g0prod = @(z,a) ...
             log(wp(z, a)./wp(z, 1/conj(a))/abs(a))/2i/pi;
         test.g0hatProd = @(z,a) test.g0prod(z, a) ...
             - log((z - a)./(z - 1/conj(a)))/2i/pi;
         
-        test.domain = skpDomain(test.dv, test.qv);
         test.innerBdryPoints = boundaryPts(test.domain, 5);
-        test.innerPoint = 0.66822-0.11895i;
-        
+        test.innerPoint = domainInput.testPointInside;
+    end
+end
+
+methods(TestMethodSetup)
+    function setupMethods(test, parameterAt)
+        test.alpha = test.domainData.parameter(parameterAt);
         test.g0object = greensC0(test.alpha, test.domain);
     end
 end
 
 methods(Test)
-    function hatAlphaOffBoundary(test)
+    function hatCheck(test)
         g0 = test.g0object;
         test.compareAllPoints(...
             @(z) test.g0hatProd(z, test.alpha), @g0.hat, 1e-5)
     end
     
-    function alphaOffBoundary(test)
+    function functionCheck(test)
         g0 = test.g0object;
         
         test.compareAllPoints(...
             @(z) test.g0prod(z, test.alpha), g0, 1e-5)
     end
     
-    function diffVarHatAlphaOffBoundary(test)
+    function hatVariableDerivative(test)
         g0 = test.g0object;
         
         d2g0h = diffh(g0, 2);
@@ -78,7 +93,7 @@ methods(Test)
         test.compareAllPoints(d3ref, d3g0h, 1e-6)
     end
     
-    function diffVarAlphaOffBoundary(test)
+    function functionVariableDerivative(test)
         g0 = test.g0object;
         
         d2g0 = diff(g0, 2);

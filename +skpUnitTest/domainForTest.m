@@ -5,22 +5,35 @@ properties(Abstract)
     dv
     qv
     
-    insideDisk
+    parameterInside
 end
 
 properties(Dependent)
-    outsideDisk
+    parameterOutside
 end
 
 methods
     function D = skpDomain(td)
         D = skpDomain(td.dv, td.qv);
     end
+    
+    function a = parameter(td, isat)
+        switch isat
+            case 'inside'
+                a = td.parameterInside;
+                
+            case 'outside'
+                a = td.parameter.Outside;
+                
+            otherwise
+                a = nan;
+        end
+    end
 end
 
 methods %getters
-    function a = get.outsideDisk(td)
-        a = 1/conj(td.insideDisk);
+    function a = get.parameterOutside(td)
+        a = 1/conj(td.parameterInside);
     end
 end
 
