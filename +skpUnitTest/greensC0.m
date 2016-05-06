@@ -1,4 +1,4 @@
-classdef greensC0 < matlab.unittest.TestCase
+classdef(Abstract) greensC0 < matlab.unittest.TestCase
 %greensC0 is the test class for G0.
 
 % E. Kropf, 2016
@@ -18,18 +18,21 @@ classdef greensC0 < matlab.unittest.TestCase
 % You should have received a copy of the GNU General Public License
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
-properties(ClassSetupParameter)
-    domainInput = struct(...
-        'simple3', skpUnitTest.domainSimple3, ...
-        'annulus3', skpUnitTest.domainAnnulus3);
+% properties(ClassSetupParameter)
+%     domainInput = struct(...
+%         'simple3', skpUnitTest.domainSimple3, ...
+%         'annulus3', skpUnitTest.domainAnnulus3);
+% end
+
+properties(Abstract, MethodSetupParameter)
+    parameterAt
 end
 
-properties(MethodSetupParameter)
-    parameterAt = {'inside', 'origin'}
+properties(Abstract)
+    domainData
 end
 
 properties
-    domainData
     domain
     alpha
     
@@ -45,9 +48,9 @@ properties
 end
 
 methods(TestClassSetup)
-    function classSetup(test, domainInput)
-        test.domainData = domainInput;
-        test.domain = skpDomain(domainInput);
+    function classSetup(test)
+        testDomain = test.domainData;
+        test.domain = skpDomain(testDomain);
         
         wp = skprod(test.domain.dv, test.domain.qv, test.prodLevel);
         test.wprod = wp;
@@ -57,7 +60,7 @@ methods(TestClassSetup)
             - log((z - a)./(z - 1/conj(a)))/2i/pi;
         
         test.innerBdryPoints = boundaryPts(test.domain, 5);
-        test.innerPoint = domainInput.testPointInside;
+        test.innerPoint = testDomain.testPointInside;
     end
 end
 

@@ -33,20 +33,21 @@ end
 
 properties(Constant)
     parameterOrigin = 0
-end
 
-properties(Access=protected)
-    parameterMap
     defaultParameterKeys = {...
         'inside', 'outside', 'origin'}
     defaultParameterValues = {...
         'parameterInside', 'parameterOutside', 'parameterOrigin'}
-    
-    testPointMap
+
     defaultTestPointKeys = {...
         'inside', 'outside'}
     defaultTestPointValues = {...
         'testPointInside', 'testPointOutside'}
+end
+
+properties(Access=protected)
+    parameterMap
+    testPointMap
 end
 
 methods
@@ -84,14 +85,29 @@ methods
         
         out = builtin('subsref', td, S);
     end
-    
-    function castr = parameterLocations(dom)
-        castr = dom.parameterMap.keys;
+end
+
+methods(Static)
+    function castr = parameterLocations()
+        castr = skpUnitTest.domainForTest.defaultParameterKeys;
     end
     
-    function castr = testPointLocations(dom)
-        castr = dom.testPointMap.keys;
+    function castr = parameterLocationsWithout(class, varargin)
+        if isempty(class)
+            class = 'domainForTest';
+        end
+        castr = skpUnitTest.(class).parameterLocations;
+        mask = false(size(castr));
+        for i = 1:numel(varargin)
+            mask = mask | strcmp(varargin{i}, castr);
+        end
+        castr = castr(~mask);
     end
+    
+    function castr = testPointLocations()
+        castr = skpUnitTest.domainForTest.testPointMap.keys;
+    end
+
 end
 
 methods(Access=protected)

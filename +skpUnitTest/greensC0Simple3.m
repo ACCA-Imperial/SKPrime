@@ -1,7 +1,7 @@
-classdef domainSimple3 < skpUnitTest.domainForTest
-%domainSimple is simple 3-connected domain.
-    
-% Everett Kropf, 2016
+classdef greensC0Simple3 < skpUnitTest.greensC0
+%greensC0Simple3 checks G0 in simple 3-connected domain.
+
+% E. Kropf, 2016
 % 
 % This file is part of SKPrime.
 % 
@@ -18,16 +18,14 @@ classdef domainSimple3 < skpUnitTest.domainForTest
 % You should have received a copy of the GNU General Public License
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
+properties(MethodSetupParameter)
+    parameterAt = ...
+        skpUnitTest.domainSimple3.parameterLocationsWithout(...
+        'domainSimple3', 'outside')
+end
+
 properties
-    dv = [
-        -0.2517+0.3129i
-        0.2307-0.4667i]
-    qv = [
-        0.2377
-        0.1557]
-    
-    parameterInside = -0.4863-0.37784i
-    testPointInside = 0.66822-0.11895i
+    domainData = skpUnitTest.domainSimple3
 end
 
 end
