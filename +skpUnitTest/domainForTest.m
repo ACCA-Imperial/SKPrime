@@ -26,35 +26,75 @@ properties(Abstract)
     testPointInside
 end
 
+properties(Dependent)
+    parameterOutside
+    testPointOutside
+end
+
+properties(Constant)
+    parameterOrigin = 0
+end
+
+properties(Access=protected)
+    parameterMap
+    defaultParameterKeys = {...
+        'inside', 'outside', 'origin'}
+    defaultParameterValues = {...
+        'parameterInside', 'parameterOutside', 'parameterOrigin'}
+    
+    testPointMap
+    defaultTestPointKeys = {...
+        'inside', 'outside'}
+    defaultTestPointValues = {...
+        'testPointInside', 'testPointOutside'}
+end
+
 methods
+    function dom = domainForTest()
+        dom = useDefaultParameterMap(dom);
+        dom = useDefaultTestPointMap(dom);
+    end
+    
     function D = skpDomain(td)
         D = skpDomain(td.dv, td.qv);
     end
     
-    function a = parameter(td, isat)
-        switch isat
-            case 'inside'
-                a = td.parameterInside;
-                
-            case 'outside'
-                a = 1/conj(td.parameterInside);
-                
-            otherwise
-                a = nan;
-        end
+    function a = get.parameterOutside(td)
+        a = 1/conj(td.parameterInside);
     end
     
-    function tp = testPoint(td, isat)
-        switch isat
-            case 'inside'
-                tp = td.testPointInside;
-                
-            case 'outside'
-                tp = 1/conj(td.testPointInside);
-                
-            otherwise
-                tp = nan;
+    function tp = get.testPointOutside(td)
+        tp = 1/conj(td.testPointInside);
+    end
+    
+    function out = subsref(td, S)
+        if numel(S) == 2 && strcmp(S(1).type, '.') ...
+                && numel(S(2).subs) == 1 && strcmp(S(2).type, '()')
+            isat = S(2).subs{1};
+            switch S(1).subs
+                case 'parameter'
+                    out = td.(td.parameterMap(isat));
+                    return
+                    
+                case 'testPoint'
+                    out = td.(td.testPointMap(isat));
+                    return
+            end
         end
+        
+        out = builtin('subsref', td, S);
+    end
+end
+
+methods(Access=protected)
+    function dom = useDefaultParameterMap(dom)
+        dom.parameterMap = containers.Map(...
+            dom.defaultParameterKeys, dom.defaultParameterValues);
+    end
+    
+    function dom = useDefaultTestPointMap(dom)
+        dom.testPointMap = containers.Map(...
+            dom.defaultTestPointKeys, dom.defaultTestPointValues);
     end
 end
 
