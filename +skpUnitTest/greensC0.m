@@ -54,10 +54,6 @@ methods(TestClassSetup)
         
         wp = skprod(test.domain.dv, test.domain.qv, test.prodLevel);
         test.wprod = wp;
-        test.g0prod = @(z,a) ...
-            log(wp(z, a)./wp(z, 1/conj(a))/abs(a))/2i/pi;
-        test.g0hatProd = @(z,a) test.g0prod(z, a) ...
-            - log((z - a)./(z - 1/conj(a)))/2i/pi;
         
         test.innerBdryPoints = boundaryPts(test.domain, 5);
         test.innerPoint = testDomain.testPointInside;
@@ -68,6 +64,21 @@ methods(TestMethodSetup)
     function setupMethods(test, parameterAt)
         test.alpha = test.domainData.parameter(parameterAt);
         test.g0object = greensC0(test.alpha, test.domain);
+        
+        wp = test.wprod;
+        g0p = @(z,a) log(wp(z,a)./wp(z, 1/conj(a)))/2i/pi;
+        if test.alpha ~= 0
+            g0p = @(z,a) g0p(z, a) - log(abs(a))/2i/pi;
+            g0hp = @(z,a) g0p(z, a) ...
+                - log((z - a)./(z - 1/conj(a)))/2i/pi ...
+                - log(abs(a))/2i/pi;
+        else
+            g0hp = @(z,a) g0p(z, a) - log(z)/2i/pi;
+        end
+        test.g0prod = g0p;
+        test.g0hatProd = g0hp;
+%         test.g0hatProd = @(z,a) ...
+%             g0p(z, a) - log((z - a)./(z - 1/conj(a)))/2i/pi;
     end
 end
 
