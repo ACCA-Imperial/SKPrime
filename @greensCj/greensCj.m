@@ -106,16 +106,6 @@ methods
         gj.normConstant = real(gj.continuedFunction(alpha) + log(sf(alpha))/(2i*pi));
     end
     
-    function dgp = diffp(gj)
-        %gives derivative with respect to parameter.
-        %
-        % dgp = diffp(g0)
-        %   Derivative of g0 with respect to the parameter. The returned
-        %   object has the parameter fixed and is a function of zeta.
-        
-        dgp = greensCjDa(gj.parameter, gj.boundary, gj);
-    end
-    
     function v = feval(gj, z)
         v = complex(nan(size(z)));
         
