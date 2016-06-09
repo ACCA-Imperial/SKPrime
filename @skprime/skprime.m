@@ -464,7 +464,7 @@ methods(Access=protected, Sealed)
     end
 end
 
-methods(Access=protected)
+methods%(Access=protected)
     function skps = copyProperties(skp)
         %copies all object properties to structure
         %
