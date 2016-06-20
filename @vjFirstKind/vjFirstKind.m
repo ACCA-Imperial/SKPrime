@@ -34,6 +34,8 @@ properties(SetAccess=protected)
     logjFun
     bdryFun
     contFun
+    
+    thetaj
 end
 
 properties(Dependent)
@@ -59,6 +61,7 @@ methods
         
         vj.boundary = j;
         [d, q] = domainData(vj.domain);
+        vj.thetaj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
         
         if abs(d(j)) > q(j)
             % "double" circle center.
