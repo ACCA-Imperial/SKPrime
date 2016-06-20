@@ -175,15 +175,9 @@ methods % Property access.
     end
     
     function tau = get.taujj(vj)
-        %computes the tau_jj constant associated with the function.
+        %retrieve the tau_jj constant associated with the function.
         
-        j = vj.boundary;
-        
-        % Chose any point on Cj.
-        [dv, qv] = domainData(vj.domain);
-        z = dv(j) + qv(j);
-        
-        tau = vj.feval(z) - vj.feval(1/conj(z));
+        tau = 2i*vj.constants(vj.boundary);
     end
 end
 
