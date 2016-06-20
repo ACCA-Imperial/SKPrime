@@ -151,17 +151,41 @@ methods
     end
     
     function v = feval(vj, z)
-        v = nan(size(z));
-        inUnit = abs(z) <= 1 + eps(2);
+        D = vj.domain;
+        thj = vj.thetaj;
+        tjj = vj.taujj;
+        
+        v = complex(nan(size(z)));
         notNan = ~isnan(z);
         
-        idx = inUnit & notNan;
-        if any(idx(:))
-            v(idx) = vj.logPlus(z(idx));
+        % Points in D_zeta.
+        mask = isin(D, z) & notNan;
+        if any(mask(:))
+            v(mask) = vj.logPlus(z(mask));
         end
-        idx = ~inUnit & notNan;
-        if any(idx(:))
-            v(idx) = conj(vj.logPlus(1./conj(z(idx))));
+        
+        % Points in first reflection in to C_j.
+        done = mask;
+        mask(mask) = false;
+        mask(~done) = isin(D, thj(1./conj(z(~done)))) & notNan(~done);
+        if any(mask(:))
+            v(mask) = conj(vj.logPlus(thj(1./conj(z(mask)))) - tjj);
+        end
+        
+        % Points in D_zeta'.
+        done = done | mask;
+        mask(mask) = false;
+        mask(~done) = isin(D, 1./conj(z(~done))) & notNan(~done);
+        if any(mask(:))
+            v(mask) = conj(vj.logPlus(1./conj(z(mask))));
+        end
+        
+        % Points in first reflection into C_j'.
+        done = done | mask;
+        mask(mask) = false;
+        mask(~done) = isin(D, thj(z(~done))) & notNan(~done);
+        if any(mask(:))
+            v(mask) = vj.logPlus(thj(z(mask))) - tjj;
         end
     end
     
