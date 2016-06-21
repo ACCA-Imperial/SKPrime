@@ -74,7 +74,8 @@ methods
                 % Is it actually in the domain, or in a hole?
                 if ~isin(D, 1/conj(alpha))
                     error('SKPrime:invalidArgument', ...
-                        'The parameter is outside the domain!')
+                        ['The given parameter is outside the ' ...
+                        'acceptable region. See help.'])
                 end
                 aon = [];
                 if isinf(alpha)
@@ -91,8 +92,13 @@ methods
                 aloc = paramState.onInnerBdry;
             else
                 if ~isin(D, alpha)
-                    error('SKPrime:invalidArgument', ...
-                        'The parameter is outside the domain!')
+                    % Could be in a 1st level reflection.
+%                     if isin(D, D.theta(j, alpha))
+%                     else
+                        error('SKPrime:invalidArgument', ...
+                            ['The given parameter is outside the ' ...
+                            'acceptable region. See help.'])
+%                     end
                 end
                 aon = [];
                 if abs(alpha) == 0
