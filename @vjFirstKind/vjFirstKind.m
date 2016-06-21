@@ -158,8 +158,8 @@ methods
         v = complex(nan(size(z)));
         notNan = ~isnan(z);
         
-        % Points in D_zeta.
-        mask = isin(D, z) & notNan;
+        % Points in D_zeta (or on the boundary).
+        mask = (isin(D, z) | ison(D, z)) & notNan;
         if any(mask(:))
             v(mask) = vj.logPlus(z(mask));
         end
@@ -172,10 +172,11 @@ methods
             v(mask) = conj(vj.logPlus(thj(1./conj(z(mask)))) - tjj);
         end
         
-        % Points in D_zeta'.
+        % Points in D_zeta' (or on the outer boundary).
         done = done | mask;
         mask(mask) = false;
-        mask(~done) = isin(D, 1./conj(z(~done))) & notNan(~done);
+        mask(~done) = (isin(D, 1./conj(z(~done))) ...
+            | ison(D, 1./conj(z(~done)))) & notNan(~done);
         if any(mask(:))
             v(mask) = conj(vj.logPlus(1./conj(z(mask))));
         end
