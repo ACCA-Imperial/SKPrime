@@ -211,12 +211,36 @@ methods
     end
     
     function tf = isin(D, z)
+        %checks for points inside the domain.
+
         tf = true(size(z));
-        tf(abs(z) >= 1) = false;
+        tf(abs(z) >= 1 - eps(2)) = false;
         
         [d, q, mu] = domainData(D);
         for j = 1:mu
-            tf(abs(z - d(j)) <= q(j)) = false;
+            tf(abs(z - d(j)) <= q(j) + eps(2)) = false;
+        end
+    end
+    
+    function [tf, j] = ison(D, z)
+        %checks for points on the domain boundary.
+        
+        tf = false(size(z));
+        j = nan(size(z));
+        
+        on = (abs(z) - 1) < eps(2);
+        if any(on(:))
+            tf(on) = true;
+            j(on) = 0;
+        end
+        
+        [d, q, mu] = domainData(D);
+        for i = 1:mu
+            on = (abs(z - d(i)) - q(i)) < eps(2);
+            if any(on(:))
+                tf(on) = true;
+                j(on) = i;
+            end
         end
     end
     
