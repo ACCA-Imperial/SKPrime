@@ -253,6 +253,12 @@ methods
         end
     end
     
+    function v = theta(D, j, z)
+        %Schottky generator theta_j.
+        
+        v = D.dv(j) + D.qv(j)^2*z./(1 - conj(D.dv(j))*z);
+    end
+    
     function ostr = char(D)
         %gives defining properties of domain as string.
         
