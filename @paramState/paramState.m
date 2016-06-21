@@ -19,13 +19,15 @@ classdef paramState < int8
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 enumeration
-    isZero(-3)
+    isZero(-4)
+    innerDisk(-3)
     innerFD(-2)
     onInnerBdry(-1)
     isUnit(0)
     onOuterBdry(1)
     outerFD(2)
-    atInf(3)
+    outerDisk(3)
+    atInf(4)
 end
 
 methods
