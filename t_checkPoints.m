@@ -1,7 +1,7 @@
 %% Check points under theta (again).
 clear
 
-j = 1;
+j = 2;
 
 
 %%
@@ -25,17 +25,12 @@ thj = @(z) D.theta(j, z);
 
 %%
 
-mask = isin(D, av) | isin(D, 1./conj(av));
-for i = find(mask(:))'
-    fprintf(' av(%d) is in FD.\n', i)
-end
-
-mask = isin(D, thj(1./conj(av)));
-for i = find(mask(:))'
-    fprintf(' av(%d) is 1st level in disk C_j\n', i)
-end
-
-mask = isin(D, thj(av));
-for i = find(mask(:))'
-    fprintf(' av(%d) is 1st level in disk C_j''\n', i)
+for i = 1:numel(av)
+    ap = skpParameter(av(i), D);
+    fprintf(' av(%d) is in %s', i, char(ap.state))
+    if ap.state == paramState.innerDisk ...
+            || ap.state == paramState.outerDisk
+        fprintf(' (#%d)', ap.indisk)
+    end
+    fprintf('.\n')
 end

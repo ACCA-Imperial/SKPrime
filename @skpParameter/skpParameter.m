@@ -30,8 +30,9 @@ classdef skpParameter < double
 % FIXME: Until subsref automatically reads properties from metadata, it
 % must be modified to match property definitions.
 properties(SetAccess=protected)
-    state                   % paramState object
-    ison                    % boundary number where parameter is located
+    state               % paramState object
+    ison                % boundary number where parameter is located
+    indisk              % disk containing parameter
 end
 
 properties(Dependent)
@@ -61,6 +62,22 @@ methods
         
         [d, q] = domainDataB(D);
         
+        function ja = whichHoleNoFail(a)
+            ja = find(abs(a - d(2:end)) < q(2:end) + eps(2));
+            assert(~isempty(ja) && numel(ja) == 1, ...
+                'SKPrime:logicError', ...
+                'Code logic problem, submit bug report.')
+        end
+        function bool = isinFD(a)
+            bool = isin(D, a) | isin(D, 1/conj(a));
+        end
+        function errorOutsideDomain()
+            error('SKPrime:invalidArgument', ...
+                ['The given parameter is outside the ' ...
+                'acceptable region. See help.'])
+        end
+        
+        ja = [];
         if abs(1 - abs(alpha)) < eps(2)
             aloc = paramState.isUnit;
             aon = 0;
@@ -71,17 +88,23 @@ methods
                 aon = find(aon) - 1;
                 aloc = paramState.onOuterBdry;
             else
-                % Is it actually in the domain, or in a hole?
-                if ~isin(D, 1/conj(alpha))
-                    error('SKPrime:invalidArgument', ...
-                        ['The given parameter is outside the ' ...
-                        'acceptable region. See help.'])
-                end
                 aon = [];
-                if isinf(alpha)
-                    aloc = paramState.atInf;
+
+                % Is it in a hole or the domain?
+                if ~isin(D, 1/conj(alpha))
+                    % In a 1st level reflection?
+                    ja = whichHoleNoFail(1/conj(alpha));
+                    if isinFD(D.theta(ja, alpha))
+                        aloc = paramState.outerDisk;
+                    else
+                        errorOutsideDomain()
+                    end
                 else
-                    aloc = paramState.outerFD;
+                    if isinf(alpha)
+                        aloc = paramState.atInf;
+                    else
+                        aloc = paramState.outerFD;
+                    end
                 end
             end
         else
@@ -91,26 +114,28 @@ methods
                 aon = find(aon) - 1;
                 aloc = paramState.onInnerBdry;
             else
-                if ~isin(D, alpha)
-                    % Could be in a 1st level reflection.
-%                     if isin(D, D.theta(j, alpha))
-%                     else
-                        error('SKPrime:invalidArgument', ...
-                            ['The given parameter is outside the ' ...
-                            'acceptable region. See help.'])
-%                     end
-                end
                 aon = [];
-                if abs(alpha) == 0
-                    aloc = paramState.isZero;
+                if ~isin(D, alpha)
+                    % Check if it's in a 1st level reflection.
+                    ja = whichHoleNoFail(alpha);
+                    if isinFD(D.theta(ja, 1/conj(alpha)))
+                        aloc = paramState.innerDisk;
+                    else
+                        errorOutsideDomain()
+                    end
                 else
-                    aloc = paramState.innerFD;
+                    if abs(alpha) == 0
+                        aloc = paramState.isZero;
+                    else
+                        aloc = paramState.innerFD;
+                    end
                 end
             end
         end
         
         aobj.state = aloc;
         aobj.ison = aon;
+        aobj.indisk = ja;
     end
     
     function disp(aobj)
@@ -131,6 +156,10 @@ methods
                     
                 case 'ison'
                     out = aobj.ison;
+                    return
+                    
+                case 'indisk'
+                    out = aobj.indisk;
                     return
                     
                 case 'inUnitDomain'
