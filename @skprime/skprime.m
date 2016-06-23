@@ -59,36 +59,15 @@ properties(Dependent, Access=protected)
 end
 
 methods
-    function skp = skprime(alpha, dv, qv, N)
-        vjfuns = {};
-        phi = [];
-        if ~nargin
-            sargs = {};
-        else
-            if nargin < 4
-                N = [];
-            end
-            if nargin == 1 || (isempty(dv) && isempty(qv))
-                D = skpDomain;
-            elseif iscell(dv) ...
-                    && all(cellfun(@(c) isa(c, 'vjFirstKind'), dv(:)))
-                vjfuns = dv;
-                phi = dv.phiFun;
-                D = dv{1}.domain;
-            elseif isa(dv, 'skprime')
-                vjfuns = dv.vjFuns;
-                phi = dv.phiFun;
-                D = dv.domain;
-            elseif isa(dv, 'skpDomain') || isa(dv, 'circleRegion')
-                D = skpDomain(dv);
-                if nargin > 2 && numel(qv) == 1
-                    N = qv;
-                end
-            else
-                D = skpDomain(dv, qv);
-            end
+    function skp = skprime(varargin) %(alpha, dv, qv, N)
+        if nargin
+            [alpha, D, N, phi, vjfuns] ...
+                = skprime.parseArguments(varargin{:});
             sargs = {D, N, phi};
+        else
+            sargs = {};
         end
+        
         skp = skp@bvpFun(sargs{:});
         if ~nargin
             return
@@ -732,6 +711,51 @@ methods % Setting and getting
     
     function skp = set.logXhatOutCont(skp, lxh)
         skp.refdata.logXhatOutCont = lxh;
+    end
+end
+
+methods(Static,Hidden)
+    function [alpha, D, N, phi, vjfuns] = parseArguments(varargin)
+        %Assume a minimum of one argument given.
+        %
+        %Cases:
+        %  1) alpha, dv, qv, [N]
+        %  2) alpha, skprime, [N]
+        %  3) alpha, vjFunctions, [N]
+        %  4) alpha, skpDomain, [N]
+        %  5) alpha, bvp object, [N]
+        
+        phi = [];
+        vjfuns = {};
+        Ndx = 3;
+        
+        alpha = varargin{1};
+        D = varargin{2};
+        if isa(D, 'skprime')
+            vjfuns = D.vjFuns;
+            phi = D.phiFun;
+            D = D.domain;
+        elseif iscell(D) ...
+                && all(cellfun(@(c) isa(c, 'vjFirstKind'), D(:)))
+            vjfuns = D;
+            phi = D.phiFun;
+            D = D.domain;
+        elseif isa(D, 'bvpFun')
+            phi = D.phiFun;
+            D = D.domain;
+        elseif isa(D, 'skpDomain') || isa(D, 'circleRegion')
+            D = skpDomain(D);
+        else
+            qv = varargin{3};
+            D = skpDomain(D, qv);
+            Ndx = 4;
+        end
+        
+        if nargin == Ndx
+            N = varargin{Ndx};
+        else
+            N = [];
+        end
     end
 end
 
