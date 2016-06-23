@@ -20,7 +20,7 @@ classdef skpindisk < skprime
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 properties(SetAccess=protected)
-    auxParameter
+    diskParameter
     indisk
     
     hejhal
@@ -28,38 +28,44 @@ properties(SetAccess=protected)
 end
 
 methods
-    function skp = skpindisk(alpha, dv, qv)
-        % What I really want to do:
-        %  1) Process arguments.
-        %  2) Use domain and parameter to determine disk and auxiliary
-        %  parameter.
-        %  3) Use auxiliary parameter to call superclass constructor.
-        
-        args = {};
-        if nargin == 2
-            args = {alpha, dv};
-        elseif nargin == 3
-            args = {alpha, dv, qv};
+    function skp = skpindisk(varargin)
+        if nargin
+            %  1) Process arguments.
+            [alpha, D] = skprime.parseArguments(varargin{:});
+            
+            %  2) Use domain and parameter to determine disk and auxiliary
+            %  parameter.
+            alpha = skpParameter(alpha, D);
+            ja = alpha.indisk;
+            if alpha.state == paramState.innerDisk
+                beta = D.theta(ja, 1/conj(alpha));
+            elseif alpha.state == paramState.outerDisk
+                beta = D.theta(ja, alpha);
+            else
+                error('SKPrime:invalidArgument', ...
+                    'The parameter is not in an inner or outer disk.')
+            end
+            beta = 1/conj(beta);
+
+            %  3) Use auxiliary parameter to call superclass constructor.
+            varargin{1} = beta;
         end
         
-        skp = skp@skprime(args{:});
+        skp = skp@skprime(varargin{:});
         if ~nargin
             return
         end
         
-        D = skp.domain;
-        alpha = skp.parameter;
-        ja = alpha.indisk;
-        if alpha.state == paramState.innerDisk
-            beta = D.theta(ja, 1/conj(alpha));
-        elseif alpha.state == paramState.outerDisk
-            beta = D.theta(ja, alpha);
-        else
-            error('SKPrime:invalidArgument', ...
-                'The parameter is not in an inner or outer disk.')
-        end
+        skp.diskParameter = alpha;
         
-        skp.auxParameter = 1/conj(beta);
+        vj = skp.vjFuns{ja};
+        taujj = vj.taujj;
+        dj = D.centers(ja);
+        qj = D.radii(ja);
+        skp.hejhal = @(z) exp(-4i*pi*(vj(beta) - vj(z) + taujj/2)) ...
+            *qj^2/(1 - conj(dj)*beta)^2;
+        skp.rootHejhal = @(z) -exp(-2i*pi*(vj(beta) - vj(z) + taujj/2)) ...
+            *qj/(1 - conj(dj)*beta);
     end
 end
 
