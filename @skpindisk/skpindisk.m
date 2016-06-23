@@ -27,6 +27,10 @@ properties(SetAccess=protected)
     rootHejhal
 end
 
+properties(Access=private)
+    inunit
+end
+
 methods
     function skp = skpindisk(varargin)
         if nargin
@@ -39,8 +43,10 @@ methods
             ja = alpha.indisk;
             if alpha.state == paramState.innerDisk
                 beta = D.theta(ja, 1/conj(alpha));
+                isInUnit = true;
             elseif alpha.state == paramState.outerDisk
                 beta = D.theta(ja, alpha);
+                isInUnit = false;
             else
                 error('SKPrime:invalidArgument', ...
                     'The parameter is not in an inner or outer disk.')
@@ -57,6 +63,8 @@ methods
         end
         
         skp.diskParameter = alpha;
+        skp.indisk = ja;
+        skp.inunit = isInUnit;
         
         vj = skp.vjFuns{ja};
         taujj = vj.taujj;
@@ -66,6 +74,19 @@ methods
             *qj^2/(1 - conj(dj)*beta)^2;
         skp.rootHejhal = @(z) -exp(-2i*pi*(vj(beta) - vj(z) + taujj/2)) ...
             *qj/(1 - conj(dj)*beta);
+    end
+    
+    function v = feval(skp, z)
+        %Evaluate prime function.
+        
+        if skp.inunit
+            v = feval@skprime(skp, z).*skp.rootHejhal(z);
+        else
+            invz = 1./conj(z);
+            v = -(z/conj(skp.domain.theta(skp.indisk, skp.parameter))) ...
+                .*conj( feval@skprime(skp, invz) ...
+                .*skp.rootHejhal(invz) );
+        end
     end
 end
 
