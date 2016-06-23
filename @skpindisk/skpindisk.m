@@ -84,32 +84,33 @@ methods
         else
             invz = 1./conj(z);
             v = -(z/conj(skp.domain.theta(skp.indisk, skp.parameter))) ...
-                .*conj( feval@skprime(skp, invz) ...
-                .*skp.rootHejhal(invz) );
+                .*conj(feval@skprime(skp, invz).*skp.rootHejhal(invz));
         end
+    end
+    
+    function v = hat(skp, z)
+        %Prime "hat" function.
+        
+        v = feval(skp, z)./(z - skp.diskParameter);
+    end
+    
+    function v = X(skp, z)
+        %Square of the prime function.
+        
+        if skp.inunit
+            v = X@skprime(skp, z).*skp.hejhal(z);
+        else
+            invz = 1./conj(z);
+            v = (z/conj(skp.domain.theta(skp.indisk, skp.parameter))).^2 ...
+                .*conj(X@skprime(skp, invz).*skp.hejhal(invz));
+        end
+    end
+    
+    function v = Xhat(skp, z)
+        %Square of the prime hat function.
+        
+        v = X(skp, z)./(z - skp.diskParameter).^2;
     end
 end
 
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
