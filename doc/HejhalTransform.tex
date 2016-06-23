@@ -1,0 +1,85 @@
+\documentclass[12pt,fleqn]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{fullpage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\i}{\mathrm{i}}
+\newcommand{\conj}[1]{\overline{#1}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Use of the Hejhal transformation}
+\author{E. Kropf}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+For an arbitrary set of disjoint circular boundaries in the complex plane, each denoted $C_j$ with centre $\delta_j$ and radius $q_j$, we define the \emph{reflection of points $z$ with respect to $C_j$} by the function
+\begin{equation}
+  \rho_j(z) = \delta_j + \frac{q_j^2}{\conj{z} - \conj{\delta_j}}.
+\end{equation}
+This is an anti-conformal transformation of the plane.
+
+Given a bounded circular domain $D_\zeta$, the fundamental domain $F$ of Schottky doubles is given by reflection of $D_\zeta$ through $C_0$. The inner and outer circles are associated by the M\"obius transformation
+\begin{equation}
+  \theta_j(\zeta) = \delta_j + \frac{q_j^2\zeta}{1 - \conj{\delta_j}\zeta}.
+\end{equation}
+It is not difficult to show the relationship
+\begin{equation}
+  \theta_j(1/\conj{\zeta}) = \rho_j(\zeta).
+\end{equation}
+Note also that $1/\conj{\zeta} = \rho_0(\zeta)$.
+
+Consider the function defined by
+\begin{equation}
+  H_j(\alpha,\zeta) = \exp\left( -4\pi\i \left[ v_j(\alpha) - v_j(\zeta) + \tfrac{1}{2} \tau_{jj} \right] \right) \frac{q_j^2}{(1 - \conj{\delta_j}\zeta)^2}.
+\end{equation}
+The Hejhal transformation is then defined by
+\begin{equation}
+  X(\zeta,\theta_j(\alpha)) = H_j(\alpha,\zeta) X(\zeta,\alpha).
+\end{equation}
+The prime function is then
+\begin{equation}
+  \omega(\zeta,\theta_j(\alpha)) = \sqrt{H_j(\alpha,\zeta)} \omega(\zeta,\alpha)
+\end{equation}
+where we will assume the proper branch of the square root has been chosen for the prime function on the right. The choice of branch for the square root the function $H_j$ should be to ensure $\omega(\zeta,\theta_j(1/\conj{\alpha}))$ behaves like $(\zeta - \theta_j(1/\conj{\alpha}))$ as $\zeta\to\theta_j(1/\conj{\alpha})$. The transformation identity
+\begin{equation}
+  \conj{\omega(1/\conj{\zeta},1/\conj{\alpha})} = -\frac{1}{\zeta\alpha} \omega(\zeta,\alpha) 
+\end{equation}
+will also be useful below.
+
+\section{Computing the prime function}
+We would like to be able to compute the prime function for the parameter $\alpha$ inside any disk, as this is defined in terms of the product formula (more generally?). The boundary value problem is only formulated for the parameter in the closure of $F$, and we must resort to the Hejhal transformation for values outside $F$ (inside the $2m$ disks).
+
+The method is chosen to be limited to the first image of the domain (via the group generators $\theta_j$) inside the disks. If not, we could otherwise inadvertently end up with many applications of the transformation in an attempt to work our way back through the copies of the domain to the original. Whether this limitation may be remedied through the use of M\"obius transformations of $F$ remains an open question. 
+
+\subsection{In an inner disk}
+Suppose that for some $1\le j\le m$ we have $|\alpha - \delta_j| < q_j$. As a consequence, the relationship
+\begin{equation}
+  \beta = \theta_j(1/\conj{\alpha}) \quad\Leftrightarrow\quad \alpha = \theta_j(1/\conj{\beta})
+\end{equation}
+holds. If $\beta\notin F$, then $\alpha$ is inside a 2nd or deeper level copy of $F$ under the generators $\theta_j$, and we ignore it.
+
+Suppose then that $\beta\in F$. Then $\alpha$ is in a first level copy of $F$ under the generators $\theta_j$ (it is a first level reflection of $F$ through $C_j$), but more importantly we may use $\beta$ and the Hejhal transformation to compute the prime function for this $\alpha$ by
+\begin{equation}
+  \omega(\zeta,\alpha) = \omega(\zeta,\theta_j(1/\conj{\beta})) = -\sqrt{H_j(1/\conj{\beta},\zeta)} \omega(\zeta,1/\conj{\beta}).
+\end{equation}
+Numerical experiments have shown the negative branch of the square root for $H_j$ is the correct branch, but an analytic proof of this remains undone.
+
+\subsection{In an outer disk}
+For $\alpha$ in an outer disk, we suppose that for some $1\le j\le m$ we have $|\alpha - \delta_j'| < q_j$. This gives the relationship
+\begin{equation}
+  \beta = \theta_j(\alpha) \quad\Leftrightarrow\quad \alpha = \frac{1}{\conj{\theta_j}(1/\beta)}.
+\end{equation}
+To see this, write out the expressions in the reflection notation above, \textit{e.g.} $\theta_j(\alpha) = \rho_j(\rho_0(\alpha))$. (The Schwarz conjugate $\conj{\theta_j}(\zeta) = \conj{\theta_j(\conj{\zeta})}$ is also used for readability.)
+
+The desired compuation is then
+\begin{align}
+  \omega(\zeta,\alpha) &= \omega(\zeta,1/\conj{\theta_j(1/\conj{\beta})}) \nonumber \\
+  &= -\left( \frac{\zeta}{\conj{\theta_j}(1/\beta)} \right) \conj{\omega(1/\conj{\zeta}, \theta_j(1/\conj{\beta}))} \nonumber \\
+  &= \left( \frac{\zeta}{\conj{\theta_j}(1/\beta)} \right) \conj{\sqrt{H_j(1/\conj{\beta},1/\conj{\zeta})} \omega(1/\conj{\zeta}, 1/\conj{\beta})}
+\end{align}
+where we have used the prime function identity for inversion of the variables with respect to the unit circle. Again the negative branch of the square root for $H_j$ was chosen.
+
+\end{document}

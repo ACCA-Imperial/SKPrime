@@ -1,1 +1,7 @@
+# Why is this here?
 *.mp4
+
+# Latex files to ignore.
+*.aux
+*.log
+HejhalTransform.pdf
