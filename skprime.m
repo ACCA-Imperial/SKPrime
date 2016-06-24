@@ -1,7 +1,7 @@
-classdef paramState < int8
-%paramState describes the state of the alpha parameter.
+function skp = skprime(alpha, varargin)
+%SKPRIME returns a Schottky-Klein prime function.
 
-% E. Kropf, 2015
+% Everett Kropf, 2016
 % 
 % This file is part of SKPrime.
 % 
@@ -18,23 +18,15 @@ classdef paramState < int8
 % You should have received a copy of the GNU General Public License
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
-enumeration
-    isZero(-4)
-    innerDisk(-3)
-    innerFD(-2)
-    onInnerBdry(-1)
-    isUnit(0)
-    onOuterBdry(1)
-    outerFD(2)
-    outerDisk(3)
-    atInf(4)
-end
+% Where is the parameter?
+D = skpfunction.parseArguments(alpha, varargin{:});
+alpha = skpParameter(alpha, D);
 
-methods
-    function state = inv(state)
-        m = enumeration(state);
-        state = m(-state + (numel(m) + 1)/2);
-    end
-end
-
+% Dispatch to proper class.
+switch alpha.state
+    case {paramState.innerDisk, paramState.outerDisk}
+        skp = skpindisk(alpha, varargin{:});
+        
+    otherwise
+        skp = skpfunction(alpha, varargin{:});
 end

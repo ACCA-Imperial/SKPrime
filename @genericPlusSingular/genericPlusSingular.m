@@ -41,6 +41,7 @@ classdef genericPlusSingular < bvpFun
 properties(SetAccess=protected)
     knownImaginary
     singularPart
+    singularPartDz
 end
 
 methods
@@ -63,6 +64,19 @@ methods
         
         f.knownImaginary = known;
         f.singularPart = singPart;
+    end
+    
+    function df = diff(f)
+        %First order variable derivative.
+        
+        if isempty(f.singularPartDz)
+            error('SKPrime:RuntimeError', ...
+                'Function "diff" not implemented for class %s.', ...
+                class(f))
+        end
+        
+        dfh = dftDerivative(f, @f.hat, 1);
+        df = @(z) dfh(z) + f.singularPartDz(z);
     end
     
     function v = feval(f, z)

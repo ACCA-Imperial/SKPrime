@@ -60,15 +60,8 @@ methods
         alpha = skpParameter(alpha, dpg0.domain);
         dpg0.parameter = alpha;
         
-        resx = @(z) (1./(alpha - z) + 1./(conj(alpha) ...
-            - z*conj(alpha)^2))/2i/pi;
-        dpg0.partialWrtX = ...
-            genericPlusSingular(resx, @(z) -imag(resx(z)), dpg0);        
-        
-        resy = @(z) (1./(alpha - z) - 1./(conj(alpha) ...
-            - z*conj(alpha)^2))/2/pi;
-        dpg0.partialWrtY = ...
-            genericPlusSingular(resy, @(z) -imag(resy(z)), dpg0);
+        dpg0.partialWrtX = greensC0Dpxy(alpha, 'x', dpg0);
+        dpg0.partialWrtY = greensC0Dpxy(alpha, 'y', dpg0);
         
         dpg0.normalizeConstant = dpg0.hat(alpha) + 1/(4i*pi*alpha);
     end
@@ -93,6 +86,13 @@ methods
         
         v = (dp.partialWrtX.hat(z) - 1i*dp.partialWrtY.hat(z))/2 ...
             - dp.normalizeConstant;
+    end
+end
+
+methods(Hidden)
+    function [dxG, dyG] = getPartialXyDerivatives(dpg0)
+        dxG = dpg0.partialWrtX;
+        dyG = dpg0.partialWrtY;
     end
 end
 
