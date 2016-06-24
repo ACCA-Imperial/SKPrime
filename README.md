@@ -27,7 +27,7 @@ If you have the [FMM2D software](http://www.cims.nyu.edu/cmcl/fmm2dlib/fmm2dlib.
 ### Contribution guidelines ###
 
 * Ask Everett.
-* TBD
+* Please see the [wiki](https://github.com/ehkropf/SKPrime/wiki).
 
 ### Contact ###
 
