@@ -1,4 +1,4 @@
-classdef skpindisk < skprime
+classdef skpindisk < skpfunction
 %skpindisk is the SKPrime function for the parameter in a 1st level
 %refelction of the domain.
 
@@ -32,10 +32,10 @@ properties(Access=private)
 end
 
 methods
-    function skp = skpindisk(varargin)
+    function skp = skpindisk(alpha, varargin)
         if nargin
             %  1) Process arguments.
-            [alpha, D] = skprime.parseArguments(varargin{:});
+            D = skpfunction.parseArguments(varargin{:});
             
             %  2) Use domain and parameter to determine disk and auxiliary
             %  parameter.
@@ -53,11 +53,10 @@ methods
             end
             beta = 1/conj(beta);
 
-            %  3) Use auxiliary parameter to call superclass constructor.
-            varargin{1} = beta;
         end
         
-        skp = skp@skprime(varargin{:});
+        %  3) Use auxiliary parameter to call superclass constructor.
+        skp = skp@skpfunction(beta, varargin{:});
         if ~nargin
             return
         end
@@ -80,11 +79,11 @@ methods
         %Evaluate prime function.
         
         if skp.inunit
-            v = feval@skprime(skp, z).*skp.rootHejhal(z);
+            v = feval@skpfunction(skp, z).*skp.rootHejhal(z);
         else
             invz = 1./conj(z);
             v = -(z/conj(skp.domain.theta(skp.indisk, skp.parameter))) ...
-                .*conj(feval@skprime(skp, invz).*skp.rootHejhal(invz));
+                .*conj(feval@skpfunction(skp, invz).*skp.rootHejhal(invz));
         end
     end
     
@@ -98,11 +97,11 @@ methods
         %Square of the prime function.
         
         if skp.inunit
-            v = X@skprime(skp, z).*skp.hejhal(z);
+            v = X@skpfunction(skp, z).*skp.hejhal(z);
         else
             invz = 1./conj(z);
             v = (z/conj(skp.domain.theta(skp.indisk, skp.parameter))).^2 ...
-                .*conj(X@skprime(skp, invz).*skp.hejhal(invz));
+                .*conj(X@skpfunction(skp, invz).*skp.hejhal(invz));
         end
     end
     
