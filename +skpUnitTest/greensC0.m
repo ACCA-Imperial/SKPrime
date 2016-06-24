@@ -66,19 +66,16 @@ methods(TestMethodSetup)
         test.g0object = greensC0(test.alpha, test.domain);
         
         wp = test.wprod;
-        g0p = @(z,a) log(wp(z,a)./wp(z, 1/conj(a)))/2i/pi;
+        logprat = @(z,a) log(wp(z,a)./wp(z, 1/conj(a)))/2i/pi;
         if test.alpha ~= 0
-            g0p = @(z,a) g0p(z, a) - log(abs(a))/2i/pi;
-            g0hp = @(z,a) g0p(z, a) ...
-                - log((z - a)./(z - 1/conj(a)))/2i/pi ...
-                - log(abs(a))/2i/pi;
+            g0p = @(z,a) logprat(z, a) - log(abs(a))/2i/pi;
+            g0hp = @(z,a) g0p(z, a) - log((z - a)./(z - 1/conj(a)))/2i/pi;
         else
+            g0p = @(z,a) logprat(z, a);
             g0hp = @(z,a) g0p(z, a) - log(z)/2i/pi;
         end
         test.g0prod = g0p;
         test.g0hatProd = g0hp;
-%         test.g0hatProd = @(z,a) ...
-%             g0p(z, a) - log((z - a)./(z - 1/conj(a)))/2i/pi;
     end
 end
 
@@ -86,38 +83,40 @@ methods(Test)
     function hatCheck(test)
         g0 = test.g0object;
         test.compareAllPoints(...
-            @(z) test.g0hatProd(z, test.alpha), @g0.hat, 1e-5)
+            @(z) exp(2i*pi*test.g0hatProd(z, test.alpha)), ...
+            @(z) exp(2i*pi*g0.hat(z)), 1e-5)
     end
     
     function functionCheck(test)
         g0 = test.g0object;
         
         test.compareAllPoints(...
-            @(z) test.g0prod(z, test.alpha), g0, 1e-5)
+            @(z) exp(2i*pi*test.g0prod(z, test.alpha)), ...
+            @(z) exp(2i*pi*g0(z)), 1e-5)
     end
     
     function hatVariableDerivative(test)
         g0 = test.g0object;
         
+        dg0h = diffh(g0, 1);
         d2g0h = diffh(g0, 2);
-        d3g0h = diffh(g0, 3);
         
         h = 1e-6;
-        d3ref = @(z) (d2g0h(z + h) - d2g0h(z - h))/2/h;
+        d2ref = @(z) (dg0h(z + h) - dg0h(z - h))/2/h;
         
-        test.compareAllPoints(d3ref, d3g0h, 1e-6)
+        test.compareAllPoints(d2ref, d2g0h, 1e-5)
     end
     
     function functionVariableDerivative(test)
         g0 = test.g0object;
         
+        dg0 = diff(g0, 1);
         d2g0 = diff(g0, 2);
-        d3g0 = diff(g0, 3);
         
         h = 1e-6;
-        d3ref = @(z) (d2g0(z + h) - d2g0(z - h))/2/h;
+        d2ref = @(z) (dg0(z + h) - dg0(z - h))/2/h;
         
-        test.compareAllPoints(d3ref, d3g0, 1e-6)
+        test.compareAllPoints(d2ref, d2g0, 1e-5)
     end
 end
 
