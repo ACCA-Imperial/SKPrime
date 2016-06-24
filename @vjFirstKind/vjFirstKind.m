@@ -34,6 +34,8 @@ properties(SetAccess=protected)
     logjFun
     bdryFun
     contFun
+    
+    thetaj
 end
 
 properties(Dependent)
@@ -59,6 +61,7 @@ methods
         
         vj.boundary = j;
         [d, q] = domainData(vj.domain);
+        vj.thetaj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
         
         if abs(d(j)) > q(j)
             % "double" circle center.
@@ -148,17 +151,42 @@ methods
     end
     
     function v = feval(vj, z)
-        v = nan(size(z));
-        inUnit = abs(z) <= 1 + eps(2);
+        D = vj.domain;
+        thj = vj.thetaj;
+        tjj = vj.taujj;
+        
+        v = complex(nan(size(z)));
         notNan = ~isnan(z);
         
-        idx = inUnit & notNan;
-        if any(idx(:))
-            v(idx) = vj.logPlus(z(idx));
+        % Points in D_zeta (or on the boundary).
+        mask = (isin(D, z) | ison(D, z)) & notNan;
+        if any(mask(:))
+            v(mask) = vj.logPlus(z(mask));
         end
-        idx = ~inUnit & notNan;
-        if any(idx(:))
-            v(idx) = conj(vj.logPlus(1./conj(z(idx))));
+        
+        % Points in first reflection in to C_j.
+        done = mask;
+        mask(mask) = false;
+        mask(~done) = isin(D, thj(1./conj(z(~done)))) & notNan(~done);
+        if any(mask(:))
+            v(mask) = conj(vj.logPlus(thj(1./conj(z(mask)))) - tjj);
+        end
+        
+        % Points in D_zeta' (or on the outer boundary).
+        done = done | mask;
+        mask(mask) = false;
+        mask(~done) = (isin(D, 1./conj(z(~done))) ...
+            | ison(D, 1./conj(z(~done)))) & notNan(~done);
+        if any(mask(:))
+            v(mask) = conj(vj.logPlus(1./conj(z(mask))));
+        end
+        
+        % Points in first reflection into C_j'.
+        done = done | mask;
+        mask(mask) = false;
+        mask(~done) = isin(D, thj(z(~done))) & notNan(~done);
+        if any(mask(:))
+            v(mask) = vj.logPlus(thj(z(mask))) - tjj;
         end
     end
     
@@ -175,15 +203,9 @@ methods % Property access.
     end
     
     function tau = get.taujj(vj)
-        %computes the tau_jj constant associated with the function.
+        %retrieve the tau_jj constant associated with the function.
         
-        j = vj.boundary;
-        
-        % Chose any point on Cj.
-        [dv, qv] = domainData(vj.domain);
-        z = dv(j) + qv(j);
-        
-        tau = vj.feval(z) - vj.feval(1/conj(z));
+        tau = 2i*vj.constants(vj.boundary);
     end
 end
 

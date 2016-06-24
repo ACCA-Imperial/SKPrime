@@ -1,19 +1,19 @@
-classdef skprime < bvpFun
-%SKPRIME is the Shottky-Klein prime function.
+classdef skpfunction < bvpFun
+%SKPFUNCTION is the Shottky-Klein prime function.
 %
-% skprime(alpha, dv, qv)
-% skprime(alpha, D)
+% skpfunction(alpha, dv, qv)
+% skpfunction(alpha, D)
 %   Solve the boundary value problem for the SK-prime function given the
 %   parameter alpha and the vectors dv and qv, respectively the centers and
 %   radii of the circles bounded by the unit circle. The domain may also be
 %   given as a skpDomain object D.
 %
-% w = skprime(...)
-% w2 = skprime(param, w)
+% w = skpfunction(...)
+% w2 = skpfunction(param, w)
 %   Use a previously computed prime function to accelerate the computation
 %   of a new prime function on the same domain with a different parameter.
 %
-% skprime(..., N)
+% skpfunction(..., N)
 %   Specify the truncation level of the Fourier series on each boundary
 %   circle (same for all circles). See bvpFun.truncation for default.
 %
@@ -23,7 +23,7 @@ classdef skprime < bvpFun
 %
 % See also: skpDomain, bvpFun
 
-% E. Kropf, 2015
+% Everett Kropf, 2015, 2016
 % 
 % This file is part of SKPrime.
 % 
@@ -59,36 +59,14 @@ properties(Dependent, Access=protected)
 end
 
 methods
-    function skp = skprime(alpha, dv, qv, N)
-        vjfuns = {};
-        phi = [];
-        if ~nargin
-            sargs = {};
-        else
-            if nargin < 4
-                N = [];
-            end
-            if nargin == 1 || (isempty(dv) && isempty(qv))
-                D = skpDomain;
-            elseif iscell(dv) ...
-                    && all(cellfun(@(c) isa(c, 'vjFirstKind'), dv(:)))
-                vjfuns = dv;
-                phi = dv.phiFun;
-                D = dv{1}.domain;
-            elseif isa(dv, 'skprime')
-                vjfuns = dv.vjFuns;
-                phi = dv.phiFun;
-                D = dv.domain;
-            elseif isa(dv, 'skpDomain') || isa(dv, 'circleRegion')
-                D = skpDomain(dv);
-                if nargin > 2 && numel(qv) == 1
-                    N = qv;
-                end
-            else
-                D = skpDomain(dv, qv);
-            end
+    function skp = skpfunction(alpha, varargin) %(alpha, dv, qv, N)
+        if nargin
+            [D, N, phi, vjfuns] = skpfunction.parseArguments(varargin{:});
             sargs = {D, N, phi};
+        else
+            sargs = {};
         end
+        
         skp = skp@bvpFun(sargs{:});
         if ~nargin
             return
@@ -261,7 +239,7 @@ methods
         %Note the returned function is a function of the variable
         %with the parameter *fixed*.
         %
-        %See also skprime/diffXp.
+        %See also skpfunction/diffXp.
         
         warning('SKPrime:underDevelopment', ...
             'This method is under development. Do not trust its output.')
@@ -323,7 +301,7 @@ methods
         %Note the returned function is a function of the variable
         %with the parameter *fixed*.
         %
-        %See also skprime/diffp.
+        %See also skpfunction/diffp.
         
         alpha = skp.parameter;
         if alpha == 0
@@ -369,9 +347,9 @@ methods
     function skp = invParam(skp)
         %gives the prime function with inverted parameter
         %
-        %  w = skprime(...);
+        %  w = skpfunction(...);
         %  wi = invParam(w);
-        %  Then isa(wi, 'skprime') is a true statememt.
+        %  Then isa(wi, 'skpfunction') is a true statememt.
         
         skp = skpinvparam(skp);
     end
@@ -402,7 +380,7 @@ methods
     function X = X(skp, z)
         %returns the square of the prime function
         %
-        % w = skprime(...);
+        % w = skpfunction(...);
         % Xval = X(w, z);
         
         if skp.parameter.state ~= paramState.atInf
@@ -470,7 +448,7 @@ methods(Access=protected)
         %
         % Gives external access to a copy of object internals.
         
-        mco = ?skprime;
+        mco = ?skpfunction;
         for k = 1:numel(mco.PropertyList)
             pname = mco.PropertyList(k).Name;
             skps.(pname) = skp.(pname);
@@ -735,4 +713,48 @@ methods % Setting and getting
     end
 end
 
-end % skprime
+methods(Static,Hidden)
+    function [D, N, phi, vjfuns] = parseArguments(varargin)
+        %Assume a minimum of one argument given.
+        %
+        %Cases:
+        %  1) dv, qv, [N]
+        %  2) skpfunction, [N]
+        %  3) vjFunctions, [N]
+        %  4) skpDomain, [N]
+        %  5) bvp object, [N]
+        
+        phi = [];
+        vjfuns = {};
+        Ndx = 2;
+        
+        D = varargin{1};
+        if isa(D, 'skpfunction')
+            vjfuns = D.vjFuns;
+            phi = D.phiFun;
+            D = D.domain;
+        elseif iscell(D) ...
+                && all(cellfun(@(c) isa(c, 'vjFirstKind'), D(:)))
+            vjfuns = D;
+            phi = D.phiFun;
+            D = D.domain;
+        elseif isa(D, 'bvpFun')
+            phi = D.phiFun;
+            D = D.domain;
+        elseif isa(D, 'skpDomain') || isa(D, 'circleRegion')
+            D = skpDomain(D);
+        else
+            qv = varargin{2};
+            D = skpDomain(D, qv);
+            Ndx = 3;
+        end
+        
+        if nargin == Ndx
+            N = varargin{Ndx};
+        else
+            N = [];
+        end
+    end
+end
+
+end % skpfunction

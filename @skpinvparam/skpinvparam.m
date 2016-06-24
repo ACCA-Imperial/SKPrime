@@ -1,4 +1,4 @@
-classdef skpinvparam < skprime
+classdef skpinvparam < skpfunction
 %SKPINVPARAM is the inverted parameter prime function.
 %
 % w = skprime(...)
@@ -38,8 +38,8 @@ methods
             return
         end
         
-        if ~isa(skp, 'skprime')
-            error('SKPrime:invalidArgument', 'Expected a "skprime" object.')
+        if ~isa(skp, 'skpfunction')
+            error('SKPrime:invalidArgument', 'Expected a "skpfunction" object.')
         end
         
         skps = copyProperties(skp);
@@ -52,7 +52,7 @@ methods
     function wc = feval(skpc, z)
         %provides function evaluation
         
-        wc = conj(feval@skprime(skpc, 1./conj(z)));
+        wc = conj(feval@skpfunction(skpc, 1./conj(z)));
         alpha = skpc.parameter;
         if 0 ~= alpha && ~isinf(alpha)
             wc = -z/conj(alpha).*wc;
@@ -76,7 +76,7 @@ methods
     function Xc = X(skpc, z)
         %gives the square of the prime function
         
-        Xc = conj(X@skprime(skpc, 1./conj(z)));
+        Xc = conj(X@skpfunction(skpc, 1./conj(z)));
         alpha = skpc.parameter;
         if 0 ~= alpha && ~isinf(alpha)
             Xc = (z/conj(alpha)).^2.*Xc;
