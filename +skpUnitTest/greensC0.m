@@ -84,7 +84,7 @@ methods(Test)
         g0 = test.g0object;
         test.compareAllPoints(...
             @(z) exp(2i*pi*test.g0hatProd(z, test.alpha)), ...
-            @(z) exp(2i*pi*g0.hat(z)), 1e-5)
+            @(z) exp(2i*pi*g0.hat(z)), 1e-4)
     end
     
     function functionCheck(test)
@@ -92,7 +92,7 @@ methods(Test)
         
         test.compareAllPoints(...
             @(z) exp(2i*pi*test.g0prod(z, test.alpha)), ...
-            @(z) exp(2i*pi*g0(z)), 1e-5)
+            @(z) exp(2i*pi*g0(z)), 1e-4)
     end
     
     function hatVariableDerivative(test)
@@ -104,7 +104,7 @@ methods(Test)
         h = 1e-6;
         d2ref = @(z) (dg0h(z + h) - dg0h(z - h))/2/h;
         
-        test.compareAllPoints(d2ref, d2g0h, 1e-5)
+        test.compareAllPoints(d2ref, d2g0h, 1e-4)
     end
     
     function functionVariableDerivative(test)
@@ -116,7 +116,7 @@ methods(Test)
         h = 1e-6;
         d2ref = @(z) (dg0(z + h) - dg0(z - h))/2/h;
         
-        test.compareAllPoints(d2ref, d2g0, 1e-5)
+        test.compareAllPoints(d2ref, d2g0, 1e-4)
     end
 end
 
