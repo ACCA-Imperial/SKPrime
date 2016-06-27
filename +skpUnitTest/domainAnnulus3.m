@@ -19,11 +19,11 @@ classdef domainAnnulus3 < skpUnitTest.domainForTest
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 properties
-    dv = [0; 0.52621+0.23899i];
-    qv = [0.25; 0.14095];
+    dv = [0; 0.52621+0.23899i]
+    qv = [0.25; 0.14095]
     
-    parameterInside = -0.50729+0.29388i;
-    testPointInside = 0.27638-0.55977i;
+    parameterInside = -0.50729+0.29388i
+    testPointInside = 0.27638-0.55977i
 end
 
 methods
