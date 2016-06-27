@@ -1,7 +1,7 @@
-classdef(Abstract) greensC0 < matlab.unittest.TestCase
-%greensC0 is the test class for G0.
+classdef(Abstract) greensC0 < skpUnitTest.skpTestBase
+%skpUnitTest.greensC0 is the test class for G0.
 
-% E. Kropf, 2016
+% Everett Kropf, 2016
 % 
 % This file is part of SKPrime.
 % 
@@ -24,47 +24,40 @@ classdef(Abstract) greensC0 < matlab.unittest.TestCase
 %         'annulus3', skpUnitTest.domainAnnulus3);
 % end
 
-properties(Abstract, MethodSetupParameter)
-    parameterAt
-end
-
-properties(Abstract)
-    domainData
-end
-
 properties
-    domain
-    alpha
+    pointMap = containers.Map(...
+        {'inner point', 'inner boundary'}, ...
+        {'innerPoint', 'innerBdryPoints'}, ...
+        'UniformValues', true)
     
-    prodLevel = 6
+    innerPoint
+    innerBdryPoints
+
+    g0object
+    
     wprod
+    prodLevel = 6
     g0prod
     g0hatProd
-
-    innerBdryPoints
-    innerPoint
-    
-    g0object
 end
 
 methods(TestClassSetup)
-    function classSetup(test)
-        testDomain = test.domainData;
-        test.domain = skpDomain(testDomain);
-        
-        wp = skprod(test.domain.dv, test.domain.qv, test.prodLevel);
-        test.wprod = wp;
-        
+    function createProduct(test)
+        test.wprod = skprod(test.domain.dv, test.domain.qv, test.prodLevel);
+    end
+    
+    function initTestPoints(test)
         test.innerBdryPoints = boundaryPts(test.domain, 5);
-        test.innerPoint = testDomain.testPointInside;
+        test.innerPoint = test.domainData.testPointInside;
     end
 end
 
 methods(TestMethodSetup)
-    function setupMethods(test, parameterAt)
-        test.alpha = test.domainData.parameter(parameterAt);
+    function createObjectForTest(test)
         test.g0object = greensC0(test.alpha, test.domain);
-        
+    end
+       
+    function specifyPotential(test)
         wp = test.wprod;
         logprat = @(z,a) log(wp(z,a)./wp(z, 1/conj(a)))/2i/pi;
         if test.alpha ~= 0
@@ -117,22 +110,6 @@ methods(Test)
         d2ref = @(z) (dg0(z + h) - dg0(z - h))/2/h;
         
         test.compareAllPoints(d2ref, d2g0, 1e-4)
-    end
-end
-
-methods
-    function compareAllPoints(test, ref, fun, tol)
-        testPointCell = {
-            test.innerBdryPoints, 'inner boundary'
-            test.innerPoint, 'inner point'
-            };
-        
-        for i = 1:size(testPointCell, 1)
-            [z, str] = testPointCell{i,:};
-            err = ref(z) - fun(z);
-            test.verifyLessThan(max(abs(err(:))), tol, ...
-                sprintf('Absolute error > %.1e on %s check.', tol, str))
-        end
     end
 end
 
