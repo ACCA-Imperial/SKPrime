@@ -19,7 +19,7 @@ function skp = skprime(alpha, varargin)
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 % Where is the parameter?
-D = skpfunction.parseArguments(alpha, varargin{:});
+D = skpfunction.parseArguments(varargin{:});
 alpha = skpParameter(alpha, D);
 
 % Dispatch to proper class.
