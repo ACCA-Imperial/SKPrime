@@ -20,8 +20,7 @@ classdef greensC0Simple3 < skpUnitTest.greensC0
 
 properties(MethodSetupParameter)
     parameterAt = ...
-        skpUnitTest.domainSimple3.parameterLocationsWithout(...
-        'domainSimple3', 'outside')
+        skpUnitTest.domainSimple3.parameterLocationsWithout('outside')
 end
 
 properties

@@ -30,4 +30,11 @@ properties
     testPointInside = 0.66822-0.11895i
 end
 
+methods(Static)
+    function str = parameterLocationsWithout(varargin)
+        str = skpUnitTest.domainForTest.parameterLocationsWithout(...
+            'domainSimple3', varargin{:});
+    end
+end
+
 end

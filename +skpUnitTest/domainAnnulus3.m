@@ -29,7 +29,14 @@ end
 methods
     function dom = domainAnnulus3()
         dom = dom@skpUnitTest.domainForTest();
-        dom.parameterMap.remove('origin')
+        dom.parameterMap.remove('origin');
+    end
+end
+
+methods(Static)
+    function str = parameterLocationsWithout(varargin)
+        str = skpUnitTest.domainForTest.parameterLocationsWithout(...
+            'domainAnnulus3', 'origin', varargin{:});
     end
 end
 
