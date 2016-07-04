@@ -20,8 +20,10 @@ classdef(Abstract) primeNewBase < skpUnitTest.skpTestBase
 
 properties
     pointMap = containers.Map(...
-        {'inner boundary', 'inner point'}, ...
-        {'innerBdryPoints', 'innerPoint'}, ...
+        {'inner boundary', 'inner point',  'outer boundary', ...
+         'outer point'}, ...
+        {'innerBdryPoints', 'innerPoint', 'outerBdryPoints', ...
+         'outerPoint'}, ...
         'UniformValues', true)
     
     innerBdryPoints
@@ -31,6 +33,21 @@ properties
     
     wprod
     prodLevel = 6
+end
+
+properties(Dependent)
+    outerBdryPoints
+    outerPoint
+end
+
+methods % getters
+    function pts = get.outerBdryPoints(obj)
+        pts = 1./conj(obj.innerBdryPoints);
+    end
+    
+    function pt = get.outerPoint(obj)
+        pt = 1/conj(obj.innerPoint);
+    end
 end
 
 methods(TestClassSetup)
