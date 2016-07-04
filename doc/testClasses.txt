@@ -31,7 +31,7 @@ The idea is that tests are done on a domain/parameter basis. One test class for 
     * Supplies `pointMap` for test points, with storage for the test points.
     * Holds prime object and product formula object.
     * On class setup:
-        * Setup test points, including boundary points.
+        * Setup test points, including boundary points (reads domain supplied test point).
         * Create product formula.
     * On method setup: creates the SKPrime object.
 
