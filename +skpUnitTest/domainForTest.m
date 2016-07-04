@@ -33,11 +33,13 @@ end
 
 properties(Constant)
     parameterOrigin = 0
+    parameterInfinity = inf
 
     defaultParameterKeys = {...
-        'inside', 'outside', 'origin'}
+        'inside', 'outside', 'origin', 'infinity'}
     defaultParameterValues = {...
-        'parameterInside', 'parameterOutside', 'parameterOrigin'}
+        'parameterInside', 'parameterOutside', ...
+        'parameterOrigin', 'parameterInfinity'}
 
     defaultTestPointKeys = {...
         'inside', 'outside'}
