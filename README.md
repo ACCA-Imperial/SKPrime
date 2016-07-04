@@ -8,7 +8,7 @@ This software is in the pre-release stage. Comprehensive help documentaiton for 
 
 When citing this software please mention the URL of the master repository (https://github.com/ehkropf/SKPrime), and the paper
 
-> D.G. Crowdy, C.C. Green, E.H. Kropf, M.M.S. Nasser. "The Schottky-Klein prime function: a theoretical and computational tool for applications." IMA Journal of Applied Mathematics, in press, 2016.
+> D.G. Crowdy, C.C. Green, E.H. Kropf, M.M.S. Nasser. "The Schottky-Klein prime function: a theoretical and computational tool for applications." IMA Journal of Applied Mathematics, 2016, doi: 10.1093/imamat/hxw028.
 
 ### How do I get set up? ###
 
