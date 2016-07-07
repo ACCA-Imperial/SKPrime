@@ -33,7 +33,8 @@ properties(Constant)
 
     defaultParameterKeys = {...
         'inside', 'outside', 'origin', 'infinity', 'unit', ...
-        'innerCirc', 'outerCirc', 'nearCirc'}
+        'innerCirc1', 'outerCirc1', 'nearCirc1', ...
+        'innerCircm', 'outerCircm'}
 
     defaultTestPointKeys = {...
         'inside', 'outside'}
@@ -44,9 +45,11 @@ properties(Dependent)
     defaultTestPointValues
 
     parameterOutside
-    parameterInnerCirc
-    parameterOuterCirc
-    parameterNearCirc
+    parameterInnerCirc1
+    parameterOuterCirc1
+    parameterNearCirc1
+    parameterInnerCircm
+    parameterOuterCircm
     
     testPointOutside
 end
@@ -66,20 +69,31 @@ methods % Getters
         a = 1/conj(td.parameterInside);
     end
     
-    function a = get.parameterInnerCirc(td)
+    function a = get.parameterInnerCirc1(td)
         d = td.dv(1);
         q = td.qv(1);
         a = d + q*exp(5i*pi/4);
     end
     
-    function a = get.parameterNearCirc(td)
+    function a = get.parameterOuterCirc1(td)
+        a = 1/conj(td.parameterInnerCirc1);
+    end
+    
+    function a = get.parameterNearCirc1(td)
         d = td.dv(1);
         q = td.qv(1);
         a = d + q + 1e-6;
     end
     
-    function a = get.parameterOuterCirc(td)
-        a = 1/conj(td.parameterInnerCirc);
+    function a = get.parameterInnerCircm(td)
+        m = numel(td.dv);
+        d = td.dv(m);
+        q = td.qv(m);
+        a = d + q*exp(5i*pi/4);
+    end
+    
+    function a = get.parameterOuterCircm(td)
+        a = 1/conj(td.parameterInnerCircm);
     end
     
     function tp = get.testPointOutside(td)
@@ -130,7 +144,7 @@ methods(Static)
         if isempty(class)
             class = 'domainForTest';
         end
-        castr = skpUnitTest.(class).parameterLocations;
+        castr = skpUnitTest.(class).defaultParameterKeys;
         mask = false(size(castr));
         for i = 1:numel(varargin)
             mask = mask | strcmp(varargin{i}, castr);
