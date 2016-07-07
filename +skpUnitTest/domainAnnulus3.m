@@ -1,5 +1,5 @@
 classdef domainAnnulus3 < skpUnitTest.domainForTest
-%domainAnnulus3 is a 3-conneced annular domain.
+%skpUnitTest.domainAnnulus3 is a 3-conneced annular domain.
 
 % Everett Kropf, 2016
 % 
