@@ -30,6 +30,7 @@ methods
     function dom = domainAnnulus3()
         dom = dom@skpUnitTest.domainForTest();
         dom.parameterMap.remove('origin');
+        dom.parameterMap.remove('infinity');
     end
 end
 
