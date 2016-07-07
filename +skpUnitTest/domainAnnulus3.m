@@ -34,9 +34,14 @@ methods
 end
 
 methods(Static)
+    function str = parameterLocations()
+        str = skpUnitTest.domainForTest.parameterLocationsWithout(...
+            'domainAnnulus3', 'origin', 'infinity');
+    end
+    
     function str = parameterLocationsWithout(varargin)
         str = skpUnitTest.domainForTest.parameterLocationsWithout(...
-            'domainAnnulus3', 'origin', varargin{:});
+            'domainAnnulus3', varargin{:});
     end
 end
 
