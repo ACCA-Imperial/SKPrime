@@ -20,7 +20,7 @@ classdef primeSimple3 < skpUnitTest.primeNewBase
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 properties(MethodSetupParameter)
-    parameterAt = {'inside', 'outside', 'origin', 'infinity'};
+    parameterAt = skpUnitTest.domainSimple3.parameterLocations;
 end
 
 properties
