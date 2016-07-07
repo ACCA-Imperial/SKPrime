@@ -26,25 +26,65 @@ properties(Abstract)
     testPointInside
 end
 
-properties(Dependent)
-    parameterOutside
-    testPointOutside
-end
-
 properties(Constant)
     parameterOrigin = 0
     parameterInfinity = inf
+    parameterUnit = exp(2i*pi*rand(1))
 
     defaultParameterKeys = {...
-        'inside', 'outside', 'origin', 'infinity'}
-    defaultParameterValues = {...
-        'parameterInside', 'parameterOutside', ...
-        'parameterOrigin', 'parameterInfinity'}
+        'inside', 'outside', 'origin', 'infinity', 'unit', ...
+        'innerCirc', 'outerCirc', 'nearCirc'}
 
     defaultTestPointKeys = {...
         'inside', 'outside'}
-    defaultTestPointValues = {...
-        'testPointInside', 'testPointOutside'}
+end
+
+properties(Dependent)
+    defaultParameterValues
+    defaultTestPointValues
+
+    parameterOutside
+    parameterInnerCirc
+    parameterOuterCirc
+    parameterNearCirc
+    
+    testPointOutside
+end
+
+methods % Getters
+    function pv = get.defaultParameterValues(td)
+        keys = td.defaultParameterKeys;
+        pv = td.keyToValue('parameter', keys);
+    end
+    
+    function tv = get.defaultTestPointValues(td)
+        keys = td.defaultTestPointKeys;
+        tv = td.keyToValue('testPoint', keys);
+    end
+    
+    function a = get.parameterOutside(td)
+        a = 1/conj(td.parameterInside);
+    end
+    
+    function a = get.parameterInnerCirc(td)
+        d = td.dv(1);
+        q = td.qv(1);
+        a = d + q*exp(5i*pi/4);
+    end
+    
+    function a = get.parameterNearCirc(td)
+        d = td.dv(1);
+        q = td.qv(1);
+        a = d + q + 1e-6;
+    end
+    
+    function a = get.parameterOuterCirc(td)
+        a = 1/conj(td.parameterInnerCirc);
+    end
+    
+    function tp = get.testPointOutside(td)
+        tp = 1/conj(td.testPointInside);
+    end
 end
 
 properties(Access=protected)
@@ -60,14 +100,6 @@ methods
     
     function D = skpDomain(td)
         D = skpDomain(td.dv, td.qv);
-    end
-    
-    function a = get.parameterOutside(td)
-        a = 1/conj(td.parameterInside);
-    end
-    
-    function tp = get.testPointOutside(td)
-        tp = 1/conj(td.testPointInside);
     end
     
     function out = subsref(td, S)
@@ -110,6 +142,14 @@ methods(Static)
         castr = skpUnitTest.domainForTest.testPointMap.keys;
     end
 
+    function vv = keyToValue(prefix, keys)
+        vv = cell(size(keys));
+        for i = 1:numel(vv)
+            vstr = keys{i};
+            vstr(1) = upper(vstr(1));
+            vv{i} = [prefix, vstr];
+        end
+    end
 end
 
 methods(Access=protected)
