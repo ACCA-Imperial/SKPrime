@@ -1,5 +1,6 @@
-classdef(Abstract) greensC0 < skpUnitTest.skpTestBase
-%skpUnitTest.greensC0 is the test class for G0.
+classdef(Abstract) greensC0 < skpUnitTest.greensTestBase
+%skpUnitTest.greensC0 specialises skpUnitTest.greensTestBase for the
+%Green's function wrt C0.
 
 % Everett Kropf, 2016
 % 
@@ -18,43 +19,16 @@ classdef(Abstract) greensC0 < skpUnitTest.skpTestBase
 % You should have received a copy of the GNU General Public License
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
-% properties(ClassSetupParameter)
-%     domainInput = struct(...
-%         'simple3', skpUnitTest.domainSimple3, ...
-%         'annulus3', skpUnitTest.domainAnnulus3);
-% end
-
 properties
-    pointMap = containers.Map(...
-        {'inner point', 'inner boundary'}, ...
-        {'innerPoint', 'innerBdryPoints'}, ...
-        'UniformValues', true)
+    gjObject
     
-    innerPoint
-    innerBdryPoints
-
-    g0object
-    
-    wprod
-    prodLevel = 6
-    g0prod
-    g0hatProd
-end
-
-methods(TestClassSetup)
-    function createProduct(test)
-        test.wprod = skprod(test.domain.dv, test.domain.qv, test.prodLevel);
-    end
-    
-    function initTestPoints(test)
-        test.innerBdryPoints = boundaryPts(test.domain, 5);
-        test.innerPoint = test.domainData.testPointInside;
-    end
+    gjProd
+    gjHatProd
 end
 
 methods(TestMethodSetup)
     function createObjectForTest(test)
-        test.g0object = greensC0(test.alpha, test.domain);
+        test.gjObject = greensC0(test.alpha, test.domain);
     end
        
     function specifyPotential(test)
@@ -67,49 +41,8 @@ methods(TestMethodSetup)
             g0p = @(z,a) logprat(z, a);
             g0hp = @(z,a) g0p(z, a) - log(z)/2i/pi;
         end
-        test.g0prod = g0p;
-        test.g0hatProd = g0hp;
-    end
-end
-
-methods(Test)
-    function hatCheck(test)
-        g0 = test.g0object;
-        test.compareAllPoints(...
-            @(z) exp(2i*pi*test.g0hatProd(z, test.alpha)), ...
-            @(z) exp(2i*pi*g0.hat(z)), 1e-4)
-    end
-    
-    function functionCheck(test)
-        g0 = test.g0object;
-        
-        test.compareAllPoints(...
-            @(z) exp(2i*pi*test.g0prod(z, test.alpha)), ...
-            @(z) exp(2i*pi*g0(z)), 1e-4)
-    end
-    
-    function hatVariableDerivative(test)
-        g0 = test.g0object;
-        
-        dg0h = diffh(g0, 1);
-        d2g0h = diffh(g0, 2);
-        
-        h = 1e-6;
-        d2ref = @(z) (dg0h(z + h) - dg0h(z - h))/2/h;
-        
-        test.compareAllPoints(d2ref, d2g0h, 1e-4)
-    end
-    
-    function functionVariableDerivative(test)
-        g0 = test.g0object;
-        
-        dg0 = diff(g0, 1);
-        d2g0 = diff(g0, 2);
-        
-        h = 1e-6;
-        d2ref = @(z) (dg0(z + h) - dg0(z - h))/2/h;
-        
-        test.compareAllPoints(d2ref, d2g0, 1e-4)
+        test.gjProd = g0p;
+        test.gjHatProd = g0hp;
     end
 end
 
