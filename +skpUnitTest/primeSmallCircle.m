@@ -1,4 +1,4 @@
-classdef primeSmallCircle < skpUnitTest.primeNewBase
+classdef primeSmallCircle < skpUnitTest.primeTestBase
 %skpUnitTest.primeSmallCircle tests the prime function with small circles.
 
 % Everett Kropf, 2016

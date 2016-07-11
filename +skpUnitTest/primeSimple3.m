@@ -1,4 +1,4 @@
-classdef primeSimple3 < skpUnitTest.primeNewBase
+classdef primeSimple3 < skpUnitTest.primeTestBase
 %skpUnitTest.primeSimple3 tests the prime function in a simple 3-connected
 %domain.
 

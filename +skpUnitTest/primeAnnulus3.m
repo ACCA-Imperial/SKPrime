@@ -1,4 +1,4 @@
-classdef primeAnnulus3 < skpUnitTest.primeNewBase
+classdef primeAnnulus3 < skpUnitTest.primeTestBase
 %skpUnitTest.PrimeAnnulus3 gives prime function tests for annular domain.
 
 % Everett Kropf, 2016

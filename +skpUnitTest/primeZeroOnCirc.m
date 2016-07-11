@@ -1,4 +1,4 @@
-classdef primeZeroOnCirc < skpUnitTest.primeNewBase
+classdef primeZeroOnCirc < skpUnitTest.primeTestBase
 %skpUnitTest.primeZeroOnCirc tests the origin on circle domain case.
 
 % Everett Kropf, 2016

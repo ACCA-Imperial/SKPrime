@@ -1,5 +1,5 @@
-classdef(Abstract) primeNewBase < skpUnitTest.skpTestBase
-%primeNewBase is abstract base class for testing prime functions.
+classdef(Abstract) primeTestBase < skpUnitTest.skpTestBase
+%primeTestBase is abstract base class for testing prime functions.
 
 % Everett Kropf, 2016
 % 

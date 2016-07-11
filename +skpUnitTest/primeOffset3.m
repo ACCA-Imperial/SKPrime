@@ -1,4 +1,4 @@
-classdef primeOffset3 < skpUnitTest.primeNewBase
+classdef primeOffset3 < skpUnitTest.primeTestBase
 %skpUnitTest.primeOffset3 are prime function tests for offset annular
 %domain.
 
