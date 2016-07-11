@@ -4,7 +4,6 @@ function result = skptests(select)
 % Unit tests (used as verification tests) are defined as subclasses of
 % matlab.unittest.TestCase in the skpUnitTest package.
 %
-% skptests
 % skptests prime
 %   Runs all the available tests for the prime function in the test suite.
 %
@@ -12,8 +11,10 @@ function result = skptests(select)
 %   Runs all the available tests for the Green's functions in the test
 %   suite.
 %
+% skptests
 % skptests all
-%   Runs all available tests in the SKPrime test suite.
+%   Runs all available tests in the SKPrime test suite. This is the
+%   default.
 %
 % skptests <string>
 %   Runs a test in the test suite specified by <string>. For example,
@@ -45,15 +46,15 @@ import matlab.unittest.TestRunner
 
 runner = TestRunner.withTextOutput('Verbosity', 2);
 
-suiteArgs = {'Name', 'skpUnitTest.prime*'};
+suiteArgs = {};
 if nargin
     switch select
         case 'prime'
-            % Now set as default.
+            suiteArgs = {'Name', 'skpUnitTest.prime*'};
         case {'greens'}
             suiteArgs = {'Name', 'skpUnitTest.greens*'};
         case 'all'
-            suiteArgs = {};
+            % This is the default above: suiteArgs = {};
         otherwise
             suiteArgs = {'Name', ['skpUnitTest.' select]};
     end
