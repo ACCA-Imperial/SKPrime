@@ -1,7 +1,7 @@
-classdef primeSmallCircle < skpUnitTest.primeTestBase
-%skpUnitTest.primeSmallCircle tests the prime function with small circles.
+classdef greensC0Annulus3 < skpUnitTest.greensC0
+%greensC0Annulus3 checks G0 in simple 3-connected domain.
 
-% Everett Kropf, 2016
+% E. Kropf, 2016
 % 
 % This file is part of SKPrime.
 % 
@@ -19,11 +19,11 @@ classdef primeSmallCircle < skpUnitTest.primeTestBase
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 properties(MethodSetupParameter)
-    parameterAt = skpUnitTest.domainSmallCircle.parameterLocations
+    parameterAt = {'inside', 'nearCirc1'};
 end
 
 properties
-    domainData = skpUnitTest.domainSmallCircle
+    domainData = skpUnitTest.domainAnnulus3
 end
 
 end

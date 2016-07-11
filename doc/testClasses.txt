@@ -1,0 +1,40 @@
+SKPrime test class schema
+(all in namespace skpUnitTest)
+
+The idea is that tests are done on a domain/parameter basis. One test class for each type of domain which specifies the paramater values to use for testing.
+
+* domainForTest is the test domain abstract base class.
+    * Properties:
+        * abstract properties dv, qv
+        * abstract properties `parameterInside` and `testPointOutside`
+        * dependant properties (see previous) `parameterOutside` and `testPointOutside`
+        * constant origin and infinity parameters
+        * default parameter keys and values
+        * default test point keys and values
+    * Provides .parameter('keyName') parameter access.
+    * Provides .testPoint('keyName') test point access.
+
+* domainXYZ is an example test domain.
+    * Fills in dv and qv for domain.
+    * Fills in the inside parameter and test point properties.
+
+* skpTestBase is the abstract base test class.
+    * Declares abstract method setup parameter `parameterAt`.
+    * Declares abstract `domainData` to hold `domainForTest` object.
+    * Declares abstract `pointMap` to hold a map container for the test points.
+    * Performs test class setup by getting a `skpDomain` ready.
+    * Performs test method setup by getting a parameter ready.
+    * Provides a `compareAllPoints` method for function testing at all available test points (relies on `pointMap` for list of points at which to test).
+
+* primeNewBase is the (still abstract) base class for prime function tests.
+    * Subclasses skpTestBase.
+    * Supplies `pointMap` for test points, with storage for the test points.
+    * Holds prime object and product formula object.
+    * On class setup:
+        * Setup test points, including boundary points (reads domain supplied test point).
+        * Create product formula.
+    * On method setup: creates the SKPrime object.
+
+* primeSimple3 uses the `domainSimple3` domain class.
+
+* primeAnnulus3 uses the `domainAnnulus3` domain class.

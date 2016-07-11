@@ -1,11 +1,8 @@
-classdef primeBasic < skpUnitTest.primeBase
-%primeBasic unit tests on 3-connected domain.
-%
-% Tests: see "methods(Test)" section of source file.
-%
-% See also skpUnitTest.primeBase
+classdef primeSimple3_np < matlab.unittest.TestCase
+%skpUnitTest.primeSimple3_np has unparameterized test cases for simple 3
+%domain.
 
-% Copyright Everett Kropf, 2015
+% Everett Kropf, 2016
 % 
 % This file is part of SKPrime.
 % 
@@ -23,58 +20,26 @@ classdef primeBasic < skpUnitTest.primeBase
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 properties
-    D = skpDomain([-0.2517+0.3129i, 0.2307-0.4667i], [0.2377, 0.1557])
+    domainData = skpUnitTest.domainSimple3
+end
+
+methods
+    function D = skpDomain(test)
+        D = skpDomain(...
+            test.domainData.dv, test.domainData.qv);
+    end
 end
 
 methods(Test)
-    function parameterInsideDisk(test)
-        checkViaSKProd(test, -0.3 - 0.3i)
-    end
-    
-    function parameterOutsideDisk(test)
-        checkViaSKProd(test, 1/conj(-0.3 - 0.3i))
-    end
-    
-    function parameterAtOrigin(test)
-        checkViaSKProd(test, 0)
-    end
-    
-    function parameterAtInfinity(test)
-        checkViaSKProd(test, inf)
-    end
-    
-    function parameterOnUnitCircle(test)
-        checkViaSKProd(test, exp(2i*pi*rand(1)))
-    end
-    
-    function parameterOnInnerBoundary(test)
-        d = test.D.dv(1);
-        q = test.D.qv(1);
-        alpha = d + q*exp(5i*pi/4);
-        checkViaSKProd(test, alpha)
-    end
-    
-    function parameterOnOuterBoundary(test)
-        d = test.D.dv(1);
-        q = test.D.qv(1);
-        alpha = 1/conj(d + q*exp(5i*pi/4));
-        checkViaSKProd(test, alpha)
-    end
-    
-    function parameterNearBoundary(test)
-        d = test.D.dv(1);
-        q = test.D.qv(1);
-        checkViaSKProd(test, d + q + 1e-6)
-    end
-    
     function unitRootCheckInner(test)
+        D = skpDomain(test);
         np = 200;
         zt = exp(2i*pi*(0:np-1)'/np);
         
         alpha1 = 0.6-0.192i;
-        w1 = skprime(alpha1, test.D);
+        w1 = skprime(alpha1, D);
         alpha2 = 0.6-0.191i;
-        w2 = skprime(alpha2, test.D);
+        w2 = skprime(alpha2, D);
         
         wt1 = w1(zt);
         wt2 = w2(zt);
@@ -88,14 +53,15 @@ methods(Test)
     end
     
     function unitRootCheckOuter(test)
+        D = skpDomain(test);
         np = 200;
         zt = exp(2i*pi*(0:np-1)'/np);
         zt = 1./conj(zt);
         
         alpha1 = 1/conj(0.6-0.192i);
-        w1 = skprime(alpha1, test.D);
+        w1 = skprime(alpha1, D);
         alpha2 = 1/conj(0.6-0.191i);
-        w2 = skprime(alpha2, test.D);
+        w2 = skprime(alpha2, D);
         
         wt1 = w1(zt);
         wt2 = w2(zt);

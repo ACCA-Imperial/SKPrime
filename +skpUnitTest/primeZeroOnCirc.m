@@ -1,5 +1,5 @@
-classdef primeSmallCircle < skpUnitTest.primeTestBase
-%skpUnitTest.primeSmallCircle tests the prime function with small circles.
+classdef primeZeroOnCirc < skpUnitTest.primeTestBase
+%skpUnitTest.primeZeroOnCirc tests the origin on circle domain case.
 
 % Everett Kropf, 2016
 % 
@@ -19,11 +19,11 @@ classdef primeSmallCircle < skpUnitTest.primeTestBase
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 properties(MethodSetupParameter)
-    parameterAt = skpUnitTest.domainSmallCircle.parameterLocations
+    parameterAt = skpUnitTest.domainZeroOnCirc.parameterLocations
 end
 
 properties
-    domainData = skpUnitTest.domainSmallCircle
+    domainData = skpUnitTest.domainZeroOnCirc
 end
 
 end

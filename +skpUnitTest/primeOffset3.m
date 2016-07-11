@@ -1,5 +1,6 @@
-classdef primeSmallCircle < skpUnitTest.primeTestBase
-%skpUnitTest.primeSmallCircle tests the prime function with small circles.
+classdef primeOffset3 < skpUnitTest.primeTestBase
+%skpUnitTest.primeOffset3 are prime function tests for offset annular
+%domain.
 
 % Everett Kropf, 2016
 % 
@@ -19,11 +20,11 @@ classdef primeSmallCircle < skpUnitTest.primeTestBase
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 properties(MethodSetupParameter)
-    parameterAt = skpUnitTest.domainSmallCircle.parameterLocations
+    parameterAt = skpUnitTest.domainOffset3.parameterLocations()
 end
 
 properties
-    domainData = skpUnitTest.domainSmallCircle
+    domainData = skpUnitTest.domainOffset3
 end
 
 end
