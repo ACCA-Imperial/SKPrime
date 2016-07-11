@@ -1,4 +1,4 @@
-function result = skptests(select)
+function result = skptests(subset, selector)
 %SKPTESTS runs unit tests for SKPrime.
 %
 % Unit tests (used as verification tests) are defined as subclasses of
@@ -22,6 +22,15 @@ function result = skptests(select)
 %   `skptests prime`. See the TestSuite.fromPackage documentation
 %   for more information on string format.
 %
+% skptests <string> <string>
+% The first string may be appended by another which indicates the set of
+% tests to run with `parameterAt` set explicitly by the second string. For
+% example
+%
+%    skptests prime nearCirc1
+%
+% runs all of the prime tests with `parameterAt=nearCirc1`.
+%
 % See also: matlab.unittest, matlab.unittest.TestSuite.fromPackage
 
 % Copyright Everett Kropf, 2015
@@ -43,12 +52,13 @@ function result = skptests(select)
 
 import matlab.unittest.TestSuite
 import matlab.unittest.TestRunner
+import matlab.unittest.selectors.HasParameter
 
 runner = TestRunner.withTextOutput('Verbosity', 2);
 
 suiteArgs = {};
-if nargin
-    switch select
+if nargin > 0
+    switch subset
         case 'prime'
             suiteArgs = {'Name', 'skpUnitTest.prime*'};
         case {'greens'}
@@ -56,9 +66,15 @@ if nargin
         case 'all'
             % This is the default above: suiteArgs = {};
         otherwise
-            suiteArgs = {'Name', ['skpUnitTest.' select]};
+            suiteArgs = {'Name', ['skpUnitTest.' subset]};
     end
 end
+
+if nargin > 1
+    s = HasParameter('Property', 'parameterAt', 'Name', selector);
+    suiteArgs = [{s}, suiteArgs];
+end
+
 tests = TestSuite.fromPackage('skpUnitTest', suiteArgs{:});
 
 rng('shuffle')
