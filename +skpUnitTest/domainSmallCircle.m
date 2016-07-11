@@ -1,5 +1,5 @@
-classdef primeSmallCircle < skpUnitTest.primeNewBase
-%skpUnitTest.primeSmallCircle tests the prime function with small circles.
+classdef domainSmallCircle < skpUnitTest.domainForTest
+%skpUnitTest.domainSmallCircle is a domain with small interior circles.
 
 % Everett Kropf, 2016
 % 
@@ -18,12 +18,19 @@ classdef primeSmallCircle < skpUnitTest.primeNewBase
 % You should have received a copy of the GNU General Public License
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
-properties(MethodSetupParameter)
-    parameterAt = skpUnitTest.domainSmallCircle.parameterLocations
+properties
+    dv = [-0.5; 0.5]
+    qv = [1e-4; 1e-4]
+    
+    parameterInside = 0.5i
+    testPointInside = -0.5i
 end
 
-properties
-    domainData = skpUnitTest.domainSmallCircle
+methods(Static)
+    function str = parameterLocationsWithout(varargin)
+        str = skpUnitTest.domainForTest.parameterLocationsWithout(...
+            'domainSmallCircle', varargin{:});
+    end
 end
 
 end
