@@ -19,7 +19,7 @@ classdef greensC0Annulus3 < skpUnitTest.greensC0
 % along with SKPrime.  If not, see <http://www.gnu.org/licenses/>.
 
 properties(MethodSetupParameter)
-    parameterAt = {'inside'};
+    parameterAt = {'inside', 'nearCirc1'};
 end
 
 properties
