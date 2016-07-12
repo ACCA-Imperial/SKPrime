@@ -84,8 +84,7 @@ methods
         gj.singCorrFact = sf;
         
         thja = d(j) + q(j)^2/conj(alpha - d(j));
-        loga = @(z) log((z - alpha)./(z - thja).*sf(z) ...
-            *q(j)/abs(alpha - d(j)))/(2i*pi);
+        loga = @(z) log((z - alpha)./(z - thja).*sf(z))/2i/pi;
         gj.logaFun = loga;
         
         % Known part on the boundary.
