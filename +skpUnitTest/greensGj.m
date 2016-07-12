@@ -50,6 +50,9 @@ methods(TestMethodSetup)
 end
 
 methods(Test)
+    % These override the usual checks until diff() and diffh() are added to
+    % the greensCj class. Delete these overrides at that time.
+    
     function hatVariableDerivative(test)
         gj = test.gjObject;
         try
