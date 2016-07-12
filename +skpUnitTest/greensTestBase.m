@@ -55,7 +55,8 @@ methods(Test)
         gj = test.gjObject;
         test.compareAllPoints(...
             @(z) exp(2i*pi*test.gjHatProd(z, test.alpha)), ...
-            @(z) exp(2i*pi*gj.hat(z)), 1e-4)
+            @(z) exp(2i*pi*gj.hat(z)), ...
+            1e-4)
     end
     
     function functionCheck(test)
@@ -63,7 +64,8 @@ methods(Test)
         
         test.compareAllPoints(...
             @(z) exp(2i*pi*test.gjProd(z, test.alpha)), ...
-            @(z) exp(2i*pi*gj(z)), 1e-4)
+            @(z) exp(2i*pi*gj(z)), ...
+            1e-4)
     end
     
     function hatVariableDerivative(test)
