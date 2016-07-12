@@ -255,8 +255,14 @@ methods
     
     function v = theta(D, j, z)
         %Schottky generator theta_j.
+  
+        dj = D.dv(j);
+        qj = D.qv(j);
         
-        v = D.dv(j) + D.qv(j)^2*z./(1 - conj(D.dv(j))*z);
+        v = complex(nan(size(z)));
+        zf = ~isinf(z);
+        v(~zf) = dj - qj^2/conj(dj);
+        v(zf) = dj + qj^2*z(zf)./(1 - conj(dj)*z(zf));
     end
     
     function ostr = char(D)
