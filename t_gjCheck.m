@@ -9,9 +9,11 @@ L = 6;
 
 td = skpUnitTest.domainSimple3;
 D = skpDomain(td);
-[dv, qv] = domainData(D);
+% [dv, qv] = domainData(D);
+dj = D.dv(j);
+qj = D.qv(j);
 
-alpha = td.parameter('inside');
+alpha = td.parameter('origin');
 tp = td.testPoint('inside');
 
 thj = @(z) D.theta(j, z);
@@ -26,9 +28,9 @@ ehgj = @(z) exp(2i*pi*gj.hat(z));
 wtop = skprime(alpha, gj);
 wbot = skprime(thj(1/conj(alpha)), wtop);
 
-ref1 = @(z) wtop(z)./wbot(z)*qv(j)/abs(alpha - dv(j));
-refh = @(z) ref1(z)...
-     ./(z - alpha).*(z - thj(1/conj(alpha)))/qv(j)*abs(alpha - dv(j));
+refj = @(z) wtop(z)./wbot(z)*qj/abs(alpha - dj);
+refh = @(z) refj(z)./(z - alpha).*(z - thj(1/conj(alpha)));
 
+% err = refj(tp) - egj(tp);
 err = refh(tp) - ehgj(tp);
 disp(err)
