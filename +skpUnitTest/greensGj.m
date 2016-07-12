@@ -42,8 +42,10 @@ methods(TestMethodSetup)
         qj = test.domain.qv(j);
         thj = @(z) test.domain.theta(j, z);
         
-        logprat = @(z,a) log(wp(z, a)./wp(z, thj(1/conj(a))))/2i/pi;
-        test.gjProd = @(z,a) logprat(z, a) - log(qj/abs(a - dj));
+%         logprat = @(z,a) log(wp(z, a)./wp(z, thj(1/conj(a))))/2i/pi;
+%         test.gjProd = @(z,a) logprat(z, a) + log(qj/abs(a - dj))/2i/pi;
+        test.gjProd = @(z,a) log(wp(z, a)./wp(z, thj(1/conj(a))) ...
+            *qj/abs(a - dj))/2i/pi;
         test.gjHatProd = @(z,a) ...
             test.gjProd(z, a) - log((z - a)./(z - thj(1/conj(a))))/2i/pi;
     end
