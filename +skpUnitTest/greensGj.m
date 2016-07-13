@@ -22,6 +22,9 @@ classdef(Abstract) greensGj < skpUnitTest.greensTestBase
 properties
     gjObject
     
+    gjRefFun
+    gjRefHat
+    
     gjProd
     gjHatProd
 end
@@ -48,7 +51,22 @@ end
 methods(TestMethodSetup)
     function createObjectForTest(test)
         test.gjObject = greensCj(test.alpha, test.jCircle, test.domain);
-    end    
+    end
+    
+    function specifyReferenceFunctions(test)
+        j = test.jCircle;
+        dj = test.domain.dv(j);
+        qj = test.domain.qv(j);
+        thj = @(z) test.domain.theta(j, z);
+        alpha = test.alpha;
+        
+        wt = skprime(alpha, test.domain);
+        wb = skprime(thj(1/conj(alpha)), wt);
+        
+        test.gjRefFun = @(z) log(wt(z)./wb(z)*qj/abs(alpha - dj))/2i/pi;
+        test.gjRefHat = @(z) test.gjRefFun(z) ...
+            - log((z - alpha)./(z - thj(1/conj(alpha))))/2i/pi;
+    end
 end
 
 methods(Test)

@@ -35,6 +35,9 @@ end
 properties(Abstract)
     gjObject
     
+    gjRefRun
+    gjRefHat
+    
     gjProd
     gjHatProd
 end
@@ -52,20 +55,17 @@ end
 
 methods(Test)
     function hatCheck(test)
-        gj = test.gjObject;
         test.compareAllPoints(...
-            @(z) exp(2i*pi*test.gjHatProd(z, test.alpha)), ...
-            @(z) exp(2i*pi*gj.hat(z)), ...
-            1e-4)
+            @(z) exp(2i*pi*test.gjRefHat(z)), ...
+            @(z) exp(2i*pi*test.gjObject.hat(z)), ...
+            1e-6)
     end
     
-    function functionCheck(test)
-        gj = test.gjObject;
-        
+    function functionCheck(test)        
         test.compareAllPoints(...
-            @(z) exp(2i*pi*test.gjProd(z, test.alpha)), ...
-            @(z) exp(2i*pi*gj(z)), ...
-            1e-4)
+            @(z) exp(2i*pi*test.gjRefFun(z)), ...
+            @(z) exp(2i*pi*test.gjObject(z)), ...
+            1e-6)
     end
     
     function hatVariableDerivative(test)

@@ -22,6 +22,9 @@ classdef(Abstract) greensC0 < skpUnitTest.greensTestBase
 properties
     gjObject
     
+    gjRefFun
+    gjRefHat
+    
     gjProd
     gjHatProd
 end
@@ -55,7 +58,30 @@ methods(TestMethodSetup)
     function createObjectForTest(test)
         test.gjObject = greensC0(test.alpha, test.domain);
     end
+    
+    function specifyReferenceFunctions(test)
+        alpha = test.alpha;
+        wt = skprime(alpha, test.domain);
+        wb = invParam(wt);
+        
+        function g0 = g0fun(z)
+            g0 = log(wt(z)./wb(z))/2i/pi;
+            if alpha ~= 0
+                g0 = g0 - log(abs(alpha))/2i/pi;
+            end
         end
+        
+        function g0h = g0hat(z)
+            g0h = g0fun(z);
+            if alpha ~= 0
+                g0h = g0h - log((z - alpha)./(z - 1/conj(alpha)))/2i/pi;
+            else
+                g0h = g0h - log(z)/2i/pi;
+            end
+        end
+        
+        test.gjRefFun = @g0fun;
+        test.gjRefHat = @g0hat;
     end
 end
 
