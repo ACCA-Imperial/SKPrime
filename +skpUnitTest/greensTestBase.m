@@ -35,7 +35,7 @@ end
 properties(Abstract)
     gjObject
     
-    gjRefRun
+    gjRefFun
     gjRefHat
     
     gjProd
