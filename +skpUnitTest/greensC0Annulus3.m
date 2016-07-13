@@ -1,7 +1,7 @@
 classdef greensC0Annulus3 < skpUnitTest.greensC0
 %greensC0Annulus3 checks G0 in simple 3-connected domain.
 
-% E. Kropf, 2016
+% Everett Kropf, 2016
 % 
 % This file is part of SKPrime.
 % 
