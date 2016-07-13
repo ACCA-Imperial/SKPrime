@@ -30,12 +30,8 @@ properties(Abstract)
     jCircle
 end
 
-methods(TestMethodSetup)
-    function createObjectForTest(test)
-        test.gjObject = greensCj(test.alpha, test.jCircle, test.domain);
-    end
-    
-    function specifyPotential(test)
+methods(TestClassSetup)
+    function specifyReferencePotential(test)
         wp = test.wprod;
         j = test.jCircle;
         dj = test.domain.dv(j);
@@ -47,6 +43,12 @@ methods(TestMethodSetup)
         test.gjHatProd = @(z,a) ...
             test.gjProd(z, a) - log((z - a)./(z - thj(1/conj(a))))/2i/pi;
     end
+end
+
+methods(TestMethodSetup)
+    function createObjectForTest(test)
+        test.gjObject = greensCj(test.alpha, test.jCircle, test.domain);
+    end    
 end
 
 methods(Test)

@@ -26,23 +26,36 @@ properties
     gjHatProd
 end
 
+methods(TestClassSetup)
+    function specifyReferenceProducts(test)
+        wp = test.wprod;
+        
+        function g0 = g0prod(z, a)
+            g0 = log(wp(z, a)./wp(z, 1/conj(a)))/2i/pi;
+            if a ~= 0
+                g0 = g0 - log(abs(a))/2i/pi;
+            end
+        end
+        
+        function g0h = g0hprod(z, a)
+            g0h = g0prod(z, a);
+            if a ~= 0
+                g0h = g0h - log((z - a)./(z - 1/conj(a)))/2i/pi;
+            else
+                g0h = g0h - log(z)/2i/pi;
+            end
+        end
+
+        test.gjProd = @g0prod;
+        test.gjHatProd = @g0hprod;
+    end
+end
+
 methods(TestMethodSetup)
     function createObjectForTest(test)
         test.gjObject = greensC0(test.alpha, test.domain);
     end
-       
-    function specifyPotential(test)
-        wp = test.wprod;
-        logprat = @(z,a) log(wp(z,a)./wp(z, 1/conj(a)))/2i/pi;
-        if test.alpha ~= 0
-            g0p = @(z,a) logprat(z, a) - log(abs(a))/2i/pi;
-            g0hp = @(z,a) g0p(z, a) - log((z - a)./(z - 1/conj(a)))/2i/pi;
-        else
-            g0p = @(z,a) logprat(z, a);
-            g0hp = @(z,a) g0p(z, a) - log(z)/2i/pi;
         end
-        test.gjProd = g0p;
-        test.gjHatProd = g0hp;
     end
 end
 
