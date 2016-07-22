@@ -228,7 +228,7 @@ methods
         tf = false(size(z));
         j = nan(size(z));
         
-        on = (abs(z) - 1) < eps(2);
+        on = abs(abs(z) - 1) < eps(2);
         if any(on(:))
             tf(on) = true;
             j(on) = 0;
@@ -236,7 +236,7 @@ methods
         
         [d, q, mu] = domainData(D);
         for i = 1:mu
-            on = (abs(z - d(i)) - q(i)) < eps(2);
+            on = abs(abs(z - d(i)) - q(i)) < eps(2);
             if any(on(:))
                 tf(on) = true;
                 j(on) = i;
