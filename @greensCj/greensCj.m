@@ -54,12 +54,15 @@ methods
         if ~nargin
             return
         end
-        
+
+        if j < 1 || gj.domain.m < j
+            error('The argument "j" must index an inner boundary circle.')
+        end
         gj.boundary = j;
+        
         alpha = skpParameter(alpha, gj.domain);
         gj.parameter = alpha;
-        [d, q] = domainData(gj.domain);
-        
+
         if ~isempty(alpha.ison) && alpha.ison == j
             % Alpha on C_j is const zero.
             gj.logaFun = @(z) zeros(size(z));
@@ -70,20 +73,11 @@ methods
             error('SKPrime:invalidArgument', ...
                 'The BVP for Gj with infinite alpha is not yet defined.')
         end
-        
-        sf = @(z) 1;
-        ak = abs(alpha - d);
-        ak = find(q + eps(2) < ak & ak < q + 0.1);
-        for k = ak(ak ~= j)'
-            thka = d(k) + q(k)^2/conj(alpha - d(k));
-            sf = @(z) sf(z).*(z - d(k))./(z - thka);
-        end
-        if 0.9 < abs(alpha) && abs(alpha) < 1 - eps(2)
-            sf = @(z) sf(z)./(z - 1/conj(alpha));
-        end
+
+        sf = SKP.SingularityCorrectionGj(alpha, j, gj.domain);
         gj.singCorrFact = sf;
         
-        thja = d(j) + q(j)^2/conj(alpha - d(j));
+        thja = gj.domain.theta(j, 1/conj(alpha));
         loga = @(z) log((z - alpha)./(z - thja).*sf(z))/2i/pi;
         gj.logaFun = loga;
         
@@ -107,6 +101,54 @@ methods
             + log(sf(alpha))/(2i*pi));
     end
     
+    function dgj = diff(gj, n)
+        %gives the variable derivative of the Green's function.
+        %
+        % dgj = diff(gj)
+        % dgj = diff(gj, n)
+        %   Returns function handle to derivative of g0 with respect to the
+        %   variable by way of DFT on the boundary and Cauchy continuation
+        %   for the interior. Derivative is restricted to the unit disk.
+        %   The order of the derivative is given by n, which is computed
+        %   by recursive application (default n=1).
+        
+        alpha = gj.parameter;
+        if ~isempty(alpha.ison) && alpha.ison == gj.boundary
+            dgj = @(z) complex(zeros(size(z)));
+            return
+        end
+        
+        if nargin < 2
+            n = 1;
+        end
+        
+        dgjh = diffh(gj, n);
+        dmult = (-1)^(n-1)*factorial(n-1);
+        dsf = diff(gj.singCorrFact);
+        thja = gj.domain.theta(gj.boundary, 1/conj(alpha));
+
+        dgj = @(z) dgjh(z) + ...
+            (dmult*(1./(z - alpha).^n - 1./(z - thja).^n) + dsf(z))/2i/pi;
+    end
+    
+    function dgh = diffh(gj, n)
+        %gives derivative of the analytic part wrt zeta variable.
+        %
+        % dgh = diffh(gj)
+        % dgh = diffh(gj, n)
+        %   Returns function handle to derivative of g0.hat by way of
+        %   DFT on the boundary and Cauchy continuation for the interior.
+        %   Derivative is restricted to the unit disk. The order of the
+        %   derivative is given by integer n > 0 (default = 1), computed by
+        %   recursive application of the DFT.
+        
+        if nargin < 2
+            n = 1;
+        end
+        
+        dgh = dftDerivative(gj, @gj.hat, n);
+    end
+    
     function dgp = diffp(gj)
         %gives derivative with respect to parameter.
         %
@@ -118,26 +160,13 @@ methods
     end
     
     function v = feval(gj, z)
-        v = complex(nan(size(z)));
+        %provides function evaluation for the Green's function.
         
-        inUnit = abs(z) <= 1 + eps(2);
-        notNan = ~isnan(z);
-        idx = inUnit & notNan;
-        if any(idx(:))
-            v(idx) = gj.logPlus(z(idx));
-        end
-        idx = ~inUnit & notNan;
-        if any(idx(:))
-            v(idx) = conj(gj.logPlus(1./conj(z(idx))));
-        end
+        v = gj.logaFun(z) + gj.hat(z);
     end
     
     function v = hat(gj, z)
-        v = bvpEval(gj, z);
-    end
-    
-    function v = logPlus(gj, z)
-        v = gj.logaFun(z) + gj.hat(z) - gj.normConstant;
+        v = bvpEval(gj, z) - gj.normConstant;
     end
 end
 
