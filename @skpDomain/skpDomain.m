@@ -220,6 +220,8 @@ methods
         for j = 1:mu
             tf(abs(z - d(j)) <= q(j) + eps(2)) = false;
         end
+        disp(tf)
+%         error('exiting')
     end
     
     function [tf, j] = ison(D, z)
@@ -263,6 +265,18 @@ methods
         zf = ~isinf(z);
         v(~zf) = dj - qj^2/conj(dj);
         v(zf) = dj + qj^2*z(zf)./(1 - conj(dj)*z(zf));
+    end
+    
+    function v = itheta(D, j, z)
+        %Inverse of the Schottky generator theta_j.
+  
+        dj = D.dv(j);
+        qj = D.qv(j);
+        
+        v = complex(nan(size(z)));
+        zf = ~isinf(z);
+        v(~zf) = 1/conj(dj);
+        v(zf) = (z-dj)./(conj(dj)*(z-dj)+qj^2);
     end
     
     function ostr = char(D)
