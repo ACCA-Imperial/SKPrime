@@ -36,6 +36,7 @@ properties(SetAccess=protected)
     contFun
     
     thetaj
+    ithetaj
 end
 
 properties(Dependent)
@@ -62,6 +63,7 @@ methods
         vj.boundary = j;
         [d, q] = domainData(vj.domain);
         vj.thetaj = @(z) d(j) + q(j)^2*z./(1 - conj(d(j))*z);
+        vj.ithetaj = @(z) (z - d(j))./(conj(d(j))*(z - d(j)) + q(j)^2);
         
         if abs(d(j)) > q(j)
             % "double" circle center.
@@ -152,7 +154,8 @@ methods
     
     function v = feval(vj, z)
         D = vj.domain;
-        thj = vj.thetaj;
+%         thj = vj.thetaj;
+        ithj = vj.ithetaj;
         tjj = vj.taujj;
         
         v = complex(nan(size(z)));
@@ -164,12 +167,12 @@ methods
             v(mask) = vj.logPlus(z(mask));
         end
         
-        % Points in first reflection in to C_j.
+        % Points in first reflection in to C_j'.
         done = mask;
         mask(mask) = false;
-        mask(~done) = isin(D, thj(1./conj(z(~done)))) & notNan(~done);
+        mask(~done) = isin(D, ithj(1./conj(z(~done)))) & notNan(~done);
         if any(mask(:))
-            v(mask) = conj(vj.logPlus(thj(1./conj(z(mask)))) - tjj);
+            v(mask) = conj(vj.logPlus(ithj(1./conj(z(mask)))) - tjj);
         end
         
         % Points in D_zeta' (or on the outer boundary).
@@ -181,12 +184,12 @@ methods
             v(mask) = conj(vj.logPlus(1./conj(z(mask))));
         end
         
-        % Points in first reflection into C_j'.
+        % Points in first reflection into C_j.
         done = done | mask;
         mask(mask) = false;
-        mask(~done) = isin(D, thj(z(~done))) & notNan(~done);
+        mask(~done) = isin(D, ithj(z(~done))) & notNan(~done);
         if any(mask(:))
-            v(mask) = vj.logPlus(thj(z(mask))) - tjj;
+            v(mask) = vj.logPlus(ithj(z(mask))) - tjj;
         end
     end
     
