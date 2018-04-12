@@ -220,8 +220,6 @@ methods
         for j = 1:mu
             tf(abs(z - d(j)) <= q(j) + eps(2)) = false;
         end
-        disp(tf)
-%         error('exiting')
     end
     
     function [tf, j] = ison(D, z)
