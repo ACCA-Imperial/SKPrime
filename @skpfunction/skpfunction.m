@@ -241,11 +241,11 @@ methods
         %
         %See also skpfunction/diffXp.
         
-        warning('SKPrime:underDevelopment', ...
-            'This method is under development. Do not trust its output.')
-
+%         warning('SKPrime:underDevelopment', ...
+%             'This method is under development. Do not trust its output.')
+        
         dXp = diffXp(skp);
-        dwp = @(z) dXp(z)./sqrt(skp.X(z))/2;
+        dwp = @(z) dXp(z)./feval(skp,z)/2;
     end
     
     function dX = diffX(skp, n)
