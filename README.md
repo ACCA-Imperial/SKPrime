@@ -12,7 +12,7 @@ When citing this software please mention the URL of the master repository (https
 
 ### How do I get set up? ###
 
-* Download a zip (or tar.gz) of the [current release](https://github.com/ehkropf/SKPrime/releases/latest).
+* Download a zip (or tar.gz) of the [current release](https://github.com/ACCA-Imperial/SKPrime/releases/tag/v0.1.5).
 * Unpack the zip somewhere.
 * Run the `install.m` function from MATLAB in the directory you've just unzipped.
     * This will put the SKPrime directory on your MATLAB search path.
